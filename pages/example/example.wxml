@@ -1,0 +1,2 @@
+<!--src/pages/xml2can/xml2can.wxml-->
+<painter style='position:absolute;left:40rpx' palette="{{template}}" bind:imgOK="onImgOK" />

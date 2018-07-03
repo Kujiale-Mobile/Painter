@@ -1,0 +1,11 @@
+/* src/pages/xml2can/xml2can.wxss */
+
+.container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: blue;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
