@@ -1,3 +1,5 @@
+# Painter
+
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
 
 由于我们无法将小程序直接分享到朋友圈，但分享到朋友圈的需求目前又很多，目前业界的做法是利用小程序的 Canvas 功能生成一张带有二维码的图片，然后引导用户下载图片到本地后再分享到朋友圈。而小程序 Canvas 功能是很难用的，往往为了绘制一张简单图片，就得写上一堆 boilerplate code 。如果此时一个小程序中包含多个绘图的需求，那绝壁要疯。另外 Canvas 上有很多绘图的坑，肯定会让你疯上加疯。
@@ -24,24 +26,35 @@
 
 ## 使用方法
 
-1. 作为自定义组件引入
+1. 引入代码
 
-```
-"usingComponents":{
-  "painter":"/components/painter/painter"
-}
-```
+   可以在主项目下执行以下命令，通过 submodule 的方式引入 painter 组件。建议是在 components 目录下。
 
-2. 组件接收 `palette` 字段作为画图数据的数据源, 图案数据以json形式存在，推荐使用“皮肤模板”的方法进行传递，示例代码如下：
+   ```
+   git submodule add https://github.com/Kujiale-Mobile/PainterCore.git painter
+   ```
 
-    <painter palette="{{data}}" bind:imgOK="onImgOK" />
+2. 作为自定义组件引入，注意目录为第一步引入的代码所在目录
 
-3. 数据传入后，则会自动进行绘图。绘图完成后，你可以通过绑定 imgOK 或 onImgErr 事件来获得成功后的图片 或失败的原因。
+   ```
+   "usingComponents":{
+     "painter":"/components/painter/painter"
+   }
+   ```
 
-```
-bind:imgOK="onImgOK"
-bind:imgErr="onImgErr"
-```
+3. 组件接收 `palette` 字段作为画图数据的数据源, 图案数据以json形式存在，推荐使用“皮肤模板”的方法进行传递，示例代码如下：
+
+   ```
+   <painter palette="{{data}}" bind:imgOK="onImgOK" />
+   ```
+
+
+4. 数据传入后，则会自动进行绘图。绘图完成后，你可以通过绑定 imgOK 或 onImgErr 事件来获得成功后的图片 或失败的原因。
+
+   ```
+   bind:imgOK="onImgOK"
+   bind:imgErr="onImgErr"
+   ```
 
 ## Palette 规范
 
@@ -121,3 +134,20 @@ views: 里面承载子 view
 
 
 
+## License
+
+```
+Copyright (c) 2018 Kujiale
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
