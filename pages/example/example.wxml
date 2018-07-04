@@ -1,2 +1,4 @@
-<!--src/pages/xml2can/xml2can.wxml-->
-<painter style='position:absolute;left:40rpx' palette="{{template}}" bind:imgOK="onImgOK" />
+<view>
+  <painter customStyle='margin-left:40rpx' palette="{{template}}" bind:imgOK="onImgOK" />
+  <button style='position:relative;margin-top:50rpx' bind:tap='saveImage'>保存</button>
+</view>

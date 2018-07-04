@@ -32,8 +32,8 @@ export default class LastMayday {
           type: 'qrcode',
           content: 'https://github.com/Kujiale-Mobile',
           css: {
-            left: '20rpx',
-            bottom: '20rpx',
+            left: '30rpx',
+            bottom: '30rpx',
             width: '100rpx',
             height: '100rpx',
           },

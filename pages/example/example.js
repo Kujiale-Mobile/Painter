@@ -2,6 +2,7 @@ import Card from '../../palette/card';
 
 // src/pages/xml2can/xml2can.js
 Page({
+  imagePath: '',
   card: new Card(),
   userInfo: {
     avatar: 'https://qhyxpicoss.kujiale.com/r/2017/12/04/L3D123I45VHNYULVSAEYCV3P3X6888_3200x2400.jpg@!70q',
@@ -15,9 +16,13 @@ Page({
   },
 
   onImgOK(e) {
+    this.imagePath = e.detail.path;
     console.log(e);
+  },
+
+  saveImage() {
     wx.saveImageToPhotosAlbum({
-      filePath: e.detail.path,
+      filePath: this.imagePath,
     })
   },
 

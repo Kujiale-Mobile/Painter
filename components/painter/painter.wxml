@@ -1,1 +1,1 @@
-<canvas canvas-id="k-canvas" style="{{painterStyle}}" />
+<canvas canvas-id="k-canvas" style="{{painterStyle}}{{customStyle}}" />

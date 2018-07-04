@@ -10,6 +10,9 @@ Component({
    * 组件的属性列表
    */
   properties: {
+    customStyle: {
+      type: String,
+    },
     palette: {
       type: Object,
       observer: function (newVal, oldVal) {
