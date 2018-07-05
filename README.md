@@ -36,6 +36,8 @@ git clone https://github.com/Kujiale-Mobile/Painter.git --recursive
 
 代码下载后，用小程序 IDE 打开后即可使用。
 
+**注：请选择小程序项目，非小游戏**
+
 
 
 ### 使用 Painter
