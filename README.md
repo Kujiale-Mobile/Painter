@@ -34,7 +34,7 @@
 git clone https://github.com/Kujiale-Mobile/Painter.git --recursive
 ```
 
-代码下载后，用小程序 IDE 打开后即可使用。
+代码下载后，用小程序 IDE 打开后即可使用。如果需要同步项目到最新代码，注意同步主工程后，用 `git submodule update` 更新下 PainterCore。
 
 **注：请选择小程序项目，非小游戏**
 
@@ -112,6 +112,7 @@ views: 里面承载子 view
 | rotate                | 旋转，按照顺时针旋转的度数，默认不旋转                      |
 | borderRadius          | 边界圆角程度，如果是正方形布局，该属性为一半宽或高时，则为圆形          |
 | top、right、bottom、left | 如 css 中为 absolute 布局时的作用，默认 top 和 left 为 0 |
+| align                 | center：中间对齐方式；right：右对齐方式；left：左对齐方式（默认，可不写） |
 
 ### 尺寸即其他
 
@@ -151,6 +152,10 @@ views: 里面承载子 view
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/first.png)
 
 
+
+## How To Contribute
+
+因 Painter 的核心库部分在 https://github.com/Kujiale-Mobile/PainterCore.git 中，所以你需要同时 fork 该库，修改调试通过后。需要同时在 PainterCore 和 Painter 两个库上提交 PR。
 
 ## License
 
