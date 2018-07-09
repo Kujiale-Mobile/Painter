@@ -26,15 +26,13 @@
 
 ### 运行例子
 
-因该项目为 submodule 管理方式。首次 clone 代码时，需加上 `--recursive` 参数。
-
 ```
-git clone https://github.com/Kujiale-Mobile/Painter.git --recursive
+git clone https://github.com/Kujiale-Mobile/Painter.git
 ```
 
 代码下载后，用小程序 IDE 打开后即可使用。
 
-**注：请选择小程序项目，非小游戏**
+**注：请选择小程序项目，非小游戏，例子中无 appid，所以无法在手机上运行，如果需要真机调试，请在打开例子时，填上自己的小程序 id**  
 
 
 
