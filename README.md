@@ -6,11 +6,9 @@
 
 这边说上几个小程序 Canvas 的坑：
 
-1， Canvas 绘图是用的 px，而在小程序中我们一般使用 rpx 进行相对布局。
-
-2，小程序的 drawCanvas 方法，在 IDE 中可以直接设置网络图片进行绘制，但在真机上设置网络图片无用。
-
-3，canvasContext.clip 方法在 iOS 设备上 微信 6.6.6 版本及以下有 bug，会导致该 clip 下面使用的的 restore 方法失效。
+1. Canvas 绘图是用的 px，而在小程序中我们一般使用 rpx 进行相对布局。
+2. 小程序的 drawCanvas 方法，在 IDE 中可以直接设置网络图片进行绘制，但在真机上设置网络图片无用。
+3. canvasContext.clip 方法在 iOS 设备上 微信 6.6.6 版本及以下有 bug，会导致该 clip 下面使用的的 restore 方法失效。
 
 
 
@@ -34,7 +32,7 @@
 git clone https://github.com/Kujiale-Mobile/Painter.git --recursive
 ```
 
-代码下载后，用小程序 IDE 打开后即可使用。如果需要同步项目到最新代码，注意同步主工程后，用 `git submodule update` 更新下 PainterCore。
+代码下载后，用小程序 IDE 打开后即可使用。
 
 **注：请选择小程序项目，非小游戏**
 
@@ -44,10 +42,19 @@ git clone https://github.com/Kujiale-Mobile/Painter.git --recursive
 
 1. 引入代码
 
-   可以在主项目下执行以下命令，通过 submodule 的方式引入 painter 组件。建议是在 components 目录下。
+   Painter 的核心代码在另一个 repo 中，https://github.com/Kujiale-Mobile/PainterCore.git。你可以通过以下三种方式进行库的引入：
+
+   一，直接下载代码，拷贝代码到你需要的库中。（不推荐）
+
+   二，submodule 的方式。可以在主项目下执行以下命令。如后续需更新代码，则到对应目录下 pull 最新的代码即可。（推荐）
 
    ```
-   git submodule add https://github.com/Kujiale-Mobile/PainterCore.git painter
+   git submodule add https://github.com/Kujiale-Mobile/PainterCore.git components/painter
+   ```
+   三，subtree 的方式。也一样是在主项目中执行命令。代码更新要复杂点，submodule 和 subtree 的区别请自行 Google。
+
+   ```
+   git subtree add --prefix=components/painter https://github.com/Kujiale-Mobile/PainterCore.git master
    ```
 
 2. 作为自定义组件引入，注意目录为第一步引入的代码所在目录
@@ -150,12 +157,6 @@ views: 里面承载子 view
 绘制效果如下
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/first.png)
-
-
-
-## How To Contribute
-
-因 Painter 的核心库部分在 https://github.com/Kujiale-Mobile/PainterCore.git 中，所以你需要同时 fork 该库，修改调试通过后。需要同时在 PainterCore 和 Painter 两个库上提交 PR。
 
 ## License
 
