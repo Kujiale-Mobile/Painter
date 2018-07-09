@@ -40,7 +40,7 @@ git clone https://github.com/Kujiale-Mobile/Painter.git
 
 1. 引入代码
 
-   Painter 的核心代码在另一个 repo 中，https://github.com/Kujiale-Mobile/PainterCore.git。你可以通过以下三种方式进行库的引入：
+   Painter 的核心代码在另一个 repo 中，https://github.com/Kujiale-Mobile/PainterCore.git 。你可以通过以下三种方式进行库的引入：
 
    一，直接下载代码，拷贝代码到你需要的库中。（不推荐）
 
