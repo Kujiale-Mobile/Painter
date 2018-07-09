@@ -2,19 +2,21 @@
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
 
-由于我们无法将小程序直接分享到朋友圈，但分享到朋友圈的需求目前又很多，业界目前的做法是利用小程序的 Canvas 功能生成一张带有二维码的图片，然后引导用户下载图片到本地后再分享到朋友圈。而小程序 Canvas 功能是很难用的，往往为了绘制一张简单图片，就得写上一堆 boilerplate code 。如果此时一个小程序中包含多个绘图的需求，那绝壁要疯。另外 Canvas 上有很多绘图的坑，肯定会让你疯上加疯。
+由于我们无法将小程序直接分享到朋友圈，但分享到朋友圈的需求又很多，业界目前的做法是利用小程序的 Canvas 功能生成一张带有二维码的图片，然后引导用户下载图片到本地后再分享到朋友圈。而小程序 Canvas 功能是很难用的，往往为了绘制一张简单图片，就得写上一堆 boilerplate code ，而且一不小心还会踩到 Canvas 的各种彩蛋（坑）。我想此时你的心情肯定是这样的。
 
-这边说上几个小程序 Canvas 的坑：
+![](https://ws3.sinaimg.cn/large/52eb2279ly1fig620lx34j207g07g77v.jpg)
+
+这边说上几个小程序 Canvas 的坑
 
 1. Canvas 绘图是用的 px，而在小程序中我们一般使用 rpx 进行相对布局。
-2. 小程序的 drawCanvas 方法，在 IDE 中可以直接设置网络图片进行绘制，但在真机上设置网络图片无用。
-3. canvasContext.clip 方法在 iOS 设备上 微信 6.6.6 版本及以下有 bug，会导致该 clip 下面使用的的 restore 方法失效。
+2. 小程序 Canvas 中的 drawImage 方法，在 IDE 中可以直接设置网络图片进行绘制，但在真机上设置网络图片无用。
+3. canvasContext.clip 方法在 iOS 设备上的微信 6.6.6 版本及以下有 bug，会导致该 clip 下面使用的的 restore 方法失效。
 
 
 
 ## 画家计划
 
-想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹。那我们就想到可不可以做一款可以很方便生成图片的库，而且还能屏蔽掉直接使用 Canvas 的那些坑呢。所以我们发起了 “画家计划— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
+想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹。那我们就想到可不可以做一款可以很方便生成图片，并且还能屏蔽掉直接使用 Canvas 的一些坑的库呢？所以我们发起了 “`画家计划`— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
 
 ![整体架构](http://7xq276.com2.z0.glb.qiniucdn.com/painter.png)
 
@@ -148,13 +150,16 @@ views: 里面承载子 view
       height: '192rpx',
     },
   }
+  ...
   ],
 }
 ```
 
 绘制效果如下
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/first.png)
+![](http://7xq276.com2.z0.glb.qiniucdn.com/2.png)
+
+![](https://ws4.sinaimg.cn/large/006tNc79ly1fig7q9k5nuj30cq06zgm7.jpg)
 
 ## License
 
