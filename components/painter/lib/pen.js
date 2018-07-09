@@ -75,7 +75,7 @@ export default class Painter {
   _doBorder(borderRadius, width, height) {
     if (borderRadius && width && height) {
       const r = Math.min(borderRadius.toPx(), width / 2, height / 2);
-
+      this.ctx.setFillStyle("rgba(0, 0, 0, 0)");
       this.ctx.beginPath();
       this.ctx.arc(-width / 2 + r, -height / 2 + r, r, 1 * Math.PI, 1.5 * Math.PI);
       this.ctx.lineTo(width / 2 - r, -height / 2);
