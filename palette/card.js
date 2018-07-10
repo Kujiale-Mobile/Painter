@@ -13,7 +13,7 @@ export default class LastMayday {
 
   _template() {
     return ({
-      background: '#eee',
+      background: 'https://qhyxpicoss.kujiale.com/2018/06/12/LMPUSDAKAEBKKOASAAAAAAY8_981x600.png',
       width: '654rpx',
       height: '400rpx',
       borderRadius: '20rpx',
