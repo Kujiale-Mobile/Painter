@@ -101,14 +101,21 @@ export default class Painter {
     let height;
     let x;
     let y;
+    let extra;
     if (view.type === 'text') {
       this.ctx.setFillStyle(view.css.color ? view.css.color : 'black');
       this.ctx.setFontSize(view.css.fontSize.toPx());
-      /* eslint-disable prefer-destructuring */
-      width = this.ctx.measureText(view.text).width;
-      height = view.css.fontSize.toPx();
+      const textLength = this.ctx.measureText(view.text).width;
+      width = view.css.width ? view.css.width.toPx() : textLength;
+      // 计算行数
+      const calLines = Math.ceil(textLength / width);
+      const lines = view.css.maxLines < calLines ? view.css.maxLines : calLines;
+      const lineHeight = view.css.lineHeight ? view.css.lineHeight.toPx() : view.css.fontSize.toPx();
+      height = lineHeight * lines;
+
       x = view.css.right ? this.style.width - width - view.css.right.toPx() : (view.css.left ? view.css.left.toPx() : 0);
       y = view.css.bottom ? this.style.height - height - view.css.bottom.toPx() : (view.css.top ? view.css.top.toPx() : 0);
+      extra = { lines: lines, lineHeight: lineHeight };
     } else {
       width = view.css.width.toPx();
       height = view.css.height.toPx();
@@ -136,6 +143,7 @@ export default class Painter {
       height: height,
       x: x,
       y: y,
+      extra: extra,
     };
   }
 
@@ -170,9 +178,37 @@ export default class Painter {
     const {
       width,
       height,
+      extra,
     } = this._preProcess(view);
+    const { lines, lineHeight } = extra;
+    const preLineLength = Math.round(view.text.length / lines);
+    let start = 0;
+    let alreadyCount = 0;
+    for (let i = 0; i < lines; ++i) {
+      alreadyCount = preLineLength;
+      let text = view.text.substr(start, alreadyCount);
+      let measuredWith = this.ctx.measureText(text).width;
+      // 如果测量大小小于width一个字符的大小，则进行补齐，如果测量大小超出 width，则进行减除
+      // 如果已经到文本末尾，也不要进行该循环
+      while ((start + alreadyCount <= view.text.length) && (width - measuredWith > view.css.fontSize.toPx() || measuredWith > width)) {
+        if (measuredWith < width) {
+          text = view.text.substr(start, ++alreadyCount);
+        } else {
+          text = view.text.substr(start, --alreadyCount);
+        }
+        measuredWith = this.ctx.measureText(text).width;
+      }
+      start += text.length;
+      // 如果是最后一行了，发现还有未绘制完的内容，则加...
+      if (i === lines - 1 && start < view.text.length) {
+        while (this.ctx.measureText(`${text}...`).width > width) {
+          text = text.substring(0, text.length - 1);
+        }
+        text += '...';
+      }
+      this.ctx.fillText(text, -(width / 2), -(height / 2) + (i === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + i * lineHeight)));
+    }
 
-    this.ctx.fillText(view.text, -(width / 2), (height / 2));
     this.ctx.restore();
   }
 

@@ -40,11 +40,14 @@ export default class LastMayday {
         },
         {
           type: 'text',
-          text: '酷家乐 移动前端',
+          text: '酷家乐 移动前端，这是换行的测试',
           css: {
+            width: '400rpx',
+            maxLines: 1,
+            lineHeight: '100rpx',
             left: '20rpx',
             top: '50rpx',
-            fontSize: '40rpx'
+            fontSize: '40rpx',
           },
         },
       ],
