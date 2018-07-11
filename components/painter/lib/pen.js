@@ -1,6 +1,3 @@
-import Downloader from './downloader';
-
-const downloader = new Downloader();
 const QR = require('./qrcode.js');
 
 export default class Painter {
@@ -27,7 +24,7 @@ export default class Painter {
     this.ctx.save();
     const {
       width,
-      height
+      height,
     } = this.style;
     const bg = this.data.background;
     this.ctx.translate(width / 2, height / 2);
@@ -78,7 +75,7 @@ export default class Painter {
       // 防止在某些机型上周边有黑框现象，此处如果直接设置 setFillStyle 为透明，在 Android 机型上会导致被裁减的图片也变为透明， iOS 和 IDE 上不会
       // setGlobalAlpha 在 1.9.90 起支持，低版本下无效，但把 setFillStyle 设为了 white，相对默认的 black 要好点
       this.ctx.setGlobalAlpha(0);
-      this.ctx.setFillStyle("white");
+      this.ctx.setFillStyle('white');
       this.ctx.beginPath();
       this.ctx.arc(-width / 2 + r, -height / 2 + r, r, 1 * Math.PI, 1.5 * Math.PI);
       this.ctx.lineTo(width / 2 - r, -height / 2);
@@ -124,7 +121,7 @@ export default class Painter {
       case 'center':
         this.ctx.translate(x, y + height / 2);
         break;
-      case "right":
+      case 'right':
         this.ctx.translate(x - width / 2, y + height / 2);
         break;
       default:
