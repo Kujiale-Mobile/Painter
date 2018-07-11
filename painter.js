@@ -1,6 +1,8 @@
 import Pen from './lib/pen';
 import Downloader from './lib/downloader';
 
+const util = require('./lib/util');
+
 const downloader = new Downloader();
 
 // 最大尝试的绘制次数
@@ -33,6 +35,10 @@ Component({
     painterStyle: '',
   },
 
+  attached() {
+    setStringPrototype();
+  },
+
   methods: {
     /**
      * 判断一个 object 是否为 空
@@ -57,15 +63,19 @@ Component({
         return;
       }
 
-      if (!(getApp().systemInfo && getApp().systemInfo.screenWidth)) {
+      if (!getApp().painterScreenRatio) {
         try {
-          getApp().systemInfo = wx.getSystemInfoSync();
+          const systemInfo = wx.getSystemInfoSync();
+          getApp().painterScreenRatio = systemInfo.screenWidth / 750;
         } catch (e) {
-          console.error(`painter get system info failed, ${JSON.stringify(e)}`);
+          const error = `Painter get system info failed, ${JSON.stringify(e)}`;
+          that.triggerEvent('imgErr', { error: error });
+          console.error(error);
+          return;
         }
       }
-      screenK = getApp().systemInfo.screenWidth / 750;
-      
+      screenK = getApp().painterScreenRatio;
+
       this.downloadImages().then((palette) => {
         const { width, height } = palette;
         this.canvasWidthInPx = width.toPx();
@@ -82,25 +92,24 @@ Component({
         pen.paint(() => {
           this.saveImg();
         });
-      })
+      });
     },
 
     downloadImages() {
       return new Promise((resolve, reject) => {
         let preCount = 0;
         let completeCount = 0;
-        const allDownloads = [];
         const paletteCopy = JSON.parse(JSON.stringify(this.properties.palette));
-        if (paletteCopy.background && /https?:\/\//.test(paletteCopy.background)) {
-          preCount ++;
+        if (paletteCopy.background && util.isValidUrl(paletteCopy.background)) {
+          preCount++;
           downloader.download(paletteCopy.background).then((path) => {
             paletteCopy.background = path;
-            completeCount ++;
+            completeCount++;
             if (preCount === completeCount) {
               resolve(paletteCopy);
             }
           }, () => {
-            completeCount ++;
+            completeCount++;
             if (preCount === completeCount) {
               resolve(paletteCopy);
             }
@@ -108,16 +117,17 @@ Component({
         }
         if (paletteCopy.views) {
           for (const view of paletteCopy.views) {
-            if (view && view.type === 'image' && view.url && /https?:\/\//.test(view.url)) {
-              preCount ++;
+            if (view && view.type === 'image' && view.url && util.isValidUrl(view.url)) {
+              preCount++;
+              /* eslint-disable no-loop-func */
               downloader.download(view.url).then((path) => {
                 view.url = path;
-                completeCount ++;
+                completeCount++;
                 if (preCount === completeCount) {
                   resolve(paletteCopy);
                 }
               }, () => {
-                completeCount ++;
+                completeCount++;
                 if (preCount === completeCount) {
                   resolve(paletteCopy);
                 }
@@ -128,7 +138,7 @@ Component({
         if (preCount === 0) {
           resolve(paletteCopy);
         }
-      })
+      });
     },
 
     saveImg() {
@@ -170,24 +180,26 @@ Component({
   },
 });
 
-let screenK = 1;
+let screenK = 0.5;
 
-/* eslint-disable no-extend-native */
-String.prototype.toPx = function toPx() {
-  const reg = /^[0-9]+([.]{1}[0-9]+){0,1}(rpx|px)$/g;
-  const results = reg.exec(this);
-  if (!this || !results) {
-    console.error(`The size: ${this} is illegal`);
-    return 0;
-  }
-  const unit = results[2];
-  const value = parseFloat(this);
+function setStringPrototype() {
+  /* eslint-disable no-extend-native */
+  String.prototype.toPx = function toPx() {
+    const reg = /^[0-9]+([.]{1}[0-9]+){0,1}(rpx|px)$/g;
+    const results = reg.exec(this);
+    if (!this || !results) {
+      console.error(`The size: ${this} is illegal`);
+      return 0;
+    }
+    const unit = results[2];
+    const value = parseFloat(this);
 
-  let res = 0;
-  if (unit === 'rpx') {
-    res = value * screenK;
-  } else if (unit === 'px') {
-    res = value;
-  }
-  return res;
-};
+    let res = 0;
+    if (unit === 'rpx') {
+      res = value * screenK;
+    } else if (unit === 'px') {
+      res = value;
+    }
+    return res;
+  };
+}
