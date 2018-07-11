@@ -23,7 +23,7 @@ Page({
   saveImage() {
     wx.saveImageToPhotosAlbum({
       filePath: this.imagePath,
-    })
+    });
   },
 
   /**

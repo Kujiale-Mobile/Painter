@@ -72,7 +72,7 @@ git clone https://github.com/Kujiale-Mobile/Painter.git
    ```
 
 
-4. 数据传入后，则会自动进行绘图。绘图完成后，你可以通过绑定 imgOK 或 onImgErr 事件来获得成功后的图片 或失败的原因。
+4. 数据传入后，则会自动进行绘图。绘图完成后，你可以通过绑定 imgOK 或 imgErr 事件来获得成功后的图片 或失败的原因。
 
    ```
    bind:imgOK="onImgOK"
@@ -97,18 +97,26 @@ borderRadius: 边框的圆角（该属性也同样适用于子 view）
 views: 里面承载子 view
 ```
 
-### 子 View 属性
+### View 属性
 
 当我们把整体的调色板属性构建起来后，里面就可以添加子 View 来进行绘制了。
 
-| type   | content | description     | 自有css                             |
-| ------ | ------- | --------------- | --------------------------------- |
-| image  | url     | 表示图片资源的地址，本地或网络 |                                   |
-| text   | text    | 文本的内容           | fontSize: 文字大小，color: 字体颜色（默认为黑色） |
-| rect   | 无       | 矩形              | color: 颜色                         |
-| qrcode | content | 画二维码            | background:  背景颜色（默认为透明色），        |
+| type   | content | description                    | 自有css                                 |
+| ------ | ------- | ------------------------------ | --------------------------------------- |
+| image  | url     | 表示图片资源的地址，本地或网络 |                                         |
+| text   | text    | 文本的内容                     | 见下午 text 小节                        |
+| rect   | 无      | 矩形                           | color: 颜色                             |
+| qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色）， |
 
+#### text
 
+因为 text 的特殊性，此处对 text 进行单独说明。
+
+| fontSize | color                  | maxLines | lineHeight                                            |
+| -------- | ---------------------- | -------- | ----------------------------------------------------- |
+| 文字大小 | 字体颜色（默认为黑色） | 最大行数 | 行高（上下两行文字baseline的距离，默认使用 fontSize） |
+
+当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 
 ### 布局属性
 
