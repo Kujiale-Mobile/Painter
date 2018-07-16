@@ -1,5 +1,13 @@
 # Painter
 
+**Painter 的优势**
+
+- 功能全，支持文本、图片、矩形、qrcode 类型的 view 绘制
+- 布局全，支持多种布局方式，如 align（对齐方式）、rotate（旋转）
+- 支持圆角，其中图片，矩形，和整个画布支持 borderRadius 来设置圆角
+- 杠杠的性能优化，我们对网络素材图片加载实现了一套 LRU 存储机制，不用重复下载素材图片。
+- 杠杠的容错，因为某些特殊情况会导致 Canvas 绘图不完整。我们对此加入了对结果图片进行检测机制，如果绘图出错会进行重绘。
+
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
 
 由于我们无法将小程序直接分享到朋友圈，但分享到朋友圈的需求又很多，业界目前的做法是利用小程序的 Canvas 功能生成一张带有二维码的图片，然后引导用户下载图片到本地后再分享到朋友圈。而小程序 Canvas 功能是很难用的，往往为了绘制一张简单图片，就得写上一堆 boilerplate code ，而且一不小心还会踩到 Canvas 的各种彩蛋（坑~~~）。为次我们还专门开了个 repo 来搜集整理这些坑们，https://github.com/Kujiale-Mobile/MP-Keng 。
@@ -71,6 +79,10 @@ git clone https://github.com/Kujiale-Mobile/Painter.git
    ```
    bind:imgOK="onImgOK"
    bind:imgErr="onImgErr"
+   
+   onImgOK(e) {
+     其中 e.detail.path 为生成的图片路径
+   },
    ```
 
 
