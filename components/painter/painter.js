@@ -63,10 +63,9 @@ Component({
         return;
       }
 
-      if (!getApp().painterScreenRatio) {
+      if (!(getApp().systemInfo && getApp().systemInfo.screenWidth)) {
         try {
-          const systemInfo = wx.getSystemInfoSync();
-          getApp().painterScreenRatio = systemInfo.screenWidth / 750;
+          getApp().systemInfo = wx.getSystemInfoSync();
         } catch (e) {
           const error = `Painter get system info failed, ${JSON.stringify(e)}`;
           that.triggerEvent('imgErr', { error: error });
@@ -74,7 +73,7 @@ Component({
           return;
         }
       }
-      screenK = getApp().painterScreenRatio;
+      screenK = getApp().systemInfo.screenWidth / 750;
 
       this.downloadImages().then((palette) => {
         const { width, height } = palette;
