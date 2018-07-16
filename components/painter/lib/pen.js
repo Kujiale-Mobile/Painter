@@ -103,8 +103,11 @@ export default class Painter {
     let y;
     let extra;
     if (view.type === 'text') {
+      const fontWeight = view.css.fontWeight === 'bold' ? 'bold' : 'normal';
+      const fontSize = view.css.fontSize ? view.css.fontSize : '20rpx';
+      this.ctx.font = `normal ${fontWeight} ${fontSize.toPx()}px sans-serif`;
       this.ctx.setFillStyle(view.css.color ? view.css.color : 'black');
-      this.ctx.setFontSize(view.css.fontSize.toPx());
+      // this.ctx.setFontSize(view.css.fontSize.toPx());
       const textLength = this.ctx.measureText(view.text).width;
       width = view.css.width ? view.css.width.toPx() : textLength;
       // 计算行数

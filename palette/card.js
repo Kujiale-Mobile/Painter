@@ -43,6 +43,7 @@ export default class LastMayday {
           text: '酷家乐 移动前端，这是换行的测试',
           css: {
             width: '400rpx',
+            fontWeight: 'bold',
             maxLines: 1,
             lineHeight: '100rpx',
             left: '20rpx',
