@@ -195,7 +195,7 @@ function setStringPrototype() {
 
     let res = 0;
     if (unit === 'rpx') {
-      res = value * screenK;
+      res = Math.round(value * screenK);
     } else if (unit === 'px') {
       res = value;
     }
