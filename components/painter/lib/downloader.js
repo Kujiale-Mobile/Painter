@@ -1,3 +1,7 @@
+/**
+ * LRU 文件存储，使用该 downloader 可以让下载的文件存储在本地，下次进入小程序后可以直接使用
+ * 详细设计文档可查看 https://juejin.im/post/5b42d3ede51d4519277b6ce3
+ */
 const util = require('./util');
 
 const SAVED_FILES_KEY = 'savedFiles';
@@ -7,11 +11,15 @@ const KEY_TIME = 'time';
 const KEY_SIZE = 'size';
 
 // 可存储总共为 6M，目前小程序可允许的最大本地存储为 10M
-const MAX_SPACE_IN_B = 6 * 1024 * 1024;
+let MAX_SPACE_IN_B = 6 * 1024 * 1024;
 let savedFiles = {};
 
 export default class Dowloader {
   constructor() {
+    // app 如果设置了最大存储空间，则使用 app 中的
+    if (getApp().PAINTER_MAX_LRU_SPACE) {
+      MAX_SPACE_IN_B = getApp().PAINTER_MAX_LRU_SPACE;
+    }
     wx.getStorage({
       key: SAVED_FILES_KEY,
       success: function (res) {
@@ -33,45 +41,70 @@ export default class Dowloader {
         return;
       }
       const file = getFile(url);
+
       if (file) {
-        resolve(file[KEY_PATH]);
-        return;
-      }
-      wx.downloadFile({
-        url: url,
-        success: function (res) {
-          if (res.statusCode !== 200) {
-            console.error(`downloadFile ${url} failed res.statusCode is not 200`);
-            reject();
-            return;
-          }
-          const { tempFilePath } = res;
-          wx.getFileInfo({
-            filePath: tempFilePath,
-            success: (tmpRes) => {
-              const newFileSize = tmpRes.size;
-              doLru(newFileSize).then(() => {
-                saveFile(url, newFileSize, tempFilePath).then((filePath) => {
-                  resolve(filePath);
-                });
-              }, () => {
-                resolve(tempFilePath);
-              });
-            },
-            fail: (error) => {
-              // 文件大小信息获取失败，则此文件也不要进行存储
-              console.error(`getFileInfo ${res.tempFilePath} failed, ${JSON.stringify(error)}`);
-              resolve(res.tempFilePath);
-            },
-          });
-        },
-        fail: function (error) {
-          console.error(`downloadFile failed, ${JSON.stringify(error)} `);
+        // 检查文件是否正常，不正常需要重新下载
+        wx.getSavedFileInfo({
+          filePath: file[KEY_PATH],
+          success: (res) => {
+            resolve(file[KEY_PATH]);
+          },
+          fail: (error) => {
+            console.error(`the file is broken, redownload it, ${JSON.stringify(error)}`);
+            downloadFile(url).then((path) => {
+              resolve(path);
+            }, () => {
+              reject();
+            });
+          },
+        });
+      } else {
+        downloadFile(url).then((path) => {
+          resolve(path);
+        }, () => {
           reject();
-        },
-      });
+        });
+      }
     });
   }
+}
+
+function downloadFile(url) {
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url: url,
+      success: function (res) {
+        if (res.statusCode !== 200) {
+          console.error(`downloadFile ${url} failed res.statusCode is not 200`);
+          reject();
+          return;
+        }
+        const { tempFilePath } = res;
+        wx.getFileInfo({
+          filePath: tempFilePath,
+          success: (tmpRes) => {
+            const newFileSize = tmpRes.size;
+            doLru(newFileSize).then(() => {
+              saveFile(url, newFileSize, tempFilePath).then((filePath) => {
+                resolve(filePath);
+              });
+            }, () => {
+              resolve(tempFilePath);
+            });
+          },
+          fail: (error) => {
+          // 文件大小信息获取失败，则此文件也不要进行存储
+            console.error(`getFileInfo ${res.tempFilePath} failed, ${JSON.stringify(error)}`);
+            resolve(res.tempFilePath);
+          },
+        });
+      },
+      fail: function (error) {
+        console.error(`downloadFile failed, ${JSON.stringify(error)} `);
+        reject();
+      },
+    });
+  });
 }
 
 function saveFile(key, newFileSize, tempFilePath) {
