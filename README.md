@@ -129,6 +129,62 @@ views: 里面承载子 view
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 
+
+
+##### textDecoration
+
+<details><summary>textDecoration 例子（点击展开）</summary><br>
+
+```
+const common = {
+  left: '20rpx',
+  fontSize: '40rpx',
+}
+{
+  width: '654rpx',
+  height: '400rpx',
+  views: [
+    {
+      type: 'text',
+      text: 'overline',
+      css: [{
+        top: '50rpx',
+        textDecoration: 'overline',
+      }, common],
+    },
+    {
+      type: 'text',
+      text: 'underline',
+      css: [{
+        top: '120rpx',
+        textDecoration: 'underline',
+      }, common],
+    },
+    {
+      type: 'text',
+      text: 'line-through',
+      css: [{
+        top: '190rpx',
+        textDecoration: 'line-through',
+      }, common],
+    },
+    {
+      type: 'text',
+      text: 'overline underline line-through',
+      css: [{
+        top: '280rpx',
+        color: 'red',
+        textDecoration: 'overline underline line-through',
+      }, common],
+    },
+  ],
+}
+```
+
+</details>
+
+![](http://7xq276.com2.z0.glb.qiniucdn.com/wxd8ff06ba86757a7c.o6zAJs_SnyWxbff5UX4yEeTr9g4g.BMhjQYkWk4fy819897a1c0cbd445c560de1e8bd853b8.png)
+
 ### 布局属性
 
 以上 View ，除去自己拥有的特别属性外，还有以下的通用布局属性
