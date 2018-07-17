@@ -10,7 +10,7 @@
 
 **TODO**
 
-- [] borderWidth 和 borderColor 属性支持，可设置边框
+- [ ] borderWidth 和 borderColor 属性支持，可设置边框
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
 
