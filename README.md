@@ -118,13 +118,14 @@ views: 里面承载子 view
 
 因为 text 的特殊性，此处对 text 进行单独说明。
 
-| 属性名称   | 说明                               | 默认值              |
-| ---------- | ---------------------------------- | ------------------- |
-| fontSize   | 字体大小                           | 20rpx               |
-| color      | 字体颜色                           | black               |
-| maxLines   | 最大行数                           | 不限，根据 width 来 |
-| lineHeight | 行高（上下两行文字baseline的距离） | fontSize 大小       |
-| fontWeight | 字体粗细。仅支持 normal, bold      | normal              |
+| 属性名称       | 说明                                                         | 默认值              |
+| -------------- | ------------------------------------------------------------ | ------------------- |
+| fontSize       | 字体大小                                                     | 20rpx               |
+| color          | 字体颜色                                                     | black               |
+| maxLines       | 最大行数                                                     | 不限，根据 width 来 |
+| lineHeight     | 行高（上下两行文字baseline的距离）                           | fontSize 大小       |
+| fontWeight     | 字体粗细。仅支持 normal, bold                                | normal              |
+| textDecoration | 文本修饰，支持 underline、 overline、 line-through，也可组合使用 | 无效果              |
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 

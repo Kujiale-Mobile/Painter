@@ -51,6 +51,19 @@ export default class LastMayday {
             fontSize: '40rpx',
           },
         },
+        {
+          type: 'text',
+          text: 'Painter',
+          css: {
+            width: '400rpx',
+            lineHeight: '100rpx',
+            color: 'gray',
+            left: '20rpx',
+            top: '100rpx',
+            fontSize: '40rpx',
+            textDecoration: 'line-through underline',
+          },
+        },
       ],
     });
   }
