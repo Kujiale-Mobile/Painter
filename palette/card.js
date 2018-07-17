@@ -26,6 +26,7 @@ export default class LastMayday {
             right: '48rpx',
             width: '192rpx',
             height: '192rpx',
+            borderRadius: '96rpx',
           },
         },
         {
