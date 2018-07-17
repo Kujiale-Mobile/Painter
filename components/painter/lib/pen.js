@@ -207,9 +207,30 @@ export default class Painter {
         while (this.ctx.measureText(`${text}...`).width > width) {
           text = text.substring(0, text.length - 1);
         }
-        text += '...';
+        text += "..."
       }
-      this.ctx.fillText(text, -(width / 2), -(height / 2) + (i === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + i * lineHeight)));
+      const x = -(width / 2);
+      const y = -(height / 2) + (i === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + i * lineHeight));
+      this.ctx.fillText(text, x, y);
+      const fontSize = view.css.fontSize.toPx();
+      if (view.css.textDecoration) {
+        this.ctx.beginPath();
+        if (/\bunderline\b/.test(view.css.textDecoration)) {
+          this.ctx.moveTo(x, y);
+          this.ctx.lineTo(x + measuredWith, y);
+        }
+        if (/\boverline\b/.test(view.css.textDecoration)) {
+          this.ctx.moveTo(x, y - fontSize);
+          this.ctx.lineTo(x + measuredWith, y - fontSize);
+        }
+        if (/\bline-through\b/.test(view.css.textDecoration)) {
+          this.ctx.moveTo(x, y - fontSize / 3);
+          this.ctx.lineTo(x + measuredWith, y - fontSize / 3);
+        }
+        this.ctx.closePath();
+        this.ctx.setStrokeStyle(view.css.color);
+        this.ctx.stroke();
+      }
     }
 
     this.ctx.restore();
