@@ -104,8 +104,8 @@ export default class Painter {
     let extra;
     if (view.type === 'text') {
       const fontWeight = view.css.fontWeight === 'bold' ? 'bold' : 'normal';
-      const fontSize = view.css.fontSize ? view.css.fontSize : '20rpx';
-      this.ctx.font = `normal ${fontWeight} ${fontSize.toPx()}px sans-serif`;
+      view.css.fontSize = view.css.fontSize ? view.css.fontSize : '20rpx';
+      this.ctx.font = `normal ${fontWeight} ${view.css.fontSize.toPx()}px sans-serif`;
       this.ctx.setFillStyle(view.css.color ? view.css.color : 'black');
       // this.ctx.setFontSize(view.css.fontSize.toPx());
       const textLength = this.ctx.measureText(view.text).width;
@@ -197,6 +197,10 @@ export default class Painter {
         if (measuredWith < width) {
           text = view.text.substr(start, ++alreadyCount);
         } else {
+          if (text.length <= 1) {
+            // 如果只有一个字符时，直接跳出循环
+            break;
+          }
           text = view.text.substr(start, --alreadyCount);
         }
         measuredWith = this.ctx.measureText(text).width;
@@ -205,9 +209,14 @@ export default class Painter {
       // 如果是最后一行了，发现还有未绘制完的内容，则加...
       if (i === lines - 1 && start < view.text.length) {
         while (this.ctx.measureText(`${text}...`).width > width) {
+          if (text.length <= 1) {
+            // 如果只有一个字符时，直接跳出循环
+            break;
+          }
           text = text.substring(0, text.length - 1);
         }
         text += '...';
+        measuredWith = this.ctx.measureText(text).width;
       }
       const x = -(width / 2);
       const y = -(height / 2) + (i === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + i * lineHeight));
