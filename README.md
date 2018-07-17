@@ -131,9 +131,13 @@ views: 里面承载子 view
 
 
 
-##### textDecoration
+- **textDecoration**
 
-<details><summary>textDecoration 例子（点击展开）</summary><br>
+
+
+![](http://7xq276.com2.z0.glb.qiniucdn.com/textDecoration.png)
+
+<details><summary>例子代码（点击展开）</summary><br>
 
 ```
 const common = {
@@ -143,6 +147,7 @@ const common = {
 {
   width: '654rpx',
   height: '400rpx',
+  background: '#bbbbbb',
   views: [
     {
       type: 'text',
@@ -182,8 +187,6 @@ const common = {
 ```
 
 </details>
-
-![](http://7xq276.com2.z0.glb.qiniucdn.com/wxd8ff06ba86757a7c.o6zAJs_SnyWxbff5UX4yEeTr9g4g.BMhjQYkWk4fy819897a1c0cbd445c560de1e8bd853b8.png)
 
 ### 布局属性
 
