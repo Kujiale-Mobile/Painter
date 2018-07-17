@@ -8,17 +8,21 @@
 - 杠杠的性能优化，我们对网络素材图片加载实现了一套 LRU 存储机制，不用重复下载素材图片。
 - 杠杠的容错，因为某些特殊情况会导致 Canvas 绘图不完整。我们对此加入了对结果图片进行检测机制，如果绘图出错会进行重绘。
 
+**TODO**
+
+- [] borderWidth 和 borderColor 属性支持，可设置边框
+
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
 
-由于我们无法将小程序直接分享到朋友圈，但分享到朋友圈的需求又很多，业界目前的做法是利用小程序的 Canvas 功能生成一张带有二维码的图片，然后引导用户下载图片到本地后再分享到朋友圈。而小程序 Canvas 功能是很难用的，往往为了绘制一张简单图片，就得写上一堆 boilerplate code ，而且一不小心还会踩到 Canvas 的各种彩蛋（坑~~~）。为次我们还专门开了个 repo 来搜集整理这些坑们，https://github.com/Kujiale-Mobile/MP-Keng 。
+## 画家计划
+
+小程序 Canvas 功能是很难用的，往往为了绘制一张简单图片，就得写上一堆 boilerplate code ，而且一不小心还会踩到 Canvas 的各种彩蛋（坑~~~）。为次我们还专门开了个 repo 来搜集整理这些坑们，https://github.com/Kujiale-Mobile/MP-Keng 。
 
 ![](https://ws3.sinaimg.cn/large/52eb2279ly1fig620lx34j207g07g77v.jpg)
 
 
 
-## 画家计划
-
-想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹。那我们就想到可不可以做一款可以很方便生成图片，并且还能屏蔽掉直接使用 Canvas 的一些坑的库呢？所以我们发起了 “`画家计划`— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
+想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹。我们就想到可不可以做一款可以很方便生成图片，并且还能屏蔽掉直接使用 Canvas 的一些坑的库呢？所以我们发起了 “`画家计划`— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
 
 ![整体架构](http://7xq276.com2.z0.glb.qiniucdn.com/painter.png)
 
