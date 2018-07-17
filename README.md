@@ -180,6 +180,10 @@ views: 里面承载子 view
 
 ![](https://ws4.sinaimg.cn/large/006tNc79ly1fig7q9k5nuj30cq06zgm7.jpg)
 
+## Thanks
+
+感谢 [demi520](https://github.com/demi520) 的 [wxapp-qrcode](https://github.com/demi520/wxapp-qrcode) 库，Painter 中二维码绘制部分使用了该库的部分代码，并做了些修改。
+
 ## License
 
 ```
