@@ -116,17 +116,22 @@ export default class Painter {
       const lineHeight = view.css.lineHeight ? view.css.lineHeight.toPx() : view.css.fontSize.toPx();
       height = lineHeight * lines;
 
-      x = view.css.right ? this.style.width - width - view.css.right.toPx() : (view.css.left ? view.css.left.toPx() : 0);
+      x = view.css.right ? this.style.width - view.css.right.toPx() : (view.css.left ? view.css.left.toPx() : 0);
       y = view.css.bottom ? this.style.height - height - view.css.bottom.toPx() : (view.css.top ? view.css.top.toPx() : 0);
       extra = { lines: lines, lineHeight: lineHeight };
     } else {
+      if (!(view.css.width && view.css.height)) {
+        console.error('You should set width and height');
+        return;
+      }
       width = view.css.width.toPx();
       height = view.css.height.toPx();
-      x = view.css.right ? this.style.width - width - view.css.right.toPx() : (view.css.left ? view.css.left.toPx() : 0);
+      x = view.css.right ? this.style.width - view.css.right.toPx() : (view.css.left ? view.css.left.toPx() : 0);
       y = view.css.bottom ? this.style.height - height - view.css.bottom.toPx() : (view.css.top ? view.css.top.toPx() : 0);
     }
     const angle = view.css.rotate ? this._getAngle(view.css.rotate) : 0;
-    const align = view.css.align ? view.css.align : 'left';
+    // 当设置了 right 时，默认 align 用 right，反之用 left
+    const align = view.css.align ? view.css.align : (view.css.right ? 'right' : 'left');
     switch (align) {
       case 'center':
         this.ctx.translate(x, y + height / 2);
