@@ -129,61 +129,77 @@ views: 里面承载子 view
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 
+- **以下用个例子说下上述几个属性的用法**
 
-
-- **textDecoration**
-
-
-
-![](http://7xq276.com2.z0.glb.qiniucdn.com/textDecoration.png)
+![](http://7xq276.com2.z0.glb.qiniucdn.com/textDede.png)
 
 <details><summary>例子代码（点击展开）</summary><br>
 
 ```
+export default class LastMayday {
+  do() {
+    return this._template();
+  }
+
+  _template() {
+    return ({
+      width: '654rpx',
+      height: '700rpx',
+      background: '#eee',
+      views: [
+        _textDecoration('overline', 0),
+        _textDecoration('underline', 1),
+        _textDecoration('line-through', 2),
+        _textDecoration('overline underline line-through', 3, 'red'),
+        {
+          type: 'text',
+          text: "fontWeight: 'bold'",
+          css: [{
+            top: `${startTop + 4 * gapSize}rpx`,
+            fontWeight: 'bold',
+          }, common],
+        },
+        {
+          type: 'text',
+          text: '我是把width设置为300rpx后，我就换行了',
+          css: [{
+            top: `${startTop + 5 * gapSize}rpx`,
+            width: '400rpx',
+          }, common],
+        },
+        {
+          type: 'text',
+          text: '我设置了maxLines为1，看看会产生什么效果',
+          css: [{
+            top: `${startTop + 7 * gapSize}rpx`,
+            width: '400rpx',
+            maxLines: 1,
+          }, common],
+        },
+      ],
+    });
+  }
+}
+
+const startTop = 50;
+const gapSize = 70;
 const common = {
   left: '20rpx',
   fontSize: '40rpx',
+};
+
+function _textDecoration(decoration, index, color) {
+  return ({
+    type: 'text',
+    text: decoration,
+    css: [{
+      top: `${startTop + index * gapSize}rpx`,
+      color: color,
+      textDecoration: decoration,
+    }, common],
+  });
 }
-{
-  width: '654rpx',
-  height: '400rpx',
-  background: '#bbbbbb',
-  views: [
-    {
-      type: 'text',
-      text: 'overline',
-      css: [{
-        top: '50rpx',
-        textDecoration: 'overline',
-      }, common],
-    },
-    {
-      type: 'text',
-      text: 'underline',
-      css: [{
-        top: '120rpx',
-        textDecoration: 'underline',
-      }, common],
-    },
-    {
-      type: 'text',
-      text: 'line-through',
-      css: [{
-        top: '190rpx',
-        textDecoration: 'line-through',
-      }, common],
-    },
-    {
-      type: 'text',
-      text: 'overline underline line-through',
-      css: [{
-        top: '280rpx',
-        color: 'red',
-        textDecoration: 'overline underline line-through',
-      }, common],
-    },
-  ],
-}
+
 ```
 
 </details>
