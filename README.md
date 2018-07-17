@@ -208,12 +208,15 @@ function _textDecoration(decoration, index, color) {
 
 以上 View ，除去自己拥有的特别属性外，还有以下的通用布局属性
 
-| 属性                    | 意义                                       |
-| --------------------- | ---------------------------------------- |
-| rotate                | 旋转，按照顺时针旋转的度数，默认不旋转                      |
-| borderRadius          | 边界圆角程度，如果是正方形布局，该属性为一半宽或高时，则为圆形          |
-| top、right、bottom、left | 如 css 中为 absolute 布局时的作用，默认 top 和 left 为 0 |
-| align                 | center：中间对齐方式；right：右对齐方式；left：左对齐方式（默认，可不写） |
+| 属性                     | 意义                                                         | 默认                                       |
+| ------------------------ | ------------------------------------------------------------ | ------------------------------------------ |
+| rotate                   | 旋转，按照顺时针旋转的度数                                   | 不旋转                                     |
+| borderRadius             | 边界圆角程度，如果是正方形布局，该属性为一半宽或高时，则为圆形 | 0                                          |
+| top、right、bottom、left | 如 css 中为 absolute 布局时的作用                            | 默认 top 和 left 为 0                      |
+| align                    | center：中间对齐方式；right：右对齐方式；left：左对齐方式    | 当设置有 right 时，默认 right，否则为 left |
+| width、height            | 除 text 以外，其他几种类型的 view 必须设置这两个属性         |                                            |
+
+![](http://7xq276.com2.z0.glb.qiniucdn.com/buju.png)
 
 ### 尺寸即其他
 
