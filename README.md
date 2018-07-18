@@ -12,6 +12,7 @@
 
 - [ ] borderWidth 和 borderColor 属性支持，可设置边框
 - [ ] 可通过文本中的换行符进行主动换行
+- [ ] fontFamily 属性支持
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
 
