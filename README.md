@@ -41,11 +41,11 @@ git clone https://github.com/Kujiale-Mobile/Painter.git
 
 ### 使用 Painter
 
+mpvue 的使用方法请移步 [mpvue接入方案](https://github.com/Kujiale-Mobile/Painter/wiki/mpvue-%E6%8E%A5%E5%85%A5%E6%96%B9%E5%BC%8F)
+
 1. 引入代码
 
-   Painter 的核心代码在另一个 repo 中，https://github.com/Kujiale-Mobile/PainterCore.git 。你可以通过submodule 的方式进行库的引入
-
-   主目录下执行以下命令。如后续需更新代码，则到对应目录下 pull 最新的代码即可。有关 submodule 的用法可自行 Google。
+   Painter 的核心代码在另一个 repo 中，https://github.com/Kujiale-Mobile/PainterCore.git 。你可以通过submodule 的方式进行库的引入。有关 submodule 的用法可自行 Google。
 
    ```
    git submodule add https://github.com/Kujiale-Mobile/PainterCore.git components/painter
