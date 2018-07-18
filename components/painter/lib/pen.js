@@ -130,6 +130,8 @@ export default class Painter {
       y = view.css.bottom ? this.style.height - height - view.css.bottom.toPx() : (view.css.top ? view.css.top.toPx() : 0);
     }
     const angle = view.css.rotate ? this._getAngle(view.css.rotate) : 0;
+    // 添加文字textAlign
+    this.ctx.textAlign = view.css.textAlign;
     // 当设置了 right 时，默认 align 用 right，反之用 left
     const align = view.css.align ? view.css.align : (view.css.right ? 'right' : 'left');
     switch (align) {
