@@ -89,7 +89,7 @@ Component({
         const ctx = wx.createCanvasContext('k-canvas', this);
         const pen = new Pen(ctx, palette);
         pen.paint(() => {
-          this.saveImg();
+          this.saveImgToLocal();
         });
       });
     },
@@ -140,34 +140,13 @@ Component({
       });
     },
 
-    saveImg() {
+    saveImgToLocal() {
       const that = this;
       setTimeout(() => {
         wx.canvasToTempFilePath({
           canvasId: 'k-canvas',
           success: function (res) {
-            wx.getImageInfo({
-              src: res.tempFilePath,
-              success: (infoRes) => {
-                if (that.paintCount > MAX_PAINT_COUNT) {
-                  const error = `The result is always fault, even we tried ${MAX_PAINT_COUNT} times`;
-                  console.error(error);
-                  that.triggerEvent('imgErr', { error: error });
-                  return;
-                }
-                // 比例相符时才证明绘制成功，否则进行强制重绘制
-                if (Math.abs((infoRes.width * that.canvasHeightInPx - that.canvasWidthInPx * infoRes.height) / (infoRes.height * that.canvasHeightInPx)) < 0.01) {
-                  that.triggerEvent('imgOK', { path: res.tempFilePath });
-                } else {
-                  that.startPaint();
-                }
-                that.paintCount++;
-              },
-              fail: (error) => {
-                console.error(`getImageInfo failed, ${JSON.stringify(error)}`);
-                that.triggerEvent('imgErr', { error: error });
-              },
-            });
+            that.getImageInfo(res.tempFilePath);
           },
           fail: function (error) {
             console.error(`canvasToTempFilePath failed, ${JSON.stringify(error)}`);
@@ -175,6 +154,32 @@ Component({
           },
         }, this);
       }, 300);
+    },
+
+    getImageInfo(filePath) {
+      const that = this;
+      wx.getImageInfo({
+        src: filePath,
+        success: (infoRes) => {
+          if (that.paintCount > MAX_PAINT_COUNT) {
+            const error = `The result is always fault, even we tried ${MAX_PAINT_COUNT} times`;
+            console.error(error);
+            that.triggerEvent('imgErr', { error: error });
+            return;
+          }
+          // 比例相符时才证明绘制成功，否则进行强制重绘制
+          if (Math.abs((infoRes.width * that.canvasHeightInPx - that.canvasWidthInPx * infoRes.height) / (infoRes.height * that.canvasHeightInPx)) < 0.01) {
+            that.triggerEvent('imgOK', { path: filePath });
+          } else {
+            that.startPaint();
+          }
+          that.paintCount++;
+        },
+        fail: (error) => {
+          console.error(`getImageInfo failed, ${JSON.stringify(error)}`);
+          that.triggerEvent('imgErr', { error: error });
+        },
+      });
     },
   },
 });
