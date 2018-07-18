@@ -11,18 +11,13 @@
 **TODO**
 
 - [ ] borderWidth 和 borderColor 属性支持，可设置边框
+- [ ] 可通过文本中的换行符进行主动换行
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
 
 ## 画家计划
 
-小程序 Canvas 功能是很难用的，往往为了绘制一张简单图片，就得写上一堆 boilerplate code ，而且一不小心还会踩到 Canvas 的各种彩蛋（坑~~~）。为次我们还专门开了个 repo 来搜集整理这些坑们，https://github.com/Kujiale-Mobile/MP-Keng 。
-
-![](https://ws3.sinaimg.cn/large/52eb2279ly1fig620lx34j207g07g77v.jpg)
-
-
-
-想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹。我们就想到可不可以做一款可以很方便生成图片，并且还能屏蔽掉直接使用 Canvas 的一些坑的库呢？所以我们发起了 “`画家计划`— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
+想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹（有关小程序的坑，可看 https://github.com/Kujiale-Mobile/MP-Keng ）。我们就想到可不可以做一款可以很方便生成图片，并且还能屏蔽掉直接使用 Canvas 的一些坑的库呢？对此我们发起了 “`画家计划`— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
 
 ![整体架构](http://7xq276.com2.z0.glb.qiniucdn.com/painter.png)
 
@@ -48,19 +43,12 @@ git clone https://github.com/Kujiale-Mobile/Painter.git
 
 1. 引入代码
 
-   Painter 的核心代码在另一个 repo 中，https://github.com/Kujiale-Mobile/PainterCore.git 。你可以通过以下三种方式进行库的引入：
+   Painter 的核心代码在另一个 repo 中，https://github.com/Kujiale-Mobile/PainterCore.git 。你可以通过submodule 的方式进行库的引入
 
-   一，直接下载代码，拷贝代码到你需要的库中。（不推荐）
-
-   二，submodule 的方式。可以在主项目下执行以下命令。如后续需更新代码，则到对应目录下 pull 最新的代码即可。（推荐）
+   主目录下执行以下命令。如后续需更新代码，则到对应目录下 pull 最新的代码即可。有关 submodule 的用法可自行 Google。
 
    ```
    git submodule add https://github.com/Kujiale-Mobile/PainterCore.git components/painter
-   ```
-   三，subtree 的方式。也一样是在主项目中执行命令。代码更新要复杂点，submodule 和 subtree 的区别请自行 Google。
-
-   ```
-   git subtree add --prefix=components/painter https://github.com/Kujiale-Mobile/PainterCore.git master
    ```
 
 2. 作为自定义组件引入，注意目录为第一步引入的代码所在目录
