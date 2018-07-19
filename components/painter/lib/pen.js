@@ -225,7 +225,11 @@ export default class Painter {
       }
       const x = -(width / 2);
       const y = -(height / 2) + (i === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + i * lineHeight));
-      this.ctx.fillText(text, x, y);
+      if (view.css.textStyle === 'stroke') {
+        this.ctx.strokeText(text, x, y, measuredWith);
+      } else {
+        this.ctx.fillText(text, x, y, measuredWith);
+      }
       const fontSize = view.css.fontSize.toPx();
       if (view.css.textDecoration) {
         this.ctx.beginPath();
