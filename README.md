@@ -100,10 +100,10 @@ views: 里面承载子 view
 
 当我们把整体的调色板属性构建起来后，里面就可以添加子 View 来进行绘制了。
 
-| type   | content | description                    | 自有css                               |
+| type   | 内容    | description                    | 自有css                               |
 | ------ | ------- | ------------------------------ | ------------------------------------- |
 | image  | url     | 表示图片资源的地址，本地或网络 |                                       |
-| text   | text    | 文本的内容                     | 见下午 text 小节                      |
+| text   | text    | 文本的内容                     | 见下面 text 小节                      |
 | rect   | 无      | 矩形                           | color: 颜色                           |
 | qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色） |
 
