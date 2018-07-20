@@ -256,6 +256,12 @@ function _textDecoration(decoration, index, color) {
 
 ![](https://ws4.sinaimg.cn/large/006tNc79ly1fig7q9k5nuj30cq06zgm7.jpg)
 
+## 使用 Painter 的项目
+
+<div>
+<img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/>
+</div>
+
 ## Thanks
 
 感谢 [demi520](https://github.com/demi520) 的 [wxapp-qrcode](https://github.com/demi520/wxapp-qrcode) 库，Painter 中二维码绘制部分使用了该库的部分代码，并做了些修改。
