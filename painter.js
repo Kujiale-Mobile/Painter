@@ -188,8 +188,17 @@ let screenK = 0.5;
 
 function setStringPrototype() {
   /* eslint-disable no-extend-native */
-  String.prototype.toPx = function toPx() {
-    const reg = /^[0-9]+([.]{1}[0-9]+){0,1}(rpx|px)$/g;
+  /**
+   * 是否支持负数
+   * @param {Boolean} minus 是否支持负数
+   */
+  String.prototype.toPx = function toPx(minus) {
+    let reg;
+    if (minus) {
+      reg = /^-?[0-9]+([.]{1}[0-9]+){0,1}(rpx|px)$/g;
+    } else {
+      reg = /^[0-9]+([.]{1}[0-9]+){0,1}(rpx|px)$/g;
+    }
     const results = reg.exec(this);
     if (!this || !results) {
       console.error(`The size: ${this} is illegal`);
