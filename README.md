@@ -10,7 +10,7 @@
 
 **TODO**
 
-- [ ] borderWidth 和 borderColor 属性支持，可设置边框
+- [x] borderWidth 和 borderColor 属性支持，可设置边框
 - [ ] 可通过文本中的换行符进行主动换行
 - [ ] fontFamily 属性支持
 
@@ -100,12 +100,12 @@ views: 里面承载子 view
 
 当我们把整体的调色板属性构建起来后，里面就可以添加子 View 来进行绘制了。
 
-| type   | 内容    | description                    | 自有css                               |
-| ------ | ------- | ------------------------------ | ------------------------------------- |
-| image  | url     | 表示图片资源的地址，本地或网络 |                                       |
-| text   | text    | 文本的内容                     | 见下面 text 小节                      |
-| rect   | 无      | 矩形                           | color: 颜色                           |
-| qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色） |
+| type   | 内容    | description                    | 自有css                                                      |
+| ------ | ------- | ------------------------------ | ------------------------------------------------------------ |
+| image  | url     | 表示图片资源的地址，本地或网络 |                                                              |
+| text   | text    | 文本的内容                     | 见下面 text 小节                                             |
+| rect   | 无      | 矩形                           | color: 颜色                                                  |
+| qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色）color: 二维码颜色（默认黑色） |
 
 #### text
 
@@ -206,15 +206,26 @@ function _textDecoration(decoration, index, color) {
 
 以上 View ，除去自己拥有的特别属性外，还有以下的通用布局属性
 
-| 属性                     | 意义                                                         | 默认                                       |
-| ------------------------ | ------------------------------------------------------------ | ------------------------------------------ |
-| rotate                   | 旋转，按照顺时针旋转的度数                                   | 不旋转                                     |
-| borderRadius             | 边界圆角程度，如果是正方形布局，该属性为一半宽或高时，则为圆形 | 0                                          |
-| top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值                 | 默认 top 和 left 为 0                      |
-| align                    | center：中间对齐方式；right：右对齐方式；left：左对齐方式    | 当设置有 right 时，默认 right，否则为 left |
-| width、height            | 除 text 以外，其他几种类型的 view 必须设置这两个属性         |                                            |
+| 属性                     | 说明                                                      | 默认                                       |
+| ------------------------ | --------------------------------------------------------- | ------------------------------------------ |
+| rotate                   | 旋转，按照顺时针旋转的度数                                | 不旋转                                     |
+| width、height            | 除 text 以外，其他几种类型的 view 必须设置这两个属性      |                                            |
+| top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值              | 默认 top 和 left 为 0                      |
+| align                    | center：中间对齐方式；right：右对齐方式；left：左对齐方式 | 当设置有 right 时，默认 right，否则为 left |
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/buju.png)
+
+#### border 类型
+
+| 属性         | 说明                                                         | 默认                   |
+| ------------ | ------------------------------------------------------------ | ---------------------- |
+| borderRadius | 边界圆角程度，如果是正方形布局，该属性为一半宽或高时，则为圆形 | 0                      |
+| borderWidth  | 边界宽度，外边界                                             | 必设值，否则无边框效果 |
+| borderColor  | 边框颜色                                                     | black                  |
+
+![](http://7xq276.com2.z0.glb.qiniucdn.com/border.png)
+
+
 
 ### 尺寸即其他
 

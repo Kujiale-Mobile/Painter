@@ -752,7 +752,7 @@
      * 新增$this参数，传入组件的this,兼容在组件中生成
      * @param bg 目前只能设置颜色值
      */ 
-    draw: function (str, ctx, startX, startY, cavW, cavH, bg, $this, ecc) {
+    draw: function (str, ctx, startX, startY, cavW, cavH, bg, color, $this, ecc) {
       var that = this;
       ecclevel = ecc || ecclevel;
       if (!ctx) {
@@ -763,13 +763,12 @@
       str = that.utf16to8(str);//增加中文显示
 
       var frame = that.getFrame(str);
-        // 组件中生成qrcode需要绑定this 
       var px = size / width;
       if (bg) {
         ctx.setFillStyle(bg)
         ctx.fillRect(startX, startY, cavW, cavW);
       }
-      ctx.setFillStyle('#000000');
+      ctx.setFillStyle(color || 'black');
       for (var i = 0; i < width; i++) {
         for (var j = 0; j < width; j++) {
           if (frame[j * width + i]) {
