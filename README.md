@@ -254,13 +254,13 @@ function _textDecoration(decoration, index, color) {
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/2.png)
 
-![](https://ws4.sinaimg.cn/large/006tNc79ly1fig7q9k5nuj30cq06zgm7.jpg)
-
 ## 使用 Painter 的项目
 
-<div>
-<img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/>
-</div>
+| 酷咖名片                                                     |      |      |      |      |      |
+| :------------------------------------------------------------: | ---- | ---- | ---- | ---- | ---- |
+| <img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/> |      |      |      |      |      |
+
+欢迎提交自己的项目，一起交流学习。[点子征集](https://github.com/Kujiale-Mobile/Painter/issues/23)
 
 ## Thanks
 
