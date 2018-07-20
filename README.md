@@ -213,7 +213,7 @@ function _textDecoration(decoration, index, color) {
 | top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值              | 默认 top 和 left 为 0                      |
 | align                    | center：中间对齐方式；right：右对齐方式；left：左对齐方式 | 当设置有 right 时，默认 right，否则为 left |
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/buju.png)
+![](http://7xq276.com2.z0.glb.qiniucdn.com/rotate.png)
 
 #### border 类型
 
