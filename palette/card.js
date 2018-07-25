@@ -19,11 +19,12 @@ export default class LastMayday {
         },
         {
           type: 'text',
-          text: '我是把width设置为400rpx后，我就换行了',
+          text: '我是把width设置为400rpx后，我就换行了xx行了',
           css: [{
             top: `${startTop + 5 * gapSize}rpx`,
+            align: 'center',
             width: '400rpx',
-          }, common],
+          }, common, { left: '300rpx' }],
         },
         {
           type: 'text',

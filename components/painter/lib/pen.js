@@ -266,7 +266,19 @@ export default class Painter {
         text += '...';
         measuredWith = this.ctx.measureText(text).width;
       }
-      const x = -(width / 2);
+      this.ctx.setTextAlign(view.css.align ? view.css.align : 'left');
+      let x;
+      switch (view.css.align) {
+        case 'center':
+          x = 0;
+          break;
+        case 'right':
+          x = (width / 2);
+          break;
+        default:
+          x = -(width / 2);
+          break;
+      }
       const y = -(height / 2) + (i === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + i * lineHeight));
       if (view.css.textStyle === 'stroke') {
         this.ctx.strokeText(text, x, y, measuredWith);
