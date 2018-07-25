@@ -14,8 +14,6 @@
 - [ ] 可通过文本中的换行符进行主动换行
 - [ ] fontFamily 属性支持
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/painter.gif)
-
 ## 画家计划
 
 想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹（有关小程序的坑，可看 https://github.com/Kujiale-Mobile/MP-Keng ）。我们就想到可不可以做一款可以很方便生成图片，并且还能屏蔽掉直接使用 Canvas 的一些坑的库呢？对此我们发起了 “`画家计划`— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
@@ -206,12 +204,11 @@ function _textDecoration(decoration, index, color) {
 
 以上 View ，除去自己拥有的特别属性外，还有以下的通用布局属性
 
-| 属性                     | 说明                                                      | 默认                                       |
-| ------------------------ | --------------------------------------------------------- | ------------------------------------------ |
-| rotate                   | 旋转，按照顺时针旋转的度数                                | 不旋转                                     |
-| width、height            | 除 text 以外，其他几种类型的 view 必须设置这两个属性      |                                            |
-| top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值              | 默认 top 和 left 为 0                      |
-| align                    | center：中间对齐方式；right：右对齐方式；left：左对齐方式 | 当设置有 right 时，默认 right，否则为 left |
+| 属性                     | 说明                                                 | 默认                  |
+| ------------------------ | ---------------------------------------------------- | --------------------- |
+| rotate                   | 旋转，按照顺时针旋转的度数                           | 不旋转                |
+| width、height            | 除 text 以外，其他几种类型的 view 必须设置这两个属性 |                       |
+| top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值         | 默认 top 和 left 为 0 |
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/rotate.png)
 
@@ -225,7 +222,97 @@ function _textDecoration(decoration, index, color) {
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/border.png)
 
+#### align
 
+Painter 的 align 类型与 css 中的 align 有些许不同。在 Painter 中 align 表示 view 本身的对齐方式，而不像 css 中表示对其子 view 的操作。align 可以作用在 Painter 支持的所有 view 上。它以设置的 left、top、right、bottom 的位置为基准，然后做不同的对齐操作。并且 align 在文字多行情况下，会影响多行文字的对齐方式。
+
+**注意：如果布局使用了 right 确定位置，则该 view 会默认右对齐布局，但此时文字还是从左边绘制。**
+
+![](http://7xq276.com2.z0.glb.qiniucdn.com/align.png)
+
+<details><summary>例子代码（点击展开）</summary><br>
+
+```
+{
+  width: '654rpx',
+  height: '600rpx',
+  background: '#eee',
+  views: [
+    {
+      type: 'rect',
+      css: {
+        top: '40rpx',
+        left: '327rpx',
+        color: 'rgba(255, 0, 0, 0.5)',
+        width: '5rpx',
+        height: '500rpx',
+      },
+    },
+    {
+      type: 'image',
+      url: '/palette/avatar.jpg',
+      css: {
+        top: '40rpx',
+        left: '327rpx',
+        width: '100rpx',
+        height: '100rpx',
+      },
+    },
+    {
+      type: 'qrcode',
+      content: '/palette/avatar.jpg',
+      css: {
+        top: '180rpx',
+        left: '327rpx',
+        width: '120rpx',
+        height: '120rpx',
+      },
+    },
+    {
+      type: 'text',
+      text: "align: 'left' 或者不写",
+      css: {
+        top: '320rpx',
+        left: '327rpx',
+        fontSize: '30rpx',
+      },
+    },
+    {
+      type: 'text',
+      text: "align: 'right'",
+      css: {
+        top: '370rpx',
+        left: '327rpx',
+        align: 'right',
+        fontSize: '30rpx',
+      },
+    },
+    {
+      type: 'text',
+      text: "align: 'center'",
+      css: {
+        top: '420rpx',
+        left: '327rpx',
+        align: 'center',
+        fontSize: '30rpx',
+      },
+    },
+    {
+      type: 'text',
+      text: "在多行的情况下，align 会影响内部 text 的对齐，比如这边设置 align: 'center'",
+      css: {
+        top: '480rpx',
+        right: '327rpx',
+        width: '400rpx',
+        align: 'center',
+        fontSize: '30rpx',
+      },
+    },
+  ],
+}
+```
+
+</details>
 
 ### 尺寸即其他
 
