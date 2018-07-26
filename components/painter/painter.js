@@ -52,7 +52,7 @@ Component({
     },
 
     isNeedRefresh(newVal, oldVal) {
-      if (!newVal) {
+      if (!newVal || this.isEmpty(newVal) || util.isEqual(newVal, oldVal)) {
         return false;
       }
       return true;
