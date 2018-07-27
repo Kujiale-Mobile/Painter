@@ -11,6 +11,7 @@
 **TODO**
 
 - [x] borderWidth 和 borderColor 属性支持，可设置边框
+- [x] image 加入 mode 属性
 - [ ] 可通过文本中的换行符进行主动换行
 - [ ] fontFamily 属性支持
 
@@ -100,7 +101,7 @@ views: 里面承载子 view
 
 | type   | 内容    | description                    | 自有css                                                      |
 | ------ | ------- | ------------------------------ | ------------------------------------------------------------ |
-| image  | url     | 表示图片资源的地址，本地或网络 |                                                              |
+| image  | url     | 表示图片资源的地址，本地或网络 | mode:  aspectFit、 aspectFill（保证短边可完全显示，截取中间部分），默认为：aspectFit |
 | text   | text    | 文本的内容                     | 见下面 text 小节                                             |
 | rect   | 无      | 矩形                           | color: 颜色                                                  |
 | qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色）color: 二维码颜色（默认黑色） |
