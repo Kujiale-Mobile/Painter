@@ -99,7 +99,7 @@ Component({
         let preCount = 0;
         let completeCount = 0;
         const paletteCopy = JSON.parse(JSON.stringify(this.properties.palette));
-        if (paletteCopy.background && util.isValidUrl(paletteCopy.background)) {
+        if (paletteCopy.background) {
           preCount++;
           downloader.download(paletteCopy.background).then((path) => {
             paletteCopy.background = path;
@@ -116,15 +116,28 @@ Component({
         }
         if (paletteCopy.views) {
           for (const view of paletteCopy.views) {
-            if (view && view.type === 'image' && view.url && util.isValidUrl(view.url)) {
+            if (view && view.type === 'image' && view.url) {
               preCount++;
               /* eslint-disable no-loop-func */
               downloader.download(view.url).then((path) => {
                 view.url = path;
-                completeCount++;
-                if (preCount === completeCount) {
-                  resolve(paletteCopy);
-                }
+                wx.getImageInfo({
+                  src: view.url,
+                  success: (res) => {
+                    // 获得一下图片信息，供后续裁减使用
+                    view.sWidth = res.width;
+                    view.sHeight = res.height;
+                  },
+                  fail: (error) => {
+                    console.error(`getImageInfo failed, ${Json.stringify(error)}`);
+                  },
+                  complete: () => {
+                    completeCount++;
+                    if (preCount === completeCount) {
+                      resolve(paletteCopy);
+                    }
+                  },
+                });
               }, () => {
                 completeCount++;
                 if (preCount === completeCount) {
