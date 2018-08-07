@@ -18,6 +18,10 @@ Component({
     customStyle: {
       type: String,
     },
+    destScale: {
+      type: Number,
+      value: 1,
+    },
     palette: {
       type: Object,
       observer: function (newVal, oldVal) {
@@ -155,9 +159,12 @@ Component({
 
     saveImgToLocal() {
       const that = this;
+      const scale = that.data.destScale
       setTimeout(() => {
         wx.canvasToTempFilePath({
           canvasId: 'k-canvas',
+          destWidth: that.canvasWidthInPx * scale,
+          destHeight: that.canvasHeightInPx * scale,
           success: function (res) {
             that.getImageInfo(res.tempFilePath);
           },
