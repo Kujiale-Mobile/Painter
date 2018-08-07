@@ -233,7 +233,7 @@ export default class Painter {
     if (view.sHeight > rHeight) {
       startY = Math.round((view.sHeight - rHeight) / 2);
     }
-    if (view.css.mode === 'aspectFit') {
+    if (view.css.mode === 'scaleToFill') {
       this.ctx.drawImage(view.url, -(width / 2), -(height / 2), width, height);
     } else {
       this.ctx.drawImage(view.url, startX, startY, rWidth, rHeight, -(width / 2), -(height / 2), width, height);

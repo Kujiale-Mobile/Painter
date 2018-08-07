@@ -101,7 +101,7 @@ views: 里面承载子 view
 
 | type   | 内容    | description                    | 自有css                                                      |
 | ------ | ------- | ------------------------------ | ------------------------------------------------------------ |
-| image  | url     | 表示图片资源的地址，本地或网络 | mode:  aspectFit、 aspectFill（保证短边可完全显示，截取中间部分），默认为：aspectFit |
+| image  | url     | 表示图片资源的地址，本地或网络 | mode:   scaleToFill（ 不保持纵横比缩放图片，使图片的宽高完全拉伸至填满 image 元素）、 aspectFill（保证短边可完全显示，截取中间部分），默认为：aspectFill |
 | text   | text    | 文本的内容                     | 见下面 text 小节                                             |
 | rect   | 无      | 矩形                           | color: 颜色                                                  |
 | qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色）color: 二维码颜色（默认黑色） |
