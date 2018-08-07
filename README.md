@@ -101,10 +101,94 @@ views: 里面承载子 view
 
 | type   | 内容    | description                    | 自有css                                                      |
 | ------ | ------- | ------------------------------ | ------------------------------------------------------------ |
-| image  | url     | 表示图片资源的地址，本地或网络 | mode:   scaleToFill（ 不保持纵横比缩放图片，使图片的宽高完全拉伸至填满 image 元素）、 aspectFill（保证短边可完全显示，截取中间部分），默认为：aspectFill |
-| text   | text    | 文本的内容                     | 见下面 text 小节                                             |
+| image  | url     | 表示图片资源的地址，本地或网络 | 见 image 小节                                                |
+| text   | text    | 文本的内容                     | 见 text 小节                                                 |
 | rect   | 无      | 矩形                           | color: 颜色                                                  |
 | qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色）color: 二维码颜色（默认黑色） |
+
+#### image
+
+Painter 的 image 可以设置成本地图片或者网络图片，注意本地图片请使用绝对路径。并且如果未设置 image 的长宽，则会使用图片本身的长宽来布局，大小为图片的像素值除以 pixelRatio 。
+
+| 属性名称 | 说明                 | 默认值     |
+| -------- | -------------------- | ---------- |
+| mode     | 图片裁剪、缩放的模式 | aspectFill |
+
+**scaleToFill**：不保持纵横比缩放图片，使图片的宽高完全拉伸至填满 image 元素
+
+**aspectFill**：保持纵横比缩放图片，只保证图片的短边能完全显示出来。也就是说，图片通常只在水平或垂直方向是完整的，另一个方向将会发生截取。
+
+**注：mode 属性和小程序 image 的 mode 属性功能一致，只是支持的类型只有两种，且默认值不同。**
+
+![](https://user-images.githubusercontent.com/4279515/43760940-21b02e5c-9a56-11e8-905c-1b07ee2ad930.png)
+
+<details><summary>例子代码（点击展开）</summary><br>
+
+```
+export default class ImageExample {
+  palette() {
+    return ({
+      width: '654rpx',
+      height: '700rpx',
+      background: '#eee',
+      views: [
+        {
+          type: 'image',
+          url: '/palette/sky.jpg',
+        },
+        {
+          type: 'text',
+          text: '未设置height、width时',
+          css: {
+            right: '0rpx',
+            top: '60rpx',
+            fontSize: '30rpx',
+          },
+        },
+        {
+          type: 'image',
+          url: '/palette/sky.jpg',
+          css: {
+            width: '200rpx',
+            height: '200rpx',
+            top: '230rpx',
+          },
+        },
+        {
+          type: 'text',
+          text: "mode: 'aspectFill' 或 无",
+          css: {
+            left: '210rpx',
+            fontSize: '30rpx',
+            top: '290rpx',
+          },
+        },
+        {
+          type: 'image',
+          url: '/palette/sky.jpg',
+          css: {
+            width: '200rpx',
+            height: '200rpx',
+            mode: 'scaleToFill',
+            top: '500rpx',
+          },
+        },
+        {
+          type: 'text',
+          text: "mode: 'scaleToFill'",
+          css: {
+            left: '210rpx',
+            top: '560rpx',
+            fontSize: '30rpx',
+          },
+        },
+      ],
+    });
+  }
+}
+```
+
+</details>
 
 #### text
 
@@ -205,11 +289,11 @@ function _textDecoration(decoration, index, color) {
 
 以上 View ，除去自己拥有的特别属性外，还有以下的通用布局属性
 
-| 属性                     | 说明                                                 | 默认                  |
-| ------------------------ | ---------------------------------------------------- | --------------------- |
-| rotate                   | 旋转，按照顺时针旋转的度数                           | 不旋转                |
-| width、height            | 除 text 以外，其他几种类型的 view 必须设置这两个属性 |                       |
-| top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值         | 默认 top 和 left 为 0 |
+| 属性                     | 说明                                           | 默认                  |
+| ------------------------ | ---------------------------------------------- | --------------------- |
+| rotate                   | 旋转，按照顺时针旋转的度数                     | 不旋转                |
+| width、height            | view 的宽度和高度，其中 image 和 text 可不设置 |                       |
+| top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值   | 默认 top 和 left 为 0 |
 
 ![](http://7xq276.com2.z0.glb.qiniucdn.com/rotate.png)
 
