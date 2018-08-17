@@ -10,6 +10,7 @@ function isValidUrl(url) {
  * @param  {Object} b 对象b
  * @return {Boolean}   是否相同
  */
+/* eslint-disable */
 function equal(a, b) {
   if (a === b) return true;
 

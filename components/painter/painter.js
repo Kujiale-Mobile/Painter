@@ -30,8 +30,8 @@ Component({
     // 启用脏检查，默认 false
     dirty: {
       type: Boolean,
-      value: false
-    }
+      value: false,
+    },
   },
 
   data: {

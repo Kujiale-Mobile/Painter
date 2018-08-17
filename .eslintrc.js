@@ -25,6 +25,7 @@ module.exports = {
       // 禁止使用 console
       // @off console 的使用很常见
       "no-console": 'off',
+      "one-var": 'off',
       // @warn 无用变量警告
       "no-unused-vars": ['warn', { "vars": "all", "args": "none" }],
       // @error 变量必须先定义后使用
