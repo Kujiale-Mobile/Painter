@@ -134,7 +134,7 @@ Component({
                     view.sHeight = res.height;
                   },
                   fail: (error) => {
-                    console.error(`getImageInfo failed, ${Json.stringify(error)}`);
+                    console.error(`getImageInfo failed, ${JSON.stringify(error)}`);
                   },
                   complete: () => {
                     completeCount++;
