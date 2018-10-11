@@ -19,7 +19,7 @@
 
 想到小程序中有如此大量的生成图片需求，而 Canvas 生成方法又是如此难用和坑爹（有关小程序的坑，可看 https://github.com/Kujiale-Mobile/MP-Keng ）。我们就想到可不可以做一款可以很方便生成图片，并且还能屏蔽掉直接使用 Canvas 的一些坑的库呢？对此我们发起了 “`画家计划`— 通过 json 数据形式，来进行动态渲染并绘制出图片”。 Painter 库的整体架构如下：
 
-![整体架构](http://7xq276.com2.z0.glb.qiniucdn.com/painter.png)
+![整体架构](https://user-images.githubusercontent.com/4279515/46778561-d46b3280-cd46-11e8-99c8-62e182e6f943.png)
 
 首先，我们定义了一套绘图 JSON 规范，开发者可以根据需求构建生成图片的 Palette（调色板），然后在程序运行过程中把调色板传入给 Painter（画家）。Painter 会调用 Pen（画笔），根据 Palette 内容绘制出对应的图片后返回。
 
@@ -208,7 +208,7 @@ export default class ImageExample {
 
 - **以下用个例子说下上述几个属性的用法**
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/text.png)
+![](https://user-images.githubusercontent.com/4279515/46778602-07152b00-cd47-11e8-9965-091a3d58f417.png)
 
 <details><summary>例子代码（点击展开）</summary><br>
 
@@ -295,7 +295,7 @@ function _textDecoration(decoration, index, color) {
 | width、height            | view 的宽度和高度，其中 image 和 text 可不设置 |                       |
 | top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值   | 默认 top 和 left 为 0 |
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/rotate.png)
+![](https://user-images.githubusercontent.com/4279515/46778627-290ead80-cd47-11e8-8483-2e36e39b36f0.png)
 
 #### border 类型
 
@@ -305,7 +305,7 @@ function _textDecoration(decoration, index, color) {
 | borderWidth  | 边界宽度，外边界                                             | 必设值，否则无边框效果 |
 | borderColor  | 边框颜色                                                     | black                  |
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/border.png)
+![](https://user-images.githubusercontent.com/4279515/46778646-3cba1400-cd47-11e8-916a-3fddc172534d.png)
 
 #### align
 
@@ -313,7 +313,7 @@ Painter 的 align 类型与 css 中的 align 有些许不同。在 Painter 中 a
 
 **注意：如果布局使用了 right 确定位置，则该 view 会默认右对齐布局，但此时文字还是从左边绘制。**
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/align.png)
+![](https://user-images.githubusercontent.com/4279515/46778660-4e9bb700-cd47-11e8-8d93-e522185e8188.png)
 
 <details><summary>例子代码（点击展开）</summary><br>
 
@@ -435,7 +435,7 @@ Painter 的 align 类型与 css 中的 align 有些许不同。在 Painter 中 a
 
 绘制效果如下
 
-![](http://7xq276.com2.z0.glb.qiniucdn.com/2.png)
+![](https://user-images.githubusercontent.com/4279515/46778534-ba315480-cd46-11e8-940a-4c8f53f93928.png)
 
 ## 使用 Painter 的项目
 
