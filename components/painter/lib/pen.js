@@ -146,7 +146,7 @@ export default class Painter {
       case 'text': {
         const fontWeight = view.css.fontWeight === 'bold' ? 'bold' : 'normal';
         view.css.fontSize = view.css.fontSize ? view.css.fontSize : '20rpx';
-        this.ctx.font = `normal ${fontWeight} ${view.css.fontSize.toPx()}px sans-serif`;
+        this.ctx.font = `normal ${fontWeight} ${view.css.fontSize.toPx()}px ${view.css.fontFamily ? view.css.fontFamily : 'sans-serif'}`;
         // this.ctx.setFontSize(view.css.fontSize.toPx());
         const textLength = this.ctx.measureText(view.text).width;
         width = view.css.width ? view.css.width.toPx() : textLength;
