@@ -3,7 +3,7 @@ export default class LastMayday {
     return ({
       width: '654rpx',
       height: '1000rpx',
-      background: '#eee',
+      background: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
       views: [
         _textDecoration('overline', 0),
         _textDecoration('underline', 1),
