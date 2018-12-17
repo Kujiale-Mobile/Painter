@@ -100,6 +100,7 @@ Component({
     },
 
     downloadImages() {
+      let that = this;
       return new Promise((resolve, reject) => {
         let preCount = 0;
         let completeCount = 0;
@@ -135,6 +136,7 @@ Component({
                   },
                   fail: (error) => {
                     console.error(`getImageInfo failed, ${JSON.stringify(error)}`);
+                    that.triggerEvent('imgErr', { error: error });
                   },
                   complete: () => {
                     completeCount++;
