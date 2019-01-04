@@ -39,14 +39,8 @@ export default class Painter {
       // 背景填充颜色
       this.ctx.setFillStyle(bg);
       this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
-    } else if (bg.startsWith('linear')) {
-      const param = GD.api.analizeLinear(bg, width, height);
-      const grd = this.ctx.createLinearGradient(param[0], param[1], param[2], param[3]);
-      GD.api.linearEffect(width, height, grd, this.ctx);
-    } else if (bg.startsWith('radial')) {
-      const param = GD.api.analizeRadial(bg, width, height);
-      const grd = this.ctx.createCircularGradient(param[0], param[1], param[2]);
-      GD.api.radialEffect(width, height, grd, this.ctx);
+    } else if (GD.api.isGradient(bg)) {
+      GD.api.doGradient(bg, width, height, this.ctx);
     } else {
       // 背景填充图片
       this.ctx.drawImage(bg, -(width / 2), -(height / 2), width, height);
@@ -355,7 +349,11 @@ export default class Painter {
       width,
       height,
     } = this._preProcess(view);
-    this.ctx.setFillStyle(view.css.color);
+    if (GD.api.isGradient(view.css.color)) {
+      GD.api.doGradient(view.css.color, width, height, this.ctx);
+    } else {
+      this.ctx.setFillStyle(view.css.color);
+    }
     this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
     this.ctx.restore();
     this._doBorder(view, width, height);

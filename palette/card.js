@@ -3,12 +3,22 @@ export default class LastMayday {
     return ({
       width: '654rpx',
       height: '1000rpx',
-      background: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
+      background: '#eee',
       views: [
         _textDecoration('overline', 0),
         _textDecoration('underline', 1),
         _textDecoration('line-through', 2),
         _textDecoration('overline underline line-through', 3, 'red'),
+        {
+          type: 'rect',
+          css: {
+              width: '200rpx',
+              right: '20rpx',
+              top: '30rpx',
+              height: '100rpx',
+              color: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
+          }
+        },
         {
           type: 'text',
           text: "fontWeight: 'bold'",
@@ -74,7 +84,7 @@ export default class LastMayday {
           css: {
             bottom: '40rpx',
             right: '40rpx',
-            color: 'green',
+            color: 'radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)',
             borderRadius: '20rpx',
             borderWidth: '10rpx',
             width: '120rpx',
