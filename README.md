@@ -1,5 +1,21 @@
 # Painter
 
+**号外号外!!**
+
+Painter 支持 css3 的渐变色啦。
+
+你可以在画布的 background 属性中或者 rect 的 color 属性中使用以下方式实现渐变
+
+```
+linear-gradient(-135deg, blue 0%, rgba(18, 52, 86, 1) 20%, #987 80%)
+
+radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)
+```
+
+**注：注意颜色后面的百分比一定得写。**
+
+
+
 **Painter 的优势**
 
 - 功能全，支持文本、图片、矩形、qrcode 类型的 view 绘制
@@ -13,6 +29,7 @@
 - [x] borderWidth 和 borderColor 属性支持，可设置边框
 - [x] image 加入 mode 属性
 - [x] fontFamily 属性支持，使用方法见下方详细说明
+- [x] 支持渐变色
 - [ ] 可通过文本中的换行符进行主动换行
 
 ## 画家计划
@@ -88,7 +105,7 @@ mpvue 的使用方法请移步 [mpvue接入方案](https://github.com/Kujiale-Mo
 一个调色板首先需要给予一些整体属性
 
 ```
-background: 可以是颜色值，也可以为网络图片的链接，默认为白色
+background: 可以是颜色值，也可以为网络图片的链接，默认为白色，支持渐变色
 width: 宽度
 height: 高度
 borderRadius: 边框的圆角（该属性也同样适用于子 view）
@@ -103,7 +120,7 @@ views: 里面承载子 view
 | ------ | ------- | ------------------------------ | ------------------------------------------------------------ |
 | image  | url     | 表示图片资源的地址，本地或网络 | 见 image 小节                                                |
 | text   | text    | 文本的内容                     | 见 text 小节                                                 |
-| rect   | 无      | 矩形                           | color: 颜色                                                  |
+| rect   | 无      | 矩形                           | color: 颜色，支持渐变色                                      |
 | qrcode | content | 画二维码                       | background:  背景颜色（默认为透明色）color: 二维码颜色（默认黑色） |
 
 #### image
