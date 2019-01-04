@@ -4,7 +4,7 @@
 
 Painter 支持 css3 的渐变色啦。
 
-你可以在画布的 background 属性中或者 rect 的 color 属性中使用以下方式实现渐变
+你可以在画布的 background 属性中或者 rect 的 color 属性中使用以下方式实现渐变，其中 radial-gradient 渐变的圆心为 view 中点，半径为最长边，目前不支持自己设置。
 
 ```
 linear-gradient(-135deg, blue 0%, rgba(18, 52, 86, 1) 20%, #987 80%)
