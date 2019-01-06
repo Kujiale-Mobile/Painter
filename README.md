@@ -457,9 +457,9 @@ Painter 的 align 类型与 css 中的 align 有些许不同。在 Painter 中 a
 
 ## 使用 Painter 的项目
 
-| 酷咖名片                                                     |      |      |      |      |      |
+| 酷咖名片                                                     |    爱敲代码的猫  |      |      |      |      |
 | :------------------------------------------------------------: | ---- | ---- | ---- | ---- | ---- |
-| <img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/> |      |      |      |      |      |
+| <img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/> |   <img src="https://blog.eunji.cn/upload/2019/0/gh_95b7370bf8c9_34420190104173815780.jpg" width="100" title="爱敲代码的猫"/>   |      |      |      |      |
 
 欢迎提交自己的项目，一起交流学习。[点子征集](https://github.com/Kujiale-Mobile/Painter/issues/23)
 
