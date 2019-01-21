@@ -198,6 +198,7 @@ export default class Painter {
     if (!notClip && view.css && view.css.borderRadius) {
       this._doClip(view.css.borderRadius, width, height);
     }
+    this._doShadow(view);
 
     return {
       width: width,
@@ -354,20 +355,20 @@ export default class Painter {
     } else {
       this.ctx.setFillStyle(view.css.color);
     }
-    this._doBoxShadow(view);
     this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
     this.ctx.restore();
     this._doBorder(view, width, height);
   }
-   // box-shadow 支持 (x, y, blur, color), 不支持 spread
-   // box-shadow:0px 0px 10px rgba(0,0,0,0.1);
-  _doBoxShadow(view) {
-    if(!view.css.boxShadow){
+
+   // shadow 支持 (x, y, blur, color), 不支持 spread
+   // shadow:0px 0px 10px rgba(0,0,0,0.1);
+  _doShadow(view) {
+    if(!view.css || !view.css.shadow){
       return;
     }
-    let box = view.css.boxShadow.replace(/,\s+/g, ',').split(' ');
+    let box = view.css.shadow.replace(/,\s+/g, ',').split(' ');
     if(box.length > 4) {
-      console.error('boxShadow don\'t spread option');
+      console.error('shadow don\'t spread option');
       return;
     }
     this.ctx.shadowOffsetX = parseInt(box[0])
