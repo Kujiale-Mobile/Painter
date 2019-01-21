@@ -491,6 +491,8 @@ export default class ShadowExample {
 }
 ```
 
+
+
 ### 尺寸即其他
 
 1，目前 Painter 中支持两种尺寸单位，px 和 rpx，代表的意思和小程序中一致，此处就不多说。
