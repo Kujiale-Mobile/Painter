@@ -490,7 +490,7 @@ export default class ShadowExample {
   }
 }
 ```
-
+</details>
 
 
 ### 尺寸即其他
