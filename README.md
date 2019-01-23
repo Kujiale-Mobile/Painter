@@ -1,21 +1,5 @@
 # Painter
 
-**号外号外!!**
-
-Painter 支持 css3 的渐变色啦。
-
-你可以在画布的 background 属性中或者 rect 的 color 属性中使用以下方式实现渐变，其中 radial-gradient 渐变的圆心为 view 中点，半径为最长边，目前不支持自己设置。
-
-```
-linear-gradient(-135deg, blue 0%, rgba(18, 52, 86, 1) 20%, #987 80%)
-
-radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)
-```
-
-**注：注意颜色后面的百分比一定得写。**
-
-
-
 **Painter 的优势**
 
 - 功能全，支持文本、图片、矩形、qrcode 类型的 view 绘制
@@ -492,14 +476,34 @@ export default class ShadowExample {
 ```
 </details>
 
+#### 渐变色支持
 
-### 尺寸即其他
+你可以在画布的 background 属性或者 rect 的 color 属性中使用以下方式实现 css 3 的渐变色，其中 radial-gradient 渐变的圆心为 view 中点，半径为最长边，目前不支持自己设置。
+
+```
+linear-gradient(-135deg, blue 0%, rgba(18, 52, 86, 1) 20%, #987 80%)
+
+radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)
+```
+
+**！！！注意：颜色后面的百分比一定得写。**
+
+
+
+
+### Tips（一定要看哦～）
 
 1，目前 Painter 中支持两种尺寸单位，px 和 rpx，代表的意思和小程序中一致，此处就不多说。
 
 2，目前子 view 的 css 属性支持 object 或 array。所以意味着，你可以把几个子 view 共用的 css 属性提取出来。做到让 Palette 更加简洁。
 
 3，因为我们的 palette 是以 js 承载的 json，所以意味着你可以在每一个属性中很方便的加上自己的逻辑。也可以把某些属性单独提取出来，让多个 palette 共用，做到模块化。
+
+4，如果你只希望获得一张生成的图片来展示，可以把 Painter 挪动到屏幕外进行绘制，绘制完后得到一张图片再进行展示，如下面这样。
+
+```
+<painter style="position:fixed;top:-9999rpx" palette="{{userInfoTemplate}}" bind:imgOK="onImgOK" />
+```
 
 
 
@@ -533,9 +537,9 @@ export default class ShadowExample {
 
 ## 使用 Painter 的项目
 
-| 酷咖名片                                                     |    爱敲代码的猫  | 春节对联 |      |      |      |
+| 酷咖名片                                                     |    爱敲代码的猫  | 春节对联 | 致室友 |      |      |
 | :------------------------------------------------------------: | ---- | ---- | ---- | ---- | ---- |
-| <img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/> |   <img src="https://blog.eunji.cn/upload/2019/0/gh_95b7370bf8c9_34420190104173815780.jpg" width="100" title="爱敲代码的猫"/>   | <img src="https://user-images.githubusercontent.com/848691/51151536-4606cf80-18a6-11e9-935c-08ba88401e71.png" width="100" title="春节对联"/> |      |      |      |
+| <img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/> |   <img src="https://blog.eunji.cn/upload/2019/0/gh_95b7370bf8c9_34420190104173815780.jpg" width="100" title="爱敲代码的猫"/>   | <img src="https://user-images.githubusercontent.com/848691/51151536-4606cf80-18a6-11e9-935c-08ba88401e71.png" width="100" title="春节对联"/> | <img src="https://user-images.githubusercontent.com/16663265/51538435-3aaa3a00-1e8c-11e9-946b-a35fc230db29.png" width="100" title="致室友"/> |      |      |
 
 欢迎提交自己的项目，一起交流学习。[点子征集](https://github.com/Kujiale-Mobile/Painter/issues/23)
 
