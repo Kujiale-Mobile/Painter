@@ -16,6 +16,7 @@ export default class LastMayday {
               right: '20rpx',
               top: '30rpx',
               height: '100rpx',
+              shadow: '10rpx 10rpx 5rpx #888888',
               color: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
           }
         },
@@ -24,6 +25,7 @@ export default class LastMayday {
           text: "fontWeight: 'bold'",
           css: [{
             top: `${startTop + 4 * gapSize}rpx`,
+            shadow: '10rpx 10rpx 5rpx #888888',
             fontWeight: 'bold',
           }, common],
         },
@@ -136,6 +138,7 @@ function _image(index, rotate, borderRadius) {
         left: `${startLeft + 160 * index}rpx`,
         width: '120rpx',
         height: '120rpx',
+        shadow: '10rpx 10rpx 5rpx #888888',
         rotate: rotate,
         borderRadius: borderRadius,
       },
