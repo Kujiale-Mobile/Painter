@@ -15,6 +15,7 @@
 - [x] fontFamily 属性支持，使用方法见下方详细说明
 - [x] 支持渐变色
 - [x] 支持 box-shadow 和 text-shadow，统一使用 shadow 表示。具体说明请看下方。
+- [x] text 加入 background 属性。具体说明请看下方。
 - [ ] 可通过文本中的换行符进行主动换行
 
 ## 画家计划
@@ -206,6 +207,8 @@ export default class ImageExample {
 | textDecoration | 文本修饰，支持 underline、 overline、 line-through，也可组合使用 | 无效果              |
 | textStyle      | fill： 填充样式，stroke：镂空样式                            | fill                |
 | fontFamily     | 字体，如需加载网络字体，前提前使用 wx.loadFontFace 进行加载（https://developers.weixin.qq.com/miniprogram/dev/api/media/font/wx.loadFontFace.html） | sans-serif          |
+| background     | 文字背景颜色                                               | 无       |
+| padding        | 文字背景颜色边际与文字间距                                       | 0rpx      |
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 
