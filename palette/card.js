@@ -36,6 +36,8 @@ export default class LastMayday {
             top: `${startTop + 5 * gapSize}rpx`,
             align: 'center',
             width: '400rpx',
+            background: '#538e60',
+            padding: '10rpx',
           }, common, { left: '300rpx' }],
         },
         {
