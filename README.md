@@ -540,9 +540,9 @@ radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)
 
 ## 使用 Painter 的项目
 
-| 酷咖名片 | 爱敲代码的猫  | 春节对联 | 致室友 | GitHub小程序客户端 |      |
-| :-: | :-: | :-: | :-: | :-: | :-: |
-| <img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/> |   <img src="https://blog.eunji.cn/upload/2019/0/gh_95b7370bf8c9_34420190104173815780.jpg" width="100" title="爱敲代码的猫"/>   | <img src="https://user-images.githubusercontent.com/848691/51151536-4606cf80-18a6-11e9-935c-08ba88401e71.png" width="100" title="春节对联"/> | <img src="https://user-images.githubusercontent.com/16663265/51538435-3aaa3a00-1e8c-11e9-946b-a35fc230db29.png" width="100" title="致室友"/> | <img src="https://raw.githubusercontent.com/huangjianke/Gitter/master/images/code.png" width="100" title="Gitter"/> |      |
+| 酷咖名片 | 爱敲代码的猫  | 春节对联 | 致室友 | GitHub小程序客户端 | SwitchDog |      |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| <img src="https://user-images.githubusercontent.com/4279515/42991545-804561d4-8c38-11e8-8fc3-9f1a07a42c45.jpg" width="100" title="酷咖名片"/> |   <img src="https://blog.eunji.cn/upload/2019/0/gh_95b7370bf8c9_34420190104173815780.jpg" width="100" title="爱敲代码的猫"/>   | <img src="https://user-images.githubusercontent.com/848691/51151536-4606cf80-18a6-11e9-935c-08ba88401e71.png" width="100" title="春节对联"/> | <img src="https://user-images.githubusercontent.com/16663265/51538435-3aaa3a00-1e8c-11e9-946b-a35fc230db29.png" width="100" title="致室友"/> | <img src="https://raw.githubusercontent.com/huangjianke/Gitter/master/images/code.png" width="100" title="Gitter"/> | <img width="100" src="https://user-images.githubusercontent.com/10265417/52628946-ad3e9080-2ef3-11e9-8462-32616535e95b.jpg" alt="switch dog wxa qrcode" title="SwitchDog" /> |      |
 
 欢迎提交自己的项目，一起交流学习。[点子征集](https://github.com/Kujiale-Mobile/Painter/issues/23)
 
