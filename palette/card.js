@@ -12,15 +12,16 @@ export default class LastMayday {
         {
           type: 'rect',
           css: {
-              width: '200rpx',
-              right: '20rpx',
-              top: '30rpx',
-              height: '100rpx',
-              shadow: '10rpx 10rpx 5rpx #888888',
-              color: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
-          }
+            width: '200rpx',
+            right: '20rpx',
+            top: '30rpx',
+            height: '100rpx',
+            shadow: '10rpx 10rpx 5rpx #888888',
+            color: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
+          },
         },
         {
+          id: 'my-text-id',
           type: 'text',
           text: "fontWeight: 'bold'",
           css: [{
@@ -28,6 +29,16 @@ export default class LastMayday {
             shadow: '10rpx 10rpx 5rpx #888888',
             fontWeight: 'bold',
           }, common],
+        },
+        {
+          type: 'rect',
+          css: {
+            width: '20rpx',
+            height: '20rpx',
+            color: 'red',
+            left: [`${startTop}rpx`, 'my-text-id'],
+            top: `${startTop + 4 * gapSize + 15}rpx`,
+          },
         },
         {
           type: 'text',
