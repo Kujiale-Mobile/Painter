@@ -224,7 +224,10 @@ export default class ImageExample {
   type: 'text',
   
 2，然后在后面的 view 中，你可以在 left 和 right 属性中使用这个id。如下
-left: ['10rpx', 'my-text-id', 1] // 表示布局在距离左边，10rpx + 该text文本宽度 * 1 的距离，1为默认，可省去，你也可以使用负数或小数来做计算，最终的 left 会加上文本宽度乘以该数的值。
+left: ['10rpx', 'my-text-id', 比例] 
+表示布局在距离左边（10rpx + 该text文本宽度 * 比例） 的距离，比例默认为 1，可省去，你也可以使用负数或小数来做计算，最终的 left 会加上文本宽度乘以该数的值。
+
+注意：比例一定为一个 number
 ```
 
 - **以下用个例子说下上述几个属性的用法**
