@@ -143,25 +143,41 @@ export default class Painter {
   }
 
   _preProcess(view, notClip) {
-    let width;
+    let width=0;
     let height;
     let extra;
     switch (view.type) {
       case 'text': {
+        const textArray = view.text.split('\n');
+        //处理多个连续的'\n'
+        for(let i = 0; i < textArray.length ; ++i){
+          if(textArray[i]===''){
+            textArray[i]=' ';
+          }
+        }
         const fontWeight = view.css.fontWeight === 'bold' ? 'bold' : 'normal';
         view.css.fontSize = view.css.fontSize ? view.css.fontSize : '20rpx';
         this.ctx.font = `normal ${fontWeight} ${view.css.fontSize.toPx()}px ${view.css.fontFamily ? view.css.fontFamily : 'sans-serif'}`;
         // this.ctx.setFontSize(view.css.fontSize.toPx());
-        const textLength = this.ctx.measureText(view.text).width;
-        width = view.css.width ? view.css.width.toPx() : textLength;
         // 计算行数
-        const calLines = Math.ceil(textLength / width);
-        const lines = view.css.maxLines < calLines ? view.css.maxLines : calLines;
+        let lines=0;
+        let linesArray=[];
+        for(let i=0; i<textArray.length; ++i){
+          const textLength = this.ctx.measureText(textArray[i]).width;
+          const partWidth = view.css.width ? view.css.width.toPx() : textLength;
+          const calLines = Math.ceil(textLength / partWidth);
+          width = partWidth > width ? partWidth : width;
+          lines += calLines;
+          linesArray[i] = calLines;
+        }
+        lines = view.css.maxLines < lines ? view.css.maxLines : lines;
         const lineHeight = view.css.lineHeight ? view.css.lineHeight.toPx() : view.css.fontSize.toPx();
         height = lineHeight * lines;
         extra = {
           lines: lines,
           lineHeight: lineHeight,
+          textArray: textArray,
+          linesArray: linesArray,
         };
         break;
       }
@@ -346,86 +362,98 @@ export default class Painter {
     const {
       lines,
       lineHeight,
+      textArray,
+      linesArray
     } = extra;
-    const preLineLength = Math.round(view.text.length / lines);
-    let start = 0;
-    let alreadyCount = 0;
     // 如果设置了id，则保留 text 的长度
     if (view.id) {
-      const textWidth = this.ctx.measureText(view.text).width;
+      let textWidth = 0;
+      for(let i = 0; i < textArray.length; ++i){
+        textWidth = this.ctx.measureText(textArray[i]).width > textWidth ? this.ctx.measureText(textArray[i]).width : textWidth;
+      }
       this.globalTextWidth[view.id] = width ? (textWidth < width ? textWidth : width) : textWidth;
     }
-    for (let i = 0; i < lines; ++i) {
-      alreadyCount = preLineLength;
-      let text = view.text.substr(start, alreadyCount);
-      let measuredWith = this.ctx.measureText(text).width;
-      // 如果测量大小小于width一个字符的大小，则进行补齐，如果测量大小超出 width，则进行减除
-      // 如果已经到文本末尾，也不要进行该循环
-      while ((start + alreadyCount <= view.text.length) && (width - measuredWith > view.css.fontSize.toPx() || measuredWith > width)) {
-        if (measuredWith < width) {
-          text = view.text.substr(start, ++alreadyCount);
+    let lineIndex=0;
+    for(let j = 0; j < textArray.length; ++j){
+      const preLineLength = Math.round(textArray[j].length / linesArray[j]);
+      let start = 0;
+      let alreadyCount = 0;
+      for (let i = 0; i < linesArray[j]; ++i) {
+        //绘制行数大于最大行数，则直接跳出循环
+        if(lineIndex >= lines){
+          break;
+        }
+        alreadyCount = preLineLength;
+        let text = textArray[j].substr(start, alreadyCount);
+        let measuredWith = this.ctx.measureText(text).width;
+        // 如果测量大小小于width一个字符的大小，则进行补齐，如果测量大小超出 width，则进行减除
+        // 如果已经到文本末尾，也不要进行该循环
+        while ((start + alreadyCount <= textArray[j].length) && (width - measuredWith > view.css.fontSize.toPx() || measuredWith > width)) {
+          if (measuredWith < width) {
+            text = textArray[j].substr(start, ++alreadyCount);
+          } else {
+            if (text.length <= 1) {
+              // 如果只有一个字符时，直接跳出循环
+              break;
+            }
+            text = textArray[j].substr(start, --alreadyCount);
+          }
+          measuredWith = this.ctx.measureText(text).width;
+        }
+        start += text.length;
+        // 如果是最后一行了，发现还有未绘制完的内容，则加...
+        if (lineIndex === lines - 1 && (j < textArray.length -1 || start < textArray[j].length)) {
+          while (this.ctx.measureText(`${text}...`).width > width) {
+            if (text.length <= 1) {
+              // 如果只有一个字符时，直接跳出循环
+              break;
+            }
+            text = text.substring(0, text.length - 1);
+          }
+          text += '...';
+          measuredWith = this.ctx.measureText(text).width;
+        }
+        this.ctx.setTextAlign(view.css.align ? view.css.align : 'left');
+        let x;
+        switch (view.css.align) {
+          case 'center':
+            x = 0;
+            break;
+          case 'right':
+            x = (width / 2);
+            break;
+          default:
+            x = -(width / 2);
+            break;
+        }
+        const y = -(height / 2) + (lineIndex === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + lineIndex * lineHeight));
+        lineIndex++;
+        if (view.css.textStyle === 'stroke') {
+          this.ctx.strokeText(text, x, y, measuredWith);
         } else {
-          if (text.length <= 1) {
-            // 如果只有一个字符时，直接跳出循环
-            break;
+          this.ctx.fillText(text, x, y, measuredWith);
+        }
+        const fontSize = view.css.fontSize.toPx();
+        if (view.css.textDecoration) {
+          this.ctx.beginPath();
+          if (/\bunderline\b/.test(view.css.textDecoration)) {
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(x + measuredWith, y);
           }
-          text = view.text.substr(start, --alreadyCount);
-        }
-        measuredWith = this.ctx.measureText(text).width;
-      }
-      start += text.length;
-      // 如果是最后一行了，发现还有未绘制完的内容，则加...
-      if (i === lines - 1 && start < view.text.length) {
-        while (this.ctx.measureText(`${text}...`).width > width) {
-          if (text.length <= 1) {
-            // 如果只有一个字符时，直接跳出循环
-            break;
+          if (/\boverline\b/.test(view.css.textDecoration)) {
+            this.ctx.moveTo(x, y - fontSize);
+            this.ctx.lineTo(x + measuredWith, y - fontSize);
           }
-          text = text.substring(0, text.length - 1);
+          if (/\bline-through\b/.test(view.css.textDecoration)) {
+            this.ctx.moveTo(x, y - fontSize / 3);
+            this.ctx.lineTo(x + measuredWith, y - fontSize / 3);
+          }
+          this.ctx.closePath();
+          this.ctx.setStrokeStyle(view.css.color);
+          this.ctx.stroke();
         }
-        text += '...';
-        measuredWith = this.ctx.measureText(text).width;
-      }
-      this.ctx.setTextAlign(view.css.align ? view.css.align : 'left');
-      let x;
-      switch (view.css.align) {
-        case 'center':
-          x = 0;
-          break;
-        case 'right':
-          x = (width / 2);
-          break;
-        default:
-          x = -(width / 2);
-          break;
-      }
-      const y = -(height / 2) + (i === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + i * lineHeight));
-      if (view.css.textStyle === 'stroke') {
-        this.ctx.strokeText(text, x, y, measuredWith);
-      } else {
-        this.ctx.fillText(text, x, y, measuredWith);
-      }
-      const fontSize = view.css.fontSize.toPx();
-      if (view.css.textDecoration) {
-        this.ctx.beginPath();
-        if (/\bunderline\b/.test(view.css.textDecoration)) {
-          this.ctx.moveTo(x, y);
-          this.ctx.lineTo(x + measuredWith, y);
-        }
-        if (/\boverline\b/.test(view.css.textDecoration)) {
-          this.ctx.moveTo(x, y - fontSize);
-          this.ctx.lineTo(x + measuredWith, y - fontSize);
-        }
-        if (/\bline-through\b/.test(view.css.textDecoration)) {
-          this.ctx.moveTo(x, y - fontSize / 3);
-          this.ctx.lineTo(x + measuredWith, y - fontSize / 3);
-        }
-        this.ctx.closePath();
-        this.ctx.setStrokeStyle(view.css.color);
-        this.ctx.stroke();
       }
     }
-
     this.ctx.restore();
     this._doBorder(view, width, height);
   }
