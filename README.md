@@ -510,6 +510,49 @@ radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)
 
 **！！！注意：颜色后面的百分比一定得写。**
 
+### 其他技巧
+
+#### 文字竖行显示
+
+因为 Painter 支持换行符，所以我们可以配合向字符之间插入换行符来达到竖排显示的效果，并且我们还能自由控制是从左到右或从右到左，如下图所示。
+![](https://user-images.githubusercontent.com/4279515/61357471-f16efc00-a8aa-11e9-84b3-192fe158f38d.png)
+
+<details><summary>例子代码（点击展开）</summary><br>
+
+```
+const text = '锄禾日当午汗滴禾下土谁知盘中餐粒粒皆辛苦';
+export default class ImageExample {
+  palette() {
+    const views = [];
+    let tmpText = '';
+    let index = 0;
+    for (let i = 0; i < text.length; i++) {
+      tmpText = `${tmpText}${text[i]}\n`;
+      if (i % 5 === 4) {
+        views.push({
+          type: 'text',
+          text: tmpText,
+          css: {
+            right: `${50 + index}rpx`,
+            top: '60rpx',
+            fontSize: '40rpx',
+            lineHeight: '50rpx',
+          },
+        });
+        index += 50;
+        tmpText = '';
+      }
+    }
+    return ({
+      width: '654rpx',
+      height: '500rpx',
+      background: '#eee',
+      views: views,
+    });
+  }
+}
+```
+
 
 
 
