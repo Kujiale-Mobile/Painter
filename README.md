@@ -515,6 +515,7 @@ radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)
 #### 文字竖行显示
 
 因为 Painter 支持换行符，所以我们可以配合向字符之间插入换行符来达到竖排显示的效果，并且我们还能自由控制是从左到右或从右到左，如下图所示。
+
 ![](https://user-images.githubusercontent.com/4279515/61357471-f16efc00-a8aa-11e9-84b3-192fe158f38d.png)
 
 <details><summary>例子代码（点击展开）</summary><br>
@@ -552,9 +553,7 @@ export default class ImageExample {
   }
 }
 ```
-
-
-
+</details>
 
 ### Tips（一定要看哦～）
 
