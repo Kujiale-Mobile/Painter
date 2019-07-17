@@ -142,6 +142,29 @@ export default class Painter {
     this.ctx.restore();
   }
 
+  _addSpaceToText(text, spaceCount) {
+    let newText = '';
+    let spaceText = '';
+    for(let i=0; i<spaceCount; ++i) {
+      spaceText += ' ';
+    }
+    for(let i=0; i<text.length; ++i) {
+      if(i < text.length - 1) {
+        newText += text[i]+spaceText;
+      }
+      else {
+        newText += text[i];
+      }
+    }
+    return newText;
+  }
+
+  _addSpaceToTextArray(textArray, spaceCount) {
+    for(let i=0; i<textArray.length; ++i){
+      textArray[i] = this._addSpaceToText(textArray[i],spaceCount);
+    }
+  }
+
   _preProcess(view, notClip) {
     let width = 0;
     let height;
@@ -154,6 +177,11 @@ export default class Painter {
           if (textArray[i] === '') {
             textArray[i] = ' ';
           }
+        }
+        //检查是否有number类型的letter-spacing属性,若有则通过加空格来模拟letter-spacing
+        if(view.css.letterSpacing && typeof(view.css.letterSpacing)==='number') {
+          const spaceCount = Math.round(view.css.letterSpacing);
+          this._addSpaceToTextArray(textArray, spaceCount);
         }
         const fontWeight = view.css.fontWeight === 'bold' ? 'bold' : 'normal';
         view.css.fontSize = view.css.fontSize ? view.css.fontSize : '20rpx';
