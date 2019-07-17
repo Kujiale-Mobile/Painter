@@ -210,6 +210,7 @@ export default class ImageExample {
 | fontFamily     | 字体，如需加载网络字体，前提前使用 wx.loadFontFace 进行加载（https://developers.weixin.qq.com/miniprogram/dev/api/media/font/wx.loadFontFace.html） | sans-serif          |
 | background     | 文字背景颜色                                               | 无       |
 | padding        | 文字背景颜色边际与文字间距                                       | 0rpx      |
+| textAlign | 文字的对齐方式，分为 left, center, right，view 的对齐方式请看 align 属性 | left |
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 

@@ -48,6 +48,7 @@ export default class LastMayday {
             align: 'center',
             width: '400rpx',
             background: '#538e60',
+            textAlign: 'center',
             padding: '10rpx',
           }, common, { left: '300rpx' }],
         },
