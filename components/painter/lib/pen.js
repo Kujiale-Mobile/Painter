@@ -94,9 +94,9 @@ export default class Painter {
       this.ctx.closePath();
       this.ctx.fill();
       // 在 ios 的 6.6.6 版本上 clip 有 bug，禁掉此类型上的 clip，也就意味着，在此版本微信的 ios 设备下无法使用 border 属性
-      if (!(getApp().systemInfo &&
-        getApp().systemInfo.version <= '6.6.6' &&
-        getApp().systemInfo.platform === 'ios')) {
+      if (!(getApp().systemInfo
+        && getApp().systemInfo.version <= '6.6.6'
+        && getApp().systemInfo.platform === 'ios')) {
         this.ctx.clip();
       }
       this.ctx.setGlobalAlpha(1);
@@ -145,14 +145,13 @@ export default class Painter {
   _addSpaceToText(text, spaceCount) {
     let newText = '';
     let spaceText = '';
-    for(let i=0; i<spaceCount; ++i) {
+    for (let i = 0; i < spaceCount; ++i) {
       spaceText += ' ';
     }
-    for(let i=0; i<text.length; ++i) {
-      if(i < text.length - 1) {
-        newText += text[i]+spaceText;
-      }
-      else {
+    for (let i = 0; i < text.length; ++i) {
+      if (i < text.length - 1) {
+        newText += text[i] + spaceText;
+      } else {
         newText += text[i];
       }
     }
@@ -160,8 +159,8 @@ export default class Painter {
   }
 
   _addSpaceToTextArray(textArray, spaceCount) {
-    for(let i=0; i<textArray.length; ++i){
-      textArray[i] = this._addSpaceToText(textArray[i],spaceCount);
+    for (let i = 0; i < textArray.length; ++i) {
+      textArray[i] = this._addSpaceToText(textArray[i], spaceCount);
     }
   }
 
@@ -178,8 +177,8 @@ export default class Painter {
             textArray[i] = ' ';
           }
         }
-        //检查是否有number类型的letter-spacing属性,若有则通过加空格来模拟letter-spacing
-        if(view.css.letterSpacing && typeof(view.css.letterSpacing)==='number') {
+        // 检查是否有number类型的letter-spacing属性,若有则通过加空格来模拟letter-spacing
+        if (view.css.letterSpacing && typeof (view.css.letterSpacing) === 'number') {
           const spaceCount = Math.round(view.css.letterSpacing);
           this._addSpaceToTextArray(textArray, spaceCount);
         }
@@ -210,10 +209,38 @@ export default class Painter {
         break;
       }
       case 'image': {
-        // image 如果未设置长宽，则使用图片本身的长宽
+        // image的长宽设置成auto的逻辑处理
         const ratio = getApp().systemInfo.pixelRatio ? getApp().systemInfo.pixelRatio : 2;
-        width = view.css && view.css.width ? view.css.width.toPx() : Math.round(view.sWidth / ratio);
-        height = view.css && view.css.height ? view.css.height.toPx() : Math.round(view.sHeight / ratio);
+        if (!view.css) {
+          width = Math.round(view.sWidth / ratio);
+          height = Math.round(view.sHeight / ratio);
+        } else {
+          if (!view.css.width) {
+            width = Math.round(view.sWidth / ratio);
+            if ((!view.css.height) || view.css.height === 'auto') {
+              height = Math.round(view.sHeight / ratio);
+            } else {
+              height = view.css.height.toPx();
+            }
+          } else if (view.css.width === 'auto') {
+            if ((!view.css.height) || view.css.height === 'auto') {
+              width = Math.round(view.sWidth / ratio);
+              height = Math.round(view.sHeight / ratio);
+            } else {
+              height = view.css.height.toPx();
+              width = view.sWidth / view.sHeight * height;
+            }
+          } else {
+            width = view.css.width.toPx();
+            if (!view.css.height) {
+              height = Math.round(view.sHeight / ratio);
+            } else if (view.css.height === 'auto') {
+              height = view.sHeight / view.sWidth * width;
+            } else {
+              height = view.css.height.toPx();
+            }
+          }
+        }
         break;
       }
       default:
