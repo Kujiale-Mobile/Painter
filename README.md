@@ -112,17 +112,19 @@ views: 里面承载子 view
 
 #### image
 
-Painter 的 image 可以设置成本地图片或者网络图片，注意本地图片请使用绝对路径。并且如果未设置 image 的长宽，则会使用图片本身的长宽来布局，大小为图片的像素值除以 pixelRatio 。
+Painter 的 image 可以设置成本地图片或者网络图片，注意本地图片请使用绝对路径。并且如果未设置 image 的长宽，则长宽的属性值会默认设为auto。若长宽均为auto则会使用图片本身的长宽来布局，大小为图片的像素值除以 pixelRatio 。
 
 | 属性名称 | 说明                 | 默认值     |
 | -------- | -------------------- | ---------- |
+| width    | image的宽度        | auto       |
+| height   | image的高度        | auto       |
 | mode     | 图片裁剪、缩放的模式 | aspectFill |
 
 **scaleToFill**：不保持纵横比缩放图片，使图片的宽高完全拉伸至填满 image 元素
 
 **aspectFill**：保持纵横比缩放图片，只保证图片的短边能完全显示出来。也就是说，图片通常只在水平或垂直方向是完整的，另一个方向将会发生截取。
 
-**注：mode 属性和小程序 image 的 mode 属性功能一致，只是支持的类型只有两种，且默认值不同。**
+**注：mode 属性和小程序 image 的 mode 属性功能一致，只是支持的类型只有两种，且默认值不同。 当 width 或 height 属性设置为 auto 时，mode 属性失效**
 
 ![](https://user-images.githubusercontent.com/4279515/43760940-21b02e5c-9a56-11e8-905c-1b07ee2ad930.png)
 
