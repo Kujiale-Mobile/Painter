@@ -126,7 +126,7 @@ Painter 的 image 可以设置成本地图片或者网络图片，注意本地�
 
 **注：mode 属性和小程序 image 的 mode 属性功能一致，只是支持的类型只有两种，且默认值不同。 当 width 或 height 属性设置为 auto 时，mode 属性失效**
 
-![](https://user-images.githubusercontent.com/4279515/43760940-21b02e5c-9a56-11e8-905c-1b07ee2ad930.png)
+![](https://user-images.githubusercontent.com/49523717/61441645-a4f1f200-a978-11e9-9f9c-467cfcf3ec04.png)
 
 <details><summary>例子代码（点击展开）</summary><br>
 
@@ -135,7 +135,7 @@ export default class ImageExample {
   palette() {
     return ({
       width: '654rpx',
-      height: '700rpx',
+      height: '1000rpx',
       background: '#eee',
       views: [
         {
@@ -185,6 +185,24 @@ export default class ImageExample {
           css: {
             left: '210rpx',
             top: '560rpx',
+            fontSize: '30rpx',
+          },
+        },
+        {
+          type: 'image',
+          url: '/palette/sky.jpg',
+          css: {
+            width: '200rpx',
+            height: 'auto',
+            top: '750rpx',
+          },
+        },
+        {
+          type: 'text',
+          text: '设置height为auto',
+          css: {
+            left: '210rpx',
+            top: '780rpx',
             fontSize: '30rpx',
           },
         },
