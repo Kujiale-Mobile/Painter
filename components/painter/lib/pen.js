@@ -94,9 +94,9 @@ export default class Painter {
       this.ctx.closePath();
       this.ctx.fill();
       // 在 ios 的 6.6.6 版本上 clip 有 bug，禁掉此类型上的 clip，也就意味着，在此版本微信的 ios 设备下无法使用 border 属性
-      if (!(getApp().systemInfo &&
-        getApp().systemInfo.version <= '6.6.6' &&
-        getApp().systemInfo.platform === 'ios')) {
+      if (!(getApp().systemInfo
+        && getApp().systemInfo.version <= '6.6.6'
+        && getApp().systemInfo.platform === 'ios')) {
         this.ctx.clip();
       }
       this.ctx.setGlobalAlpha(1);
@@ -182,10 +182,30 @@ export default class Painter {
         break;
       }
       case 'image': {
-        // image 如果未设置长宽，则使用图片本身的长宽
+        // image的长宽设置成auto的逻辑处理
         const ratio = getApp().systemInfo.pixelRatio ? getApp().systemInfo.pixelRatio : 2;
-        width = view.css && view.css.width ? view.css.width.toPx() : Math.round(view.sWidth / ratio);
-        height = view.css && view.css.height ? view.css.height.toPx() : Math.round(view.sHeight / ratio);
+        // 有css却未设置width或height，则默认为auto
+        if (view.css) {
+          if (!view.css.width) {
+            view.css.width = 'auto';
+          }
+          if (!view.css.height) {
+            view.css.height = 'auto';
+          }
+        }
+        if (!view.css || (view.css.width === 'auto' && view.css.height === 'auto')) {
+          width = Math.round(view.sWidth / ratio);
+          height = Math.round(view.sHeight / ratio);
+        } else if (view.css.width === 'auto') {
+          height = view.css.height.toPx();
+          width = view.sWidth / view.sHeight * height;
+        } else if (view.css.height === 'auto') {
+          width = view.css.width.toPx();
+          height = view.sHeight / view.sWidth * width;
+        } else {
+          width = view.css.width.toPx();
+          height = view.css.height.toPx();
+        }
         break;
       }
       default:

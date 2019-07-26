@@ -2,7 +2,7 @@ export default class ImageExample {
   palette() {
     return ({
       width: '654rpx',
-      height: '700rpx',
+      height: '1000rpx',
       background: '#eee',
       views: [
         {
@@ -52,6 +52,24 @@ export default class ImageExample {
           css: {
             left: '210rpx',
             top: '560rpx',
+            fontSize: '30rpx',
+          },
+        },
+        {
+          type: 'image',
+          url: '/palette/sky.jpg',
+          css: {
+            width: '200rpx',
+            height: 'auto',
+            top: '750rpx',
+          },
+        },
+        {
+          type: 'text',
+          text: '设置height为auto',
+          css: {
+            left: '210rpx',
+            top: '780rpx',
             fontSize: '30rpx',
           },
         },
