@@ -48,11 +48,11 @@
     const dir = direction && direction[1] ? parseFloat(direction[1]) : 0;
     let coordinate;
     switch (dir) {
-      case 0: console.log('case 0:'); coordinate = [0, -height / 2, 0, height / 2]; break;
-      case 90: console.log('case 90:'); coordinate = [width / 2, 0, -width / 2, 0]; break;
-      case -90: console.log('case -90:'); coordinate = [-width / 2, 0, width / 2, 0]; break;
-      case 180: console.log('case 180:'); coordinate = [0, height / 2, 0, -height / 2]; break;
-      case -180: console.log('case -180:'); coordinate = [0, -height / 2, 0, height / 2]; break;
+      case 0: coordinate = [0, -height / 2, 0, height / 2]; break;
+      case 90: coordinate = [width / 2, 0, -width / 2, 0]; break;
+      case -90: coordinate = [-width / 2, 0, width / 2, 0]; break;
+      case 180: coordinate = [0, height / 2, 0, -height / 2]; break;
+      case -180: coordinate = [0, -height / 2, 0, height / 2]; break;
       default:
         let x1 = 0;
         let y1 = 0;
