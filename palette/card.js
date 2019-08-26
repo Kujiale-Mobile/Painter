@@ -85,6 +85,7 @@ export default class LastMayday {
         {
           type: 'qrcode',
           content: 'https://github.com/Kujiale-Mobile/Painter',
+          logo: '/palette/avatar.jpg',
           css: {
             bottom: '40rpx',
             left: '180rpx',
