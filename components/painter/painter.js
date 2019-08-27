@@ -121,7 +121,7 @@ Component({
         }
         if (paletteCopy.views) {
           for (const view of paletteCopy.views) {
-            if (view && view.type === 'image' && view.url) {
+            if (view && view.type === 'image' && view.url || view.url || view && view.type === 'qrcode' && view.logo) {
               preCount++;
               /* eslint-disable no-loop-func */
               downloader.download(view.url).then((path) => {

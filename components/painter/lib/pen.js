@@ -327,7 +327,7 @@ export default class Painter {
     QR.api.draw(view.content, this.ctx, -width / 2, -height / 2, width, height, view.css.background, view.css.color);
     /* 生成带logo 二维码*/
     if (view.logo) {
-      this.ctx.drawImage(view.logo, -(width / 6), -(height / 6), width / 3, height / 3);
+      this.ctx.drawImage(view.url, -(width / 6), -(height / 6), width / 3, height / 3);
     }
     this.ctx.restore();
     this._doBorder(view, width, height);
