@@ -308,13 +308,14 @@ export default class Painter {
     }
     const width = rawWidth + pd[1] + pd[3];
     const height = rawHeight + pd[0] + pd[2];
+    this._doClip(view.css.borderRadius, width, height)
     if (GD.api.isGradient(background)) {
       GD.api.doGradient(background, width, height, this.ctx);
     } else {
       this.ctx.setFillStyle(background);
     }
     this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
-
+    
     this.ctx.restore();
   }
 
@@ -376,7 +377,7 @@ export default class Painter {
       width,
       height,
       extra,
-    } = this._preProcess(view);
+    } = this._preProcess(view, view.css.background && view.css.borderRadius);
 
     this.ctx.setFillStyle(view.css.color || 'black');
     const {
