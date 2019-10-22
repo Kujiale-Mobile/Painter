@@ -92,7 +92,14 @@ Component({
           painterStyle: `width:${width};height:${height};`,
         });
         const ctx = wx.createCanvasContext('k-canvas', this);
-        const pen = new Pen(ctx, palette);
+        const pen = new Pen(ctx, palette,(newHeight,callBack)=>{
+          this.canvasHeightInPx = newHeight;
+          newHeight = (newHeight/screenK) + "rpx"; 
+          this.setData({
+            painterStyle: `width:${width};height:${newHeight};`
+          });
+          callBack();
+        });
         pen.paint(() => {
           this.saveImgToLocal();
         });

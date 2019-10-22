@@ -2,10 +2,13 @@ const QR = require('./qrcode.js');
 const GD = require('./gradient.js');
 
 export default class Painter {
-  constructor(ctx, data) {
+  constructor(ctx, data, changeHeight) {
     this.ctx = ctx;
     this.data = data;
     this.globalTextWidth = {};
+    this.globalTextHeight = {};
+    this.globalMaxY = 0;
+    this.changeHeightFn = changeHeight;
   }
 
   paint(callback) {
@@ -17,9 +20,29 @@ export default class Painter {
     for (const view of this.data.views) {
       this._drawAbsolute(view);
     }
-    this.ctx.draw(false, () => {
-      callback();
-    });
+    console.log("this.globalMaxY:" + this.globalMaxY + ",globalMaxHeight:" + this.style.height);
+    console.log(this.globalTextHeight);
+    if (this.globalMaxY > this.style.height) {
+      this.style.height = this.globalMaxY;
+      if (typeof this.changeHeightFn === "function") {
+        this.changeHeightFn(this.style.height, () => {
+          this._background();
+          for (const view of this.data.views) {
+            this._drawAbsolute(view);
+          }
+          console.log(this.globalTextHeight);
+          this.ctx.draw(false, () => {
+            callback();
+          });
+        });
+      }
+
+    } else {
+      this.ctx.draw(false, () => {
+        callback();
+      });
+    }
+
   }
 
   _background() {
@@ -94,9 +117,9 @@ export default class Painter {
       this.ctx.closePath();
       this.ctx.fill();
       // 在 ios 的 6.6.6 版本上 clip 有 bug，禁掉此类型上的 clip，也就意味着，在此版本微信的 ios 设备下无法使用 border 属性
-      if (!(getApp().systemInfo
-        && getApp().systemInfo.version <= '6.6.6'
-        && getApp().systemInfo.platform === 'ios')) {
+      if (!(getApp().systemInfo &&
+          getApp().systemInfo.version <= '6.6.6' &&
+          getApp().systemInfo.platform === 'ios')) {
         this.ctx.clip();
       }
       this.ctx.setGlobalAlpha(1);
@@ -214,7 +237,14 @@ export default class Painter {
           return;
         }
         width = view.css.width.toPx();
-        height = view.css.height.toPx();
+        if (view.css && view.css.height) {
+          if (typeof view.css.height === 'string') {
+            height = view.css.height.toPx(true);
+          } else {
+            const heightConf = view.css.height;
+            height = heightConf[1] ? this.style.height - heightConf[0].toPx() : heightConf[0].toPx();
+          }
+        }
         break;
     }
     let x;
@@ -237,8 +267,27 @@ export default class Painter {
     } else {
       x = 0;
     }
-    const y = view.css && view.css.bottom ? this.style.height - height - view.css.bottom.toPx(true) : (view.css && view.css.top ? view.css.top.toPx(true) : 0);
-
+    let y;
+    if (view.css && view.css.bottom) {
+      y = this.style.height - height - view.css.bottom.toPx(true);
+    } else {
+      if (view.css && view.css.top) {
+        if (typeof view.css.top === 'string') {
+          y = view.css.top.toPx(true);
+        } else {
+          const tops = view.css.top;
+          y = tops[0].toPx(true) + this.globalTextHeight[tops[1]] * (tops[2] || 1);
+        }
+      } else {
+        y = 0
+      }
+    }
+    if (view.id) {
+      this.globalTextHeight[view.id] = height + y;
+    }
+    if (this.globalMaxY < (height + y)) {
+      this.globalMaxY = height + y;
+    }
     const angle = view.css && view.css.rotate ? this._getAngle(view.css.rotate) : 0;
     // 当设置了 right 时，默认 align 用 right，反之用 left
     const align = view.css && view.css.align ? view.css.align : (view.css && view.css.right ? 'right' : 'left');
@@ -308,14 +357,13 @@ export default class Painter {
     }
     const width = rawWidth + pd[1] + pd[3];
     const height = rawHeight + pd[0] + pd[2];
-    this._doClip(view.css.borderRadius, width, height)
     if (GD.api.isGradient(background)) {
       GD.api.doGradient(background, width, height, this.ctx);
     } else {
       this.ctx.setFillStyle(background);
     }
     this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
-    
+
     this.ctx.restore();
   }
 
@@ -377,7 +425,7 @@ export default class Painter {
       width,
       height,
       extra,
-    } = this._preProcess(view, view.css.background && view.css.borderRadius);
+    } = this._preProcess(view);
 
     this.ctx.setFillStyle(view.css.color || 'black');
     const {
