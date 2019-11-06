@@ -6,6 +6,7 @@ export default class Painter {
     this.ctx = ctx;
     this.data = data;
     this.globalTextWidth = {};
+    this.globalTextHeight = {};
   }
 
   paint(callback) {
@@ -237,7 +238,22 @@ export default class Painter {
     } else {
       x = 0;
     }
-    const y = view.css && view.css.bottom ? this.style.height - height - view.css.bottom.toPx(true) : (view.css && view.css.top ? view.css.top.toPx(true) : 0);
+    //const y = view.css && view.css.bottom ? this.style.height - height - view.css.bottom.toPx(true) : (view.css && view.css.top ? view.css.top.toPx(true) : 0);
+    let y;
+    if (view.css && view.css.bottom) {
+      y = this.style.height - height - view.css.bottom.toPx(true);
+    } else {
+      if (view.css && view.css.top) {
+        if (typeof view.css.top === 'string') {
+          y = view.css.top.toPx(true);
+        } else {
+          const tops = view.css.top;
+          y = tops[0].toPx(true) + this.globalTextHeight[tops[1]] * (tops[2] || 1);
+        }
+      } else {
+        y = 0
+      }
+    }
 
     const angle = view.css && view.css.rotate ? this._getAngle(view.css.rotate) : 0;
     // 当设置了 right 时，默认 align 用 right，反之用 left
@@ -393,6 +409,7 @@ export default class Painter {
         textWidth = this.ctx.measureText(textArray[i]).width > textWidth ? this.ctx.measureText(textArray[i]).width : textWidth;
       }
       this.globalTextWidth[view.id] = width ? (textWidth < width ? textWidth : width) : textWidth;
+      this.globalTextHeight[view.id] = height;
     }
     let lineIndex = 0;
     for (let j = 0; j < textArray.length; ++j) {

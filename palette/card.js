@@ -41,6 +41,7 @@ export default class LastMayday {
           },
         },
         {
+          id: 'text-id-2',
           type: 'text',
           text: '我是把width设置为400rpx后，我就换行了xx行了',
           css: [{
@@ -51,6 +52,16 @@ export default class LastMayday {
             textAlign: 'center',
             padding: '10rpx',
           }, common, { left: '300rpx' }],
+        },
+        {
+          type: 'rect',
+          css: {
+            width: '20rpx',
+            height: '20rpx',
+            color: 'red',
+            left: '200rpx',
+            top: [`${startTop + 5 * gapSize}rpx`, 'text-id-2'],
+          },
         },
         {
           type: 'text',
