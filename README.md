@@ -17,6 +17,7 @@
 - [x] 支持 box-shadow 和 text-shadow，统一使用 shadow 表示。具体说明请看下方。
 - [x] text 加入 background 属性。具体说明请看下方。
 - [x] 可获取 text 的宽度
+- [x] 支持元素的相对定位方法
 - [x] 可通过文本中的换行符进行主动换行
 - [ ] 生成的图片支持分辨率调节
 
@@ -235,23 +236,6 @@ export default class ImageExample {
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 
-**根据文本区域长度布局**
-
-很多人有获得文本宽度的需求，因为文本宽度随着字数不同而动态变化，如果想在文本后面加个图标，那么我们就需要获得文本宽度。Painter 的解决方案如下：
-
-```
-1，首先你需要为检测长度的文本添加一个 id。如下
-{
-  id: 'my-text-id',
-  type: 'text',
-  
-2，然后在后面的 view 中，你可以在 left 和 right 属性中使用这个id。如下
-left: ['10rpx', 'my-text-id', 比例] 
-表示布局在距离左边（10rpx + 该text文本宽度 * 比例） 的距离，比例默认为 1，可省去，你也可以使用负数或小数来做计算，最终的 left 会加上文本宽度乘以该数的值。
-
-注意：比例一定为一个 number
-```
-
 - **以下用个例子说下上述几个属性的用法**
 
 ![](https://user-images.githubusercontent.com/4279515/46778602-07152b00-cd47-11e8-9965-091a3d58f417.png)
@@ -342,6 +326,26 @@ function _textDecoration(decoration, index, color) {
 | top、right、bottom、left | 如 css 中为 absolute 布局时的作用，可为 负值   | 默认 top 和 left 为 0 |
 
 ![](https://user-images.githubusercontent.com/4279515/46778627-290ead80-cd47-11e8-8483-2e36e39b36f0.png)
+
+#### 相对布局方法
+
+很多人有获得文本宽度的需求，因为文本宽度随着字数不同而动态变化，如果想在文本后面加个图标，那么我们就需要获得文本宽度。Painter 的解决方案如下：
+
+```
+1，首先你需要为检测长度的文本添加一个 id。如下
+{
+  id: 'my-text-id',
+  type: 'text',
+  
+2，然后在后面的 view 中，你可以在 left 和 right 属性中使用这个id。如下
+left: ['10rpx', 'my-text-id', 比例] 
+表示布局在距离左边（10rpx + 该text文本宽度 * 比例） 的距离，比例默认为 1，可省去，你也可以使用负数或小数来做计算，最终的 left 会加上文本宽度乘以该数的值。
+
+注意：比例一定为一个 number
+```
+如果想获得高度，top 也支持上述用法，并且除文本外，你可以对任何 view 设置一个 id，然后使用上述方法进行相对布局。
+
+**注：相对布局的那个 view 代码一定需要在被相对的 view 的下面。**
 
 #### border 类型
 

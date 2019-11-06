@@ -5,8 +5,8 @@ export default class Painter {
   constructor(ctx, data) {
     this.ctx = ctx;
     this.data = data;
-    this.globalTextWidth = {};
-    this.globalTextHeight = {};
+    this.globalWidth = {};
+    this.globalHeight = {};
   }
 
   paint(callback) {
@@ -95,9 +95,9 @@ export default class Painter {
       this.ctx.closePath();
       this.ctx.fill();
       // 在 ios 的 6.6.6 版本上 clip 有 bug，禁掉此类型上的 clip，也就意味着，在此版本微信的 ios 设备下无法使用 border 属性
-      if (!(getApp().systemInfo
-        && getApp().systemInfo.version <= '6.6.6'
-        && getApp().systemInfo.platform === 'ios')) {
+      if (!(getApp().systemInfo &&
+          getApp().systemInfo.version <= '6.6.6' &&
+          getApp().systemInfo.platform === 'ios')) {
         this.ctx.clip();
       }
       this.ctx.setGlobalAlpha(1);
@@ -226,14 +226,14 @@ export default class Painter {
         // 可以用数组方式，把文字长度计算进去
         // [right, 文字id, 乘数（默认 1）]
         const rights = view.css.right;
-        x = this.style.width - rights[0].toPx(true) - this.globalTextWidth[rights[1]] * (rights[2] || 1);
+        x = this.style.width - rights[0].toPx(true) - this.globalWidth[rights[1]] * (rights[2] || 1);
       }
     } else if (view.css && view.css.left) {
       if (typeof view.css.left === 'string') {
         x = view.css.left.toPx(true);
       } else {
         const lefts = view.css.left;
-        x = lefts[0].toPx(true) + this.globalTextWidth[lefts[1]] * (lefts[2] || 1);
+        x = lefts[0].toPx(true) + this.globalWidth[lefts[1]] * (lefts[2] || 1);
       }
     } else {
       x = 0;
@@ -248,7 +248,7 @@ export default class Painter {
           y = view.css.top.toPx(true);
         } else {
           const tops = view.css.top;
-          y = tops[0].toPx(true) + this.globalTextHeight[tops[1]] * (tops[2] || 1);
+          y = tops[0].toPx(true) + this.globalHeight[tops[1]] * (tops[2] || 1);
         }
       } else {
         y = 0
@@ -274,7 +274,10 @@ export default class Painter {
       this._doClip(view.css.borderRadius, width, height);
     }
     this._doShadow(view);
-
+    if (view.id) {
+      this.globalWidth[view.id] = width;
+      this.globalHeight[view.id] = height;
+    }
     return {
       width: width,
       height: height,
@@ -331,7 +334,7 @@ export default class Painter {
       this.ctx.setFillStyle(background);
     }
     this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
-    
+
     this.ctx.restore();
   }
 
@@ -408,8 +411,7 @@ export default class Painter {
       for (let i = 0; i < textArray.length; ++i) {
         textWidth = this.ctx.measureText(textArray[i]).width > textWidth ? this.ctx.measureText(textArray[i]).width : textWidth;
       }
-      this.globalTextWidth[view.id] = width ? (textWidth < width ? textWidth : width) : textWidth;
-      this.globalTextHeight[view.id] = height;
+      this.globalWidth[view.id] = width ? (textWidth < width ? textWidth : width) : textWidth;
     }
     let lineIndex = 0;
     for (let j = 0; j < textArray.length; ++j) {
