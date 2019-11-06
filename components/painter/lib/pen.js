@@ -35,11 +35,11 @@ export default class Painter {
     this._doClip(this.data.borderRadius, width, height);
     if (!bg) {
       // 如果未设置背景，则默认使用白色
-      this.ctx.setFillStyle('#fff');
+      this.ctx.fillStyle = '#fff';
       this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
     } else if (bg.startsWith('#') || bg.startsWith('rgba') || bg.toLowerCase() === 'transparent') {
       // 背景填充颜色
-      this.ctx.setFillStyle(bg);
+      this.ctx.fillStyle = bg;
       this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
     } else if (GD.api.isGradient(bg)) {
       GD.api.doGradient(bg, width, height, this.ctx);
@@ -80,10 +80,10 @@ export default class Painter {
   _doClip(borderRadius, width, height) {
     if (borderRadius && width && height) {
       const r = Math.min(borderRadius.toPx(), width / 2, height / 2);
-      // 防止在某些机型上周边有黑框现象，此处如果直接设置 setFillStyle 为透明，在 Android 机型上会导致被裁减的图片也变为透明， iOS 和 IDE 上不会
-      // setGlobalAlpha 在 1.9.90 起支持，低版本下无效，但把 setFillStyle 设为了 white，相对默认的 black 要好点
-      this.ctx.setGlobalAlpha(0);
-      this.ctx.setFillStyle('white');
+      // 防止在某些机型上周边有黑框现象，此处如果直接设置 fillStyle 为透明，在 Android 机型上会导致被裁减的图片也变为透明， iOS 和 IDE 上不会
+      // globalAlpha 在 1.9.90 起支持，低版本下无效，但把 fillStyle 设为了 white，相对默认的 black 要好点
+      this.ctx.globalAlpha = 0;
+      this.ctx.fillStyle = 'white';
       this.ctx.beginPath();
       this.ctx.arc(-width / 2 + r, -height / 2 + r, r, 1 * Math.PI, 1.5 * Math.PI);
       this.ctx.lineTo(width / 2 - r, -height / 2);
@@ -100,7 +100,7 @@ export default class Painter {
           getApp().systemInfo.platform === 'ios')) {
         this.ctx.clip();
       }
-      this.ctx.setGlobalAlpha(1);
+      this.ctx.globalAlpha = 1;
     }
   }
 
@@ -128,8 +128,8 @@ export default class Painter {
       r = 0;
     }
     const lineWidth = borderWidth.toPx();
-    this.ctx.setLineWidth(lineWidth);
-    this.ctx.setStrokeStyle(borderColor || 'black');
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.strokeStyle = (borderColor || 'black');
     this.ctx.beginPath();
     this.ctx.arc(-width / 2 + r, -height / 2 + r, r + lineWidth / 2, 1 * Math.PI, 1.5 * Math.PI);
     this.ctx.lineTo(width / 2 - r, -height / 2 - lineWidth / 2);
@@ -270,7 +270,7 @@ export default class Painter {
         break;
     }
     this.ctx.rotate(angle);
-    if (!notClip && view.css && view.css.borderRadius) {
+    if (!notClip && view.css && view.css.borderRadius && view.type !== 'rect') {
       this._doClip(view.css.borderRadius, width, height);
     }
     this._doShadow(view);
@@ -331,7 +331,7 @@ export default class Painter {
     if (GD.api.isGradient(background)) {
       GD.api.doGradient(background, width, height, this.ctx);
     } else {
-      this.ctx.setFillStyle(background);
+      this.ctx.fillStyle = background;
     }
     this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
 
@@ -398,7 +398,7 @@ export default class Painter {
       extra,
     } = this._preProcess(view, view.css.background && view.css.borderRadius);
 
-    this.ctx.setFillStyle(view.css.color || 'black');
+    this.ctx.fillStyle = (view.css.color || 'black');
     const {
       lines,
       lineHeight,
@@ -489,7 +489,7 @@ export default class Painter {
             this.ctx.lineTo(x + measuredWith, y - fontSize / 3);
           }
           this.ctx.closePath();
-          this.ctx.setStrokeStyle(view.css.color);
+          this.ctx.strokeStyle = view.css.color;
           this.ctx.stroke();
         }
       }
@@ -507,9 +507,20 @@ export default class Painter {
     if (GD.api.isGradient(view.css.color)) {
       GD.api.doGradient(view.css.color, width, height, this.ctx);
     } else {
-      this.ctx.setFillStyle(view.css.color);
+      this.ctx.fillStyle = view.css.color;
     }
-    this.ctx.fillRect(-(width / 2), -(height / 2), width, height);
+    const borderRadius = view.css.borderRadius
+    const r = borderRadius ? Math.min(borderRadius.toPx(), width / 2, height / 2) : 0;
+    this.ctx.beginPath();
+    this.ctx.arc(-width / 2 + r, -height / 2 + r, r, 1 * Math.PI, 1.5 * Math.PI); //左上角圆弧
+    this.ctx.lineTo(width / 2 - r, -height / 2);
+    this.ctx.arc(width / 2 - r, -height / 2 + r, r, 1.5 * Math.PI, 2 * Math.PI); // 右上角圆弧
+    this.ctx.lineTo(width / 2, height / 2 - r);
+    this.ctx.arc(width / 2 - r, height / 2 - r, r, 0, 0.5 * Math.PI); // 右下角圆弧
+    this.ctx.lineTo(-width / 2 + r, height / 2);
+    this.ctx.arc(-width / 2 + r, height / 2 - r, r, 0.5 * Math.PI, 1 * Math.PI); // 左下角圆弧
+    this.ctx.closePath();
+    this.ctx.fill();
     this.ctx.restore();
     this._doBorder(view, width, height);
   }
