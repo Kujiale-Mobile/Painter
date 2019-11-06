@@ -13,6 +13,9 @@ Page({
 
   onImgOK(e) {
     this.imagePath = e.detail.path;
+    this.setData({
+      image: this.imagePath
+    })
     console.log(e);
   },
 

@@ -19,7 +19,7 @@
 - [x] 可获取 text 的宽度
 - [x] 支持元素的相对定位方法
 - [x] 可通过文本中的换行符进行主动换行
-- [ ] 生成的图片支持分辨率调节
+- [x] 生成的图片支持分辨率调节
 
 ## 画家计划
 
@@ -70,7 +70,11 @@ mpvue 的使用方法请移步 [mpvue接入方案](https://github.com/Kujiale-Mo
    ```
    <painter palette="{{data}}" bind:imgOK="onImgOK" />
    ```
+   你可以通过设置 widthPixels 来强制指定生成的图片的像素宽度，否则，会根据你画布中设置的大小来动态调节，比如你用了 rpx，则在 iphone 6 上会生成 0.5 倍像素的图片。由于 canvas 绘制的图片像素直接由 Canvas 本身大小决定，此处通过同比例放大整个画布来实现对最后生成的图片大小的调节。
 
+   ```
+   <painter customStyle='position: absolute; left: -9999rpx;' palette="{{template}}" bind:imgOK="onImgOK" widthPixels="1000"/>
+   ```
 
 4. 数据传入后，则会自动进行绘图。绘图完成后，你可以通过绑定 imgOK 或 imgErr 事件来获得成功后的图片 或失败的原因。
 

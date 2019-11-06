@@ -27,6 +27,10 @@ Component({
         }
       },
     },
+    widthPixels: {
+      type: Number,
+      value: 0
+    },
     // 启用脏检查，默认 false
     dirty: {
       type: Boolean,
@@ -38,10 +42,6 @@ Component({
     picURL: '',
     showCanvas: true,
     painterStyle: '',
-  },
-
-  attached() {
-    setStringPrototype();
   },
 
   methods: {
@@ -73,23 +73,36 @@ Component({
           getApp().systemInfo = wx.getSystemInfoSync();
         } catch (e) {
           const error = `Painter get system info failed, ${JSON.stringify(e)}`;
-          that.triggerEvent('imgErr', { error: error });
+          that.triggerEvent('imgErr', {
+            error: error
+          });
           console.error(error);
           return;
         }
       }
-      screenK = getApp().systemInfo.screenWidth / 750;
-
+      let screenK = getApp().systemInfo.screenWidth / 750;
+      setStringPrototype(screenK, 1);
+      
       this.downloadImages().then((palette) => {
-        const { width, height } = palette;
-        this.canvasWidthInPx = width.toPx();
-        this.canvasHeightInPx = height.toPx();
+        const {
+          width,
+          height
+        } = palette;
+        
         if (!width || !height) {
           console.error(`You should set width and height correctly for painter, width: ${width}, height: ${height}`);
           return;
         }
+        this.canvasWidthInPx = width.toPx();
+        if (this.properties.widthPixels) {
+          // 如果重新设置过像素宽度，则重新设置比例
+          setStringPrototype(screenK, this.properties.widthPixels / this.canvasWidthInPx)
+          this.canvasWidthInPx = this.properties.widthPixels
+        }
+  
+        this.canvasHeightInPx = height.toPx();
         this.setData({
-          painterStyle: `width:${width};height:${height};`,
+          painterStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
         });
         const ctx = wx.createCanvasContext('k-canvas', this);
         const pen = new Pen(ctx, palette);
@@ -170,7 +183,9 @@ Component({
           },
           fail: function (error) {
             console.error(`canvasToTempFilePath failed, ${JSON.stringify(error)}`);
-            that.triggerEvent('imgErr', { error: error });
+            that.triggerEvent('imgErr', {
+              error: error
+            });
           },
         }, this);
       }, 300);
@@ -184,12 +199,16 @@ Component({
           if (that.paintCount > MAX_PAINT_COUNT) {
             const error = `The result is always fault, even we tried ${MAX_PAINT_COUNT} times`;
             console.error(error);
-            that.triggerEvent('imgErr', { error: error });
+            that.triggerEvent('imgErr', {
+              error: error
+            });
             return;
           }
           // 比例相符时才证明绘制成功，否则进行强制重绘制
           if (Math.abs((infoRes.width * that.canvasHeightInPx - that.canvasWidthInPx * infoRes.height) / (infoRes.height * that.canvasHeightInPx)) < 0.01) {
-            that.triggerEvent('imgOK', { path: filePath });
+            that.triggerEvent('imgOK', {
+              path: filePath
+            });
           } else {
             that.startPaint();
           }
@@ -197,16 +216,17 @@ Component({
         },
         fail: (error) => {
           console.error(`getImageInfo failed, ${JSON.stringify(error)}`);
-          that.triggerEvent('imgErr', { error: error });
+          that.triggerEvent('imgErr', {
+            error: error
+          });
         },
       });
     },
   },
 });
 
-let screenK = 0.5;
 
-function setStringPrototype() {
+function setStringPrototype(screenK, scale) {
   /* eslint-disable no-extend-native */
   /**
    * 是否支持负数
@@ -229,9 +249,9 @@ function setStringPrototype() {
 
     let res = 0;
     if (unit === 'rpx') {
-      res = Math.round(value * screenK);
+      res = Math.round(value * screenK * (scale || 1));
     } else if (unit === 'px') {
-      res = value;
+      res = Math.round(value * (scale || 1));
     }
     return res;
   };
