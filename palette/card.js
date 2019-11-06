@@ -16,6 +16,7 @@ export default class LastMayday {
             right: '20rpx',
             top: '30rpx',
             height: '100rpx',
+            borderRadius: '100rpx',
             shadow: '10rpx 10rpx 5rpx #888888',
             color: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
           },

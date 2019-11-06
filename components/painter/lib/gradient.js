@@ -39,8 +39,8 @@
     for (let i = 0; i < colorPer.colors.length; i++) {
       grd.addColorStop(colorPer.percents[i], colorPer.colors[i]);
     }
-    ctx.setFillStyle(grd);
-    ctx.fillRect(-(width / 2), -(height / 2), width, height);
+    ctx.fillStyle = grd;
+    //ctx.fillRect(-(width / 2), -(height / 2), width, height);
   }
 
   function analizeLinear(bg, width, height) {
@@ -93,8 +93,8 @@
     for (let i = 0; i < colorPer.colors.length; i++) {
       grd.addColorStop(colorPer.percents[i], colorPer.colors[i]);
     }
-    ctx.setFillStyle(grd);
-    ctx.fillRect(-(width / 2), -(height / 2), width, height);
+    ctx.fillStyle = grd
+    //ctx.fillRect(-(width / 2), -(height / 2), width, height);
   }
 
   module.exports = { api }
