@@ -19,7 +19,7 @@ export default class Painter {
       this._drawAbsolute(view);
     }
     this.ctx.draw(false, () => {
-      callback();
+      callback && callback();
     });
   }
 
@@ -259,17 +259,40 @@ export default class Painter {
     const angle = view.css && view.css.rotate ? this._getAngle(view.css.rotate) : 0;
     // 当设置了 right 时，默认 align 用 right，反之用 left
     const align = view.css && view.css.align ? view.css.align : (view.css && view.css.right ? 'right' : 'left');
+    // 记录绘制时的画布
+    let xa = 0;
+    const ya = y + height / 2;
+
     switch (align) {
       case 'center':
-        this.ctx.translate(x, y + height / 2);
+        xa = x;
         break;
       case 'right':
-        this.ctx.translate(x - width / 2, y + height / 2);
+        xa = x - width / 2;
         break;
       default:
-        this.ctx.translate(x + width / 2, y + height / 2);
+        xa = x + width / 2;
         break;
     }
+    this.ctx.translate(xa, ya);
+    // 记录该 view 的有效点击区域
+    // TODO ，旋转和裁剪的判断
+    // 记录在真实画布上的左侧
+    let left = x
+    if (align === 'center') {
+      left = x - width / 2
+    } else if (align === 'right') {
+      left = x - width
+    }
+    view.rect = {
+      left,
+      top: y,
+      right: left + width,
+      bottom: y + height,
+      x: view.css && view.css.right ? (x - width) : x,
+      y
+    };
+
     this.ctx.rotate(angle);
     if (!notClip && view.css && view.css.borderRadius && view.type !== 'rect') {
       this._doClip(view.css.borderRadius, width, height);

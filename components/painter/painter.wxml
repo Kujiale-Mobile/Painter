@@ -1,1 +1,6 @@
-<canvas canvas-id="k-canvas" style="{{painterStyle}}{{customStyle}}" />
+<canvas canvas-id="k-canvas" 
+  style="{{painterStyle}}{{customStyle}}" 
+  bindtouchstart="onTouchStart"
+  bindtouchmove="onTouchMove"
+  bindtouchend="onTouchEnd"
+  bindtouchcancel="onTouchCancel"/>
