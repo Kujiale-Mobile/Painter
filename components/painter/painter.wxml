@@ -1,6 +1,12 @@
-<canvas canvas-id="k-canvas" 
-  style="{{painterStyle}}{{customStyle}}" 
-  bindtouchstart="onTouchStart"
-  bindtouchmove="onTouchMove"
-  bindtouchend="onTouchEnd"
-  bindtouchcancel="onTouchCancel"/>
+<view style='position: relative;{{painterStyle}}{{customStyle}}'>
+  <canvas canvas-id="bottom" style="{{painterStyle}};position: absolute;" />
+  <canvas canvas-id="k-canvas" style="{{painterStyle}};position: absolute;" />
+  <canvas 
+    canvas-id="top" 
+    style="{{painterStyle}};position: absolute;"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    bindtouchcancel="onTouchCancel"
+    disable-scroll="{{true}}" />
+</view>

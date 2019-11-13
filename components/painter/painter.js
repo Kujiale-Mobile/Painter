@@ -130,17 +130,22 @@ Component({
           background: this.currentPalette.background,
           views: bottomLayers
         }
-        new Pen(wx.createCanvasContext('bottom', this), bottomDraw).paint();
-
         const topDraw = {
           width: this.currentPalette.width,
           height: this.currentPalette.height,
           views: topLayers
         }
-        new Pen(wx.createCanvasContext('top', this), topDraw).paint();
+        if (this.prevFindedIndex < findedIndex) {
+          new Pen(wx.createCanvasContext('bottom', this), bottomDraw).paint();
+          new Pen(wx.createCanvasContext('top', this), topDraw).paint();
+        } else {
+          new Pen(wx.createCanvasContext('top', this), topDraw).paint();
+          new Pen(wx.createCanvasContext('bottom', this), bottomDraw).paint();
+        }
 
         this.doAction()
       }
+      this.prevFindedIndex = findedIndex
     },
 
     onTouchEnd() {
