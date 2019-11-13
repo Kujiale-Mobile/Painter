@@ -73,16 +73,19 @@ Component({
     },
 
     doAction(newVal) {
-      this.hasIdViews.map(view => {
-        if (view.id === newVal.id) {
-          if (Array.isArray(view.css)) {
-            view.css = [...view.css, newVal.css]
-          } else {
-            view.css = [view.css, newVal.css]
-          }
+      if (newVal && newVal.css) {
+        if (Array.isArray(this.touchedView.css)) {
+          this.touchedView.css = [...this.touchedView.css, newVal.css]
+        } else {
+          this.touchedView.css = [this.touchedView.css, newVal.css]
         }
-      })
-      const pen = new Pen(this.globalContext, this.currentPalette);
+      }
+      const draw = {
+        width: this.currentPalette.width,
+        height: this.currentPalette.height,
+        views: [this.touchedView]
+      }
+      const pen = new Pen(this.globalContext, draw);
       pen.paint();
     },
 
@@ -96,26 +99,58 @@ Component({
       } = event.touches[0]
       this.startX = x
       this.startY = y
-      for (let view of this.hasIdViews.reverse()) {
+      const totalLayerCount = this.currentPalette.views.length
+      let findedIndex = -1;
+      this.touchedView = {}
+      for (let i = totalLayerCount - 1; i >= 0; i--) {
+        const view = this.currentPalette.views[i]
         if (x > view.rect.left && y > view.rect.top && x < view.rect.right && y < view.rect.bottom) {
           if (view.id) {
             this.touchedView = view
-            this.triggerEvent('viewTouchStart', {
+            this.triggerEvent('touchStart', {
               id: view.id,
-              css: view.css
+              css: view.css,
+              rect: view.rect
             })
           }
+          findedIndex = i;
           break;
         }
+      }
+
+      if (findedIndex < 0) {
+        // 证明点击了背景
+        this.triggerEvent('touchStart', {})
+      } else if (this.touchedView.id) {
+        const bottomLayers = this.currentPalette.views.slice(0, findedIndex)
+        const topLayers = this.currentPalette.views.slice(findedIndex + 1)
+        const bottomDraw = {
+          width: this.currentPalette.width,
+          height: this.currentPalette.height,
+          background: this.currentPalette.background,
+          views: bottomLayers
+        }
+        new Pen(wx.createCanvasContext('bottom', this), bottomDraw).paint();
+
+        const topDraw = {
+          width: this.currentPalette.width,
+          height: this.currentPalette.height,
+          views: topLayers
+        }
+        new Pen(wx.createCanvasContext('top', this), topDraw).paint();
+
+        this.doAction()
       }
     },
 
     onTouchEnd() {
       this.touchedView = {}
+      this.triggerEvent('touchEnd')
     },
 
     onTouchCancel() {
       this.touchedView = {}
+      this.triggerEvent('touchCancel')
     },
 
     onTouchMove(event) {
@@ -137,6 +172,10 @@ Component({
         bottom: undefined
       }
       this.doAction({
+        id: this.touchedView.id,
+        css
+      })
+      this.triggerEvent('touchMove',{
         id: this.touchedView.id,
         css
       })
