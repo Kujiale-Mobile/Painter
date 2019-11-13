@@ -11,6 +11,9 @@ Component({
   canvasWidthInPx: 0,
   canvasHeightInPx: 0,
   paintCount: 0,
+  currentPalette: {},
+  globalContext: {},
+  hasIdViews: [],
   /**
    * 组件的属性列表
    */
@@ -36,6 +39,12 @@ Component({
       type: Boolean,
       value: false,
     },
+    actions: {
+      type: Object,
+      observer: function (newVal, oldVal) {
+        this.doAction(newVal)
+      },
+    }
   },
 
   data: {
@@ -63,6 +72,76 @@ Component({
       return true;
     },
 
+    doAction(newVal) {
+      this.hasIdViews.map(view => {
+        if (view.id === newVal.id) {
+          if (Array.isArray(view.css)) {
+            view.css = [...view.css, newVal.css]
+          } else {
+            view.css = [view.css, newVal.css]
+          }
+        }
+      })
+      const pen = new Pen(this.globalContext, this.currentPalette);
+      pen.paint();
+    },
+
+    startX: 0,
+    startY: 0,
+    touchedView: {},
+    onTouchStart(event) {
+      const {
+        x,
+        y
+      } = event.touches[0]
+      this.startX = x
+      this.startY = y
+      for (let view of this.hasIdViews.reverse()) {
+        if (x > view.rect.left && y > view.rect.top && x < view.rect.right && y < view.rect.bottom) {
+          if (view.id) {
+            this.touchedView = view
+            this.triggerEvent('viewTouchStart', {
+              id: view.id,
+              css: view.css
+            })
+          }
+          break;
+        }
+      }
+    },
+
+    onTouchEnd() {
+      this.touchedView = {}
+    },
+
+    onTouchCancel() {
+      this.touchedView = {}
+    },
+
+    onTouchMove(event) {
+      if (!this.touchedView.id) {
+        return
+      }
+      const {
+        x,
+        y
+      } = event.touches[0]
+      const offsetX = x - this.startX
+      const offsetY = y - this.startY
+      this.startX = x
+      this.startY = y
+      const css = {
+        left: `${this.touchedView.rect.x + offsetX}px`,
+        top: `${this.touchedView.rect.y + offsetY}px`,
+        right: undefined,
+        bottom: undefined
+      }
+      this.doAction({
+        id: this.touchedView.id,
+        css
+      })
+    },
+
     startPaint() {
       if (this.isEmpty(this.properties.palette)) {
         return;
@@ -73,7 +152,7 @@ Component({
           getApp().systemInfo = wx.getSystemInfoSync();
         } catch (e) {
           const error = `Painter get system info failed, ${JSON.stringify(e)}`;
-          that.triggerEvent('imgErr', {
+          this.triggerEvent('imgErr', {
             error: error
           });
           console.error(error);
@@ -82,13 +161,20 @@ Component({
       }
       let screenK = getApp().systemInfo.screenWidth / 750;
       setStringPrototype(screenK, 1);
-      
+
       this.downloadImages().then((palette) => {
+        this.currentPalette = palette
+        this.hasIdViews = []
+        palette.views && palette.views.map(view => {
+          if (view.id) {
+            this.hasIdViews.push(view)
+          }
+        })
         const {
           width,
           height
         } = palette;
-        
+
         if (!width || !height) {
           console.error(`You should set width and height correctly for painter, width: ${width}, height: ${height}`);
           return;
@@ -99,13 +185,13 @@ Component({
           setStringPrototype(screenK, this.properties.widthPixels / this.canvasWidthInPx)
           this.canvasWidthInPx = this.properties.widthPixels
         }
-  
+
         this.canvasHeightInPx = height.toPx();
         this.setData({
           painterStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
         });
-        const ctx = wx.createCanvasContext('k-canvas', this);
-        const pen = new Pen(ctx, palette);
+        this.globalContext = wx.createCanvasContext('k-canvas', this);
+        const pen = new Pen(this.globalContext, palette);
         pen.paint(() => {
           this.saveImgToLocal();
         });
