@@ -1,5 +1,5 @@
 <view style='position: relative;'>
-  <painter customStyle='margin-left: 40rpx;' palette="{{template}}" bind:imgOK="onImgOK" actions="{{actions}}"/>
+  <painter customStyle='margin-left: 40rpx; height: 1000rpx;' dancePalette="{{template}}" palette="{{paintPallette}}" bind:imgOK="onImgOK" bind:touchEnd="touchEnd"/>
   <!-- <image src="{{image}}" style="width: 654rpx; height: 1000rpx; margin-left:40rpx;"/> -->
   <button style='position:relative;margin-top:50rpx' bind:tap='saveImage'>保存</button>
 </view>

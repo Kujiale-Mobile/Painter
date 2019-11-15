@@ -1,4 +1,5 @@
-<view style='position: relative;{{painterStyle}}{{customStyle}}'>
+<view style='position: relative;{{customStyle}}'>
+  <canvas canvas-id="photo" style="{{photoStyle}};position: absolute;top: -9999rpx;" />
   <canvas canvas-id="bottom" style="{{painterStyle}};position: absolute;" />
   <canvas canvas-id="k-canvas" style="{{painterStyle}};position: absolute;" />
   <canvas canvas-id="top" style="{{painterStyle}};position: absolute;" />
