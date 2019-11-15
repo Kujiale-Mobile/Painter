@@ -17,7 +17,6 @@ Component({
   frontContext: {},
   bottomContext: {},
   topContext: {},
-  hasIdViews: [],
   /**
    * 组件的属性列表
    */
@@ -27,10 +26,18 @@ Component({
     },
     palette: {
       type: Object,
-      observer: function(newVal, oldVal) {
+      observer: function (newVal, oldVal) {
         if (this.isNeedRefresh(newVal, oldVal)) {
           this.paintCount = 0;
           this.startPaint();
+        }
+      },
+    },
+    dancePalette: {
+      type: Object,
+      observer: function (newVal, oldVal) {
+        if (!this.isEmpty(newVal)) {
+          this.initDancePalette(newVal);
         }
       },
     },
@@ -45,7 +52,7 @@ Component({
     },
     actions: {
       type: Object,
-      observer: function(newVal, oldVal) {
+      observer: function (newVal, oldVal) {
         this.doAction(newVal)
       },
     }
@@ -58,6 +65,7 @@ Component({
   },
 
   methods: {
+
     /**
      * 判断一个 object 是否为 空
      * @param {object} object
@@ -79,9 +87,9 @@ Component({
     doAction(newVal) {
       if (newVal && newVal.css) {
         if (Array.isArray(this.touchedView.css)) {
-          this.touchedView.css = [...this.touchedView.css, newVal.css]
+          this.touchedView.css = Object.assign({}, ...this.touchedView.css, newVal.css)
         } else {
-          this.touchedView.css = [this.touchedView.css, newVal.css]
+          this.touchedView.css = Object.assign({}, this.touchedView.css, newVal.css)
         }
       }
       const draw = {
@@ -91,7 +99,9 @@ Component({
       }
       const pen = new Pen(this.globalContext, draw);
       pen.paint();
-      const { rect } = this.touchedView
+      const {
+        rect
+      } = this.touchedView
       const block = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
@@ -151,7 +161,9 @@ Component({
       let canBeTouched = []
       for (let i = totalLayerCount - 1; i >= 0; i--) {
         const view = this.currentPalette.views[i]
-        const { rect } = view
+        const {
+          rect
+        } = view
         if (this.inArea(x, y, rect, hasTouchedView)) {
           canBeTouched.push({
             view,
@@ -179,7 +191,11 @@ Component({
           }
           this.touchedView = touchAble[i].view
           this.findedIndex = touchAble[i].index
-          const { rect, id, css } = this.touchedView
+          const {
+            rect,
+            id,
+            css
+          } = this.touchedView
           this.triggerEvent('touchStart', {
             id: id,
             css: css,
@@ -242,8 +258,10 @@ Component({
       this.startX = x
       this.startY = y
       this.startTimeStamp = new Date().getTime()
-      if (this.touchedView && JSON.stringify(this.touchedView) !== JSON.stringify({})) {
-        const { rect } = this.touchedView
+      if (this.touchedView && !this.isEmpty(this.touchedView)) {
+        const {
+          rect
+        } = this.touchedView
         if (rect.right - ACTION_POINT_RADIUS < x && x < rect.right + ACTION_POINT_RADIUS && rect.bottom - ACTION_POINT_RADIUS < y && y < rect.bottom + ACTION_POINT_RADIUS) {
           this.isScale = true
           this.startH = rect.bottom - rect.top
@@ -256,15 +274,17 @@ Component({
 
     onTouchEnd(e) {
       const current = new Date().getTime()
-      if ((current - this.startTimeStamp) <= 100 && !this.hasMove) {
+      if ((current - this.startTimeStamp) <= 500 && !this.hasMove) {
         this.onClick(e)
+      } else if (this.touchedView && !this.isEmpty(this.touchedView)) {
+        // 传出镜像
+        this.triggerEvent('touchEnd', this.currentPalette)
       }
       this.hasMove = false
-      this.triggerEvent('touchEnd')
     },
 
-    onTouchCancel() {
-      this.triggerEvent('touchCancel')
+    onTouchCancel(e) {
+      this.onTouchEnd(e)
     },
 
     hasMove: false,
@@ -279,7 +299,10 @@ Component({
       } = event.touches[0]
       const offsetX = x - this.startX
       const offsetY = y - this.startY
-      const { rect, type } = this.touchedView
+      const {
+        rect,
+        type
+      } = this.touchedView
       let css = {}
       if (this.isScale) {
         const newW = this.startW + offsetX > 1 ? this.startW + offsetX : 1
@@ -314,34 +337,27 @@ Component({
       })
     },
 
-    startPaint() {
-      if (this.isEmpty(this.properties.palette)) {
-        return;
-      }
-
-      if (!(getApp().systemInfo && getApp().systemInfo.screenWidth)) {
+    initScreenK() {
+      if (!(getApp() && getApp().systemInfo && getApp().systemInfo.screenWidth)) {
         try {
           getApp().systemInfo = wx.getSystemInfoSync();
         } catch (e) {
-          const error = `Painter get system info failed, ${JSON.stringify(e)}`;
-          this.triggerEvent('imgErr', {
-            error: error
-          });
-          console.error(error);
+          console.error(`Painter get system info failed, ${JSON.stringify(e)}`);
           return;
         }
       }
-      let screenK = getApp().systemInfo.screenWidth / 750;
-      setStringPrototype(screenK, 1);
+      this.screenK = 0.5;
+      if (getApp() && getApp().systemInfo && getApp().systemInfo.screenWidth) {
+        this.screenK = getApp().systemInfo.screenWidth / 750;
+      }
+      setStringPrototype(this.screenK, 1);
+    },
 
-      this.downloadImages().then((palette) => {
+    initDancePalette() {
+      this.initScreenK();
+
+      this.downloadImages(this.properties.dancePalette).then((palette) => {
         this.currentPalette = palette
-        this.hasIdViews = []
-        palette.views && palette.views.map(view => {
-          if (view.id) {
-            this.hasIdViews.push(view)
-          }
-        })
         const {
           width,
           height
@@ -351,33 +367,55 @@ Component({
           console.error(`You should set width and height correctly for painter, width: ${width}, height: ${height}`);
           return;
         }
+        this.setData({
+          painterStyle: `width:${width.toPx()}px;height:${height.toPx()}px;`,
+        });
+        this.frontContext = wx.createCanvasContext('front', this);
+        this.bottomContext = wx.createCanvasContext('bottom', this);
+        this.topContext = wx.createCanvasContext('top', this);
+        this.globalContext = wx.createCanvasContext('k-canvas', this);
+        new Pen(this.globalContext, palette).paint();
+      });
+    },
+
+    startPaint() {
+      this.initScreenK();
+
+      this.downloadImages(this.properties.palette).then((palette) => {
+        const {
+          width,
+          height
+        } = palette;
+
+        if (!width || !height) {
+          console.error(`You should set width and height correctly for painter, width: ${width}, height: ${height}`);
+          return;
+        }
+
+        // 生成图片时，根据设置的像素值重新绘制
         this.canvasWidthInPx = width.toPx();
         if (this.properties.widthPixels) {
-          // 如果重新设置过像素宽度，则重新设置比例
-          setStringPrototype(screenK, this.properties.widthPixels / this.canvasWidthInPx)
+          setStringPrototype(this.screenK, this.properties.widthPixels / this.canvasWidthInPx)
           this.canvasWidthInPx = this.properties.widthPixels
         }
 
         this.canvasHeightInPx = height.toPx();
         this.setData({
-          painterStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
+          photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
         });
-        this.globalContext = wx.createCanvasContext('k-canvas', this);
-        const pen = new Pen(this.globalContext, palette);
-        pen.paint(() => {
+        const photoContext = wx.createCanvasContext('photo', this);
+
+        new Pen(photoContext, palette).paint(() => {
           this.saveImgToLocal();
         });
-        this.frontContext = wx.createCanvasContext('front', this);
-        this.bottomContext = wx.createCanvasContext('bottom', this);
-        this.topContext = wx.createCanvasContext('top', this)
       });
     },
 
-    downloadImages() {
+    downloadImages(palette) {
       return new Promise((resolve, reject) => {
         let preCount = 0;
         let completeCount = 0;
-        const paletteCopy = JSON.parse(JSON.stringify(this.properties.palette));
+        const paletteCopy = JSON.parse(JSON.stringify(palette));
         if (paletteCopy.background) {
           preCount++;
           downloader.download(paletteCopy.background).then((path) => {
@@ -438,11 +476,11 @@ Component({
       const that = this;
       setTimeout(() => {
         wx.canvasToTempFilePath({
-          canvasId: 'k-canvas',
-          success: function(res) {
+          canvasId: 'photo',
+          success: function (res) {
             that.getImageInfo(res.tempFilePath);
           },
-          fail: function(error) {
+          fail: function (error) {
             console.error(`canvasToTempFilePath failed, ${JSON.stringify(error)}`);
             that.triggerEvent('imgErr', {
               error: error
@@ -510,7 +548,7 @@ function setStringPrototype(screenK, scale) {
 
     let res = 0;
     if (unit === 'rpx') {
-      res = Math.round(value * screenK * (scale || 1));
+      res = Math.round(value * (screenK || 0.5) * (scale || 1));
     } else if (unit === 'px') {
       res = Math.round(value * (scale || 1));
     }
