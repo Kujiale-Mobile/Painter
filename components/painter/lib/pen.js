@@ -284,18 +284,11 @@ export default class Painter {
     } else if (align === 'right') {
       left = x - width
     }
-    let top = y
-    let padding = 0
-    if (view.css.padding) {
-      padding = view.css.padding.toPx()
-      left -= padding
-      top -= padding
-    }
     view.rect = {
       left,
-      top,
-      right: left + width + 2 * padding,
-      bottom: top + height + 2 * padding,
+      top: y,
+      right: left + width,
+      bottom: y + height,
       x: view.css && view.css.right ? (x - width) : x,
       y
     };
