@@ -408,6 +408,7 @@ Component({
         new Pen(photoContext, palette).paint(() => {
           this.saveImgToLocal();
         });
+        setStringPrototype(this.screenK, 1);
       });
     },
 
