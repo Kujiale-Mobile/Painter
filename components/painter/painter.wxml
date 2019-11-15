@@ -1,9 +1,9 @@
 <view style='position: relative;{{painterStyle}}{{customStyle}}'>
   <canvas canvas-id="bottom" style="{{painterStyle}};position: absolute;" />
   <canvas canvas-id="k-canvas" style="{{painterStyle}};position: absolute;" />
-  <canvas canvas-id="front" style="{{painterStyle}};position: absolute;" />
+  <canvas canvas-id="top" style="{{painterStyle}};position: absolute;" />
   <canvas 
-    canvas-id="top" 
+    canvas-id="front" 
     style="{{painterStyle}};position: absolute;"
     bindtouchstart="onTouchStart"
     bindtouchmove="onTouchMove"
