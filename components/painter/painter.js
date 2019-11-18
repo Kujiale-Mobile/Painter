@@ -13,6 +13,7 @@ Component({
   canvasHeightInPx: 0,
   paintCount: 0,
   currentPalette: {},
+  movingCache: {},
   /**
    * 组件的属性列表
    */
@@ -22,7 +23,7 @@ Component({
     },
     palette: {
       type: Object,
-      observer: function (newVal, oldVal) {
+      observer: function(newVal, oldVal) {
         if (this.isNeedRefresh(newVal, oldVal)) {
           this.paintCount = 0;
           this.startPaint();
@@ -31,7 +32,7 @@ Component({
     },
     dancePalette: {
       type: Object,
-      observer: function (newVal, oldVal) {
+      observer: function(newVal, oldVal) {
         if (!this.isEmpty(newVal)) {
           this.initDancePalette(newVal);
         }
@@ -48,7 +49,7 @@ Component({
     },
     action: {
       type: Object,
-      observer: function (newVal, oldVal) {
+      observer: function(newVal, oldVal) {
         if (newVal) {
           this.doAction(newVal)
         }
@@ -82,7 +83,7 @@ Component({
       return true;
     },
 
-    doAction(newVal) {
+    doAction(newVal, callback, isMoving) {
       if (newVal && newVal.id && this.touchedView.id !== newVal.id) {
         // 带 id 的动作给撤回时使用，不带 id，表示对当前选中对象进行操作
         const {
@@ -118,17 +119,21 @@ Component({
       const draw = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
-        views: [doView]
+        views: this.isEmpty(doView) ? [] : [doView]
       }
       const pen = new Pen(this.globalContext, draw);
-      pen.paint();
+      if (isMoving && this.currentPalette.views[0].type === 'text') {
+        pen.paint(callback, true, this.movingCache);
+      } else {
+        pen.paint(callback)
+      }
       const {
         rect
       } = doView
       const block = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
-        views: [{
+        views: this.isEmpty(this.touchedView) ? [] : [{
           type: 'rect',
           css: {
             height: `${rect.bottom - rect.top}px`,
@@ -150,6 +155,19 @@ Component({
             top: `${rect.bottom - ACTION_POINT_RADIUS}px`
           }
         }]
+      }
+      if (this.touchedView.type === 'text') {
+        block.views.push({
+          type: 'rect',
+          css: {
+            height: `${2 * ACTION_POINT_RADIUS}px`,
+            width: `${2 * ACTION_POINT_RADIUS}px`,
+            borderRadius: `${ACTION_POINT_RADIUS}px`,
+            color: '#0000ff',
+            left: `${rect.left - ACTION_POINT_RADIUS}px`,
+            top: `${rect.top - ACTION_POINT_RADIUS}px`
+          }
+        })
       }
       const topBlock = new Pen(this.frontContext, block)
       topBlock.paint();
@@ -173,34 +191,48 @@ Component({
         )
     },
 
+    isDelete(x, y, rect) {
+      return (x > rect.left - ACTION_POINT_RADIUS &&
+        y > rect.top - ACTION_POINT_RADIUS &&
+        x < rect.left + ACTION_POINT_RADIUS &&
+        y < rect.top + ACTION_POINT_RADIUS)
+    },
+
     touchedView: {},
     findedIndex: -1,
-    onClick(event) {
+    onClick() {
       const x = this.startX
       const y = this.startY
       const totalLayerCount = this.currentPalette.views.length
-      const hasTouchedView = this.findedIndex !== -1
-      this.touchedView = {}
       let canBeTouched = []
+      let isDelete = false
       for (let i = totalLayerCount - 1; i >= 0; i--) {
         const view = this.currentPalette.views[i]
         const {
           rect
         } = view
-        if (this.inArea(x, y, rect, hasTouchedView)) {
+        if (this.touchedView && this.touchedView.id &&
+          this.touchedView.id === view.id &&
+          this.isDelete(x, y, rect)) {
+          canBeTouched.length = 0
+          this.currentPalette.views.splice(i, 1)
+          isDelete = true
+          break
+        }
+        if (this.inArea(x, y, rect, !this.isEmpty(this.touchedView))) {
           canBeTouched.push({
             view,
             index: i
           })
         }
       }
+      this.touchedView = {}
       if (canBeTouched.length === 0) {
         this.findedIndex = -1
       } else {
         let i = 0
         const touchAble = canBeTouched.filter(item => Boolean(item.view.id))
         if (touchAble.length === 0) {
-          this.touchedView = {}
           this.findedIndex = canBeTouched[0].index
         } else {
           for (i = 0; i < touchAble.length; i++) {
@@ -226,7 +258,6 @@ Component({
       }
       if (this.findedIndex < 0 || (this.touchedView && !this.touchedView.id)) {
         // 证明点击了背景 或无法移动的view
-        this.touchedView = {}
         const block = {
           width: this.currentPalette.width,
           height: this.currentPalette.height,
@@ -234,7 +265,9 @@ Component({
         }
         const topBlock = new Pen(this.frontContext, block)
         topBlock.paint();
-        if (this.findedIndex < 0) {
+        if (isDelete) {
+          this.doAction()
+        } else if (this.findedIndex < 0) {
           this.triggerEvent('touchStart', {})
         }
         this.findedIndex = -1
@@ -260,11 +293,15 @@ Component({
       }
       if (this.prevFindedIndex < this.findedIndex) {
         new Pen(this.bottomContext, bottomDraw).paint();
-        this.doAction()
+        this.doAction(null, (callbackInfo) => {
+          this.movingCache = callbackInfo
+        })
         new Pen(this.topContext, topDraw).paint();
       } else {
         new Pen(this.topContext, topDraw).paint();
-        this.doAction()
+        this.doAction(null, (callbackInfo) => {
+          this.movingCache = callbackInfo
+        })
         new Pen(this.bottomContext, bottomDraw).paint();
       }
       this.prevFindedIndex = this.findedIndex
@@ -290,6 +327,7 @@ Component({
         } = this.touchedView
         if (rect.right - ACTION_POINT_RADIUS < x && x < rect.right + ACTION_POINT_RADIUS && rect.bottom - ACTION_POINT_RADIUS < y && y < rect.bottom + ACTION_POINT_RADIUS) {
           this.isScale = true
+          this.movingCache = {}
           this.startH = rect.bottom - rect.top
           this.startW = rect.right - rect.left
         } else {
@@ -357,7 +395,11 @@ Component({
       }
       this.doAction({
         css
-      })
+      }, (callbackInfo) => {
+        if (this.isScale) {
+          this.movingCache = callbackInfo
+        }
+      }, !this.isScale)
     },
 
     initScreenK() {
@@ -378,12 +420,6 @@ Component({
 
     initDancePalette() {
       this.initScreenK();
-      this.hasIdViews = []
-      this.properties.dancePalette && this.properties.dancePalette.views.map(view => {
-        if (view.id) {
-          this.hasIdViews.push(view)
-        }
-      })
 
       this.downloadImages(this.properties.dancePalette).then((palette) => {
         this.currentPalette = palette
@@ -507,10 +543,10 @@ Component({
       setTimeout(() => {
         wx.canvasToTempFilePath({
           canvasId: 'photo',
-          success: function (res) {
+          success: function(res) {
             that.getImageInfo(res.tempFilePath);
           },
-          fail: function (error) {
+          fail: function(error) {
             console.error(`canvasToTempFilePath failed, ${JSON.stringify(error)}`);
             that.triggerEvent('imgErr', {
               error: error
