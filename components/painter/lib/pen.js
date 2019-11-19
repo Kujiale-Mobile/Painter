@@ -456,7 +456,6 @@ export default class Painter {
         } else {
           this.ctx.fillText(text, x, y, measuredWith);
         }
-        const fontSize = view.css.fontSize.toPx();
         if (view.css.textDecoration) {
           this.ctx.beginPath();
           this.ctx.moveTo(...this.callbackInfo.textDecoration.moveTo);

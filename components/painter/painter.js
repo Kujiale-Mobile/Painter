@@ -83,7 +83,50 @@ Component({
       return true;
     },
 
-    doAction(newVal, callback, isMoving) {
+    getBox(rect) {
+      return [{
+        type: 'rect',
+        css: {
+          height: `${rect.bottom - rect.top}px`,
+          width: `${rect.right - rect.left}px`,
+          left: `${rect.left}px`,
+          top: `${rect.top}px`,
+          borderWidth: '2rpx',
+          borderColor: '#0000ff',
+          color: 'transparent'
+        }
+      }, {
+        type: 'rect',
+        css: {
+          height: `${2 * ACTION_POINT_RADIUS}px`,
+          width: `${2 * ACTION_POINT_RADIUS}px`,
+          borderRadius: `${ACTION_POINT_RADIUS}px`,
+          color: '#0000ff',
+          left: `${rect.right - ACTION_POINT_RADIUS}px`,
+          top: `${rect.bottom - ACTION_POINT_RADIUS}px`
+        }
+      }]
+    },
+
+    getDeleteIcon(rect) {
+      return {
+        type: 'rect',
+        css: {
+          height: `${2 * ACTION_POINT_RADIUS}px`,
+          width: `${2 * ACTION_POINT_RADIUS}px`,
+          borderRadius: `${ACTION_POINT_RADIUS}px`,
+          color: '#0000ff',
+          left: `${rect.left - ACTION_POINT_RADIUS}px`,
+          top: `${rect.top - ACTION_POINT_RADIUS}px`
+        }
+      }
+    },
+
+    doAction(action, callback, isMoving) {
+      let newVal = null
+      if (action) {
+        newVal = action.view
+      }
       if (newVal && newVal.id && this.touchedView.id !== newVal.id) {
         // 带 id 的动作给撤回时使用，不带 id，表示对当前选中对象进行操作
         const {
@@ -133,41 +176,10 @@ Component({
       const block = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
-        views: this.isEmpty(this.touchedView) ? [] : [{
-          type: 'rect',
-          css: {
-            height: `${rect.bottom - rect.top}px`,
-            width: `${rect.right - rect.left}px`,
-            left: `${rect.left}px`,
-            top: `${rect.top}px`,
-            borderWidth: '2rpx',
-            borderColor: '#0000ff',
-            color: 'transparent'
-          }
-        }, {
-          type: 'rect',
-          css: {
-            height: `${2 * ACTION_POINT_RADIUS}px`,
-            width: `${2 * ACTION_POINT_RADIUS}px`,
-            borderRadius: `${ACTION_POINT_RADIUS}px`,
-            color: '#0000ff',
-            left: `${rect.right - ACTION_POINT_RADIUS}px`,
-            top: `${rect.bottom - ACTION_POINT_RADIUS}px`
-          }
-        }]
+        views: this.isEmpty(doView) ? [] : [...this.getBox(rect)]
       }
       if (this.touchedView.type === 'text') {
-        block.views.push({
-          type: 'rect',
-          css: {
-            height: `${2 * ACTION_POINT_RADIUS}px`,
-            width: `${2 * ACTION_POINT_RADIUS}px`,
-            borderRadius: `${ACTION_POINT_RADIUS}px`,
-            color: '#0000ff',
-            left: `${rect.left - ACTION_POINT_RADIUS}px`,
-            top: `${rect.top - ACTION_POINT_RADIUS}px`
-          }
-        })
+        block.views.push(this.getDeleteIcon(rect))
       }
       const topBlock = new Pen(this.frontContext, block)
       topBlock.paint();
@@ -206,16 +218,15 @@ Component({
       const totalLayerCount = this.currentPalette.views.length
       let canBeTouched = []
       let isDelete = false
+      let deleteIndex = -1
       for (let i = totalLayerCount - 1; i >= 0; i--) {
         const view = this.currentPalette.views[i]
         const {
           rect
         } = view
-        if (this.touchedView && this.touchedView.id &&
-          this.touchedView.id === view.id &&
-          this.isDelete(x, y, rect)) {
+        if (this.touchedView && this.touchedView.id && this.touchedView.id === view.id && this.isDelete(x, y, rect)) {
           canBeTouched.length = 0
-          this.currentPalette.views.splice(i, 1)
+          deleteIndex = i
           isDelete = true
           break
         }
@@ -266,6 +277,11 @@ Component({
         const topBlock = new Pen(this.frontContext, block)
         topBlock.paint();
         if (isDelete) {
+          this.triggerEvent('touchEnd', {
+            view: this.currentPalette.views[deleteIndex],
+            index: deleteIndex,
+            type: 'delete'
+          })
           this.doAction()
         } else if (this.findedIndex < 0) {
           this.triggerEvent('touchStart', {})
@@ -342,8 +358,7 @@ Component({
         this.onClick(e)
       } else if (this.touchedView && !this.isEmpty(this.touchedView)) {
         this.triggerEvent('touchEnd', {
-          id: this.touchedView.id,
-          css: this.touchedView.css
+          view: this.touchedView,
         })
       }
       this.hasMove = false
@@ -394,7 +409,9 @@ Component({
         }
       }
       this.doAction({
-        css
+        view: {
+          css
+        }
       }, (callbackInfo) => {
         if (this.isScale) {
           this.movingCache = callbackInfo
@@ -440,6 +457,21 @@ Component({
         this.topContext || (this.topContext = wx.createCanvasContext('top', this));
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
         new Pen(this.globalContext, palette).paint();
+        new Pen(this.frontContext, {
+          width,
+          height,
+          views: []
+        }).paint()
+        new Pen(this.bottomContext, {
+          width,
+          height,
+          views: []
+        }).paint()
+        new Pen(this.topContext, {
+          width,
+          height,
+          views: []
+        }).paint()
       });
     },
 
