@@ -279,7 +279,8 @@ Component({
         if (isDelete) {
           this.triggerEvent('touchEnd', {
             view: this.currentPalette.views[deleteIndex],
-            index: deleteIndex
+            index: deleteIndex,
+            type: 'delete'
           })
           this.doAction()
         } else if (this.findedIndex < 0) {
@@ -457,6 +458,16 @@ Component({
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
         new Pen(this.globalContext, palette).paint();
         new Pen(this.frontContext, {
+          width,
+          height,
+          views: []
+        }).paint()
+        new Pen(this.bottomContext, {
+          width,
+          height,
+          views: []
+        }).paint()
+        new Pen(this.topContext, {
           width,
           height,
           views: []
