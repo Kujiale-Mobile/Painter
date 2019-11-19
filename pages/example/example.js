@@ -11,6 +11,11 @@ Page({
    */
   data: {
     template: {},
+    customActionStyle: {
+      border: {
+        borderColor: 'red',
+      }
+    }
   },
 
   onImgOK(e) {

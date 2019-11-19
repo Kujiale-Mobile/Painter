@@ -9,3 +9,7 @@
   flex-direction: column;
   justify-content: center;
 }
+
+.top {
+  display: flex;
+}

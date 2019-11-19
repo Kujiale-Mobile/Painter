@@ -21,9 +21,13 @@ Component({
     customStyle: {
       type: String,
     },
+    // 运行自定义选择框和删除缩放按钮
+    customActionStyle: {
+      type: Object,
+    },
     palette: {
       type: Object,
-      observer: function(newVal, oldVal) {
+      observer: function (newVal, oldVal) {
         if (this.isNeedRefresh(newVal, oldVal)) {
           this.paintCount = 0;
           this.startPaint();
@@ -32,7 +36,7 @@ Component({
     },
     dancePalette: {
       type: Object,
-      observer: function(newVal, oldVal) {
+      observer: function (newVal, oldVal) {
         if (!this.isEmpty(newVal)) {
           this.initDancePalette(newVal);
         }
@@ -49,7 +53,7 @@ Component({
     },
     action: {
       type: Object,
-      observer: function(newVal, oldVal) {
+      observer: function (newVal, oldVal) {
         if (newVal) {
           this.doAction(newVal)
         }
@@ -84,7 +88,7 @@ Component({
     },
 
     getBox(rect) {
-      return [{
+      const boxArea = {
         type: 'rect',
         css: {
           height: `${rect.bottom - rect.top}px`,
@@ -95,31 +99,66 @@ Component({
           borderColor: '#0000ff',
           color: 'transparent'
         }
-      }, {
-        type: 'rect',
-        css: {
-          height: `${2 * ACTION_POINT_RADIUS}px`,
-          width: `${2 * ACTION_POINT_RADIUS}px`,
-          borderRadius: `${ACTION_POINT_RADIUS}px`,
-          color: '#0000ff',
-          left: `${rect.right - ACTION_POINT_RADIUS}px`,
-          top: `${rect.bottom - ACTION_POINT_RADIUS}px`
+      }
+      if (this.properties.customActionStyle && this.properties.customActionStyle.border) {
+        boxArea.css = Object.assign({}, boxArea.css, this.properties.customActionStyle.border)
+      }
+      Object.assign(boxArea, {
+        id: 'box'
+      })
+      return boxArea
+    },
+
+    getScaleIcon(rect) {
+      let scaleArea = {}
+      if (this.properties.customActionStyle && this.properties.customActionStyle.scale) {
+        scaleArea = this.properties.customActionStyle.scale
+      } else {
+        scaleArea = {
+          type: 'rect',
+          css: {
+            height: `${2 * ACTION_POINT_RADIUS}px`,
+            width: `${2 * ACTION_POINT_RADIUS}px`,
+            borderRadius: `${ACTION_POINT_RADIUS}px`,
+            color: '#0000ff',
+          }
         }
-      }]
+      }
+      scaleArea.css = Object.assign({}, scaleArea.css, {
+        align: 'center',
+        left: `${rect.right}px`,
+        top: `${rect.bottom - scaleArea.css.height.toPx() / 2}px`
+      })
+      Object.assign(scaleArea, {
+        id: 'scale'
+      })
+      return scaleArea
     },
 
     getDeleteIcon(rect) {
-      return {
-        type: 'rect',
-        css: {
-          height: `${2 * ACTION_POINT_RADIUS}px`,
-          width: `${2 * ACTION_POINT_RADIUS}px`,
-          borderRadius: `${ACTION_POINT_RADIUS}px`,
-          color: '#0000ff',
-          left: `${rect.left - ACTION_POINT_RADIUS}px`,
-          top: `${rect.top - ACTION_POINT_RADIUS}px`
+      let deleteArea = {}
+      if (this.properties.customActionStyle && this.properties.customActionStyle.delete) {
+        deleteArea = this.properties.customActionStyle.delete
+      } else {
+        deleteArea = {
+          type: 'rect',
+          css: {
+            height: `${2 * ACTION_POINT_RADIUS}px`,
+            width: `${2 * ACTION_POINT_RADIUS}px`,
+            borderRadius: `${ACTION_POINT_RADIUS}px`,
+            color: '#0000ff',
+          }
         }
       }
+      deleteArea.css = Object.assign({}, deleteArea.css, {
+        align: 'center',
+        left: `${rect.left}px`,
+        top: `${rect.top - deleteArea.css.height.toPx() / 2}px`
+      })
+      Object.assign(deleteArea, {
+        id: 'delete'
+      })
+      return deleteArea
     },
 
     doAction(action, callback, isMoving) {
@@ -173,41 +212,51 @@ Component({
       const {
         rect
       } = doView
-      const block = {
+      this.block = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
-        views: this.isEmpty(doView) ? [] : [...this.getBox(rect)]
+        views: this.isEmpty(doView) ? [] : [this.getBox(rect)]
       }
-      if (this.touchedView.type === 'text') {
-        block.views.push(this.getDeleteIcon(rect))
+      if (this.touchedView.css && this.touchedView.css.scalable) {
+        this.block.views.push(this.getScaleIcon(rect))
       }
-      const topBlock = new Pen(this.frontContext, block)
+      if (this.touchedView.css && this.touchedView.css.deletable) {
+        this.block.views.push(this.getDeleteIcon(rect))
+      }
+      const topBlock = new Pen(this.frontContext, this.block)
       topBlock.paint();
     },
 
-    inArea(x, y, rect, hasTouchedView) {
-      return (hasTouchedView &&
-          ((x > rect.left &&
-              y > rect.top &&
-              x < rect.right &&
-              y < rect.bottom) ||
-            (x > rect.right - ACTION_POINT_RADIUS &&
-              y > rect.bottom - ACTION_POINT_RADIUS &&
-              x < rect.right + ACTION_POINT_RADIUS &&
-              y < rect.bottom + ACTION_POINT_RADIUS))
-        ) ||
-        (x > rect.left &&
-          y > rect.top &&
-          x < rect.right &&
-          y < rect.bottom
-        )
+    isInView(x, y, rect) {
+      return (x > rect.left &&
+        y > rect.top &&
+        x < rect.right &&
+        y < rect.bottom
+      )
     },
 
-    isDelete(x, y, rect) {
-      return (x > rect.left - ACTION_POINT_RADIUS &&
-        y > rect.top - ACTION_POINT_RADIUS &&
-        x < rect.left + ACTION_POINT_RADIUS &&
-        y < rect.top + ACTION_POINT_RADIUS)
+    isInDelete(x, y) {
+      for (const view of this.block.views) {
+        if (view.id === 'delete') {
+          return (x > view.rect.left &&
+            y > view.rect.top &&
+            x < view.rect.right &&
+            y < view.rect.bottom)
+        }
+      }
+      return false
+    },
+
+    isInScale(x, y) {
+      for (const view of this.block.views) {
+        if (view.id === 'scale') {
+          return (x > view.rect.left &&
+            y > view.rect.top &&
+            x < view.rect.right &&
+            y < view.rect.bottom)
+        }
+      }
+      return false
     },
 
     touchedView: {},
@@ -224,13 +273,13 @@ Component({
         const {
           rect
         } = view
-        if (this.touchedView && this.touchedView.id && this.touchedView.id === view.id && this.isDelete(x, y, rect)) {
+        if (this.touchedView && this.touchedView.id && this.touchedView.id === view.id && this.isInDelete(x, y, rect)) {
           canBeTouched.length = 0
           deleteIndex = i
           isDelete = true
           break
         }
-        if (this.inArea(x, y, rect, !this.isEmpty(this.touchedView))) {
+        if (this.isInView(x, y, rect)) {
           canBeTouched.push({
             view,
             index: i
@@ -341,7 +390,7 @@ Component({
         const {
           rect
         } = this.touchedView
-        if (rect.right - ACTION_POINT_RADIUS < x && x < rect.right + ACTION_POINT_RADIUS && rect.bottom - ACTION_POINT_RADIUS < y && y < rect.bottom + ACTION_POINT_RADIUS) {
+        if (this.isInScale(x, y, rect)) {
           this.isScale = true
           this.movingCache = {}
           this.startH = rect.bottom - rect.top
@@ -355,7 +404,7 @@ Component({
     onTouchEnd(e) {
       const current = new Date().getTime()
       if ((current - this.startTimeStamp) <= 500 && !this.hasMove) {
-        this.onClick(e)
+        !this.isScale && this.onClick(e)
       } else if (this.touchedView && !this.isEmpty(this.touchedView)) {
         this.triggerEvent('touchEnd', {
           view: this.touchedView,
@@ -575,10 +624,10 @@ Component({
       setTimeout(() => {
         wx.canvasToTempFilePath({
           canvasId: 'photo',
-          success: function(res) {
+          success: function (res) {
             that.getImageInfo(res.tempFilePath);
           },
-          fail: function(error) {
+          fail: function (error) {
             console.error(`canvasToTempFilePath failed, ${JSON.stringify(error)}`);
             that.triggerEvent('imgErr', {
               error: error
