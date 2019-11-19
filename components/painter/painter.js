@@ -218,7 +218,6 @@ Component({
       const totalLayerCount = this.currentPalette.views.length
       let canBeTouched = []
       let isDelete = false
-      let deleteView = {}
       let deleteIndex = -1
       for (let i = totalLayerCount - 1; i >= 0; i--) {
         const view = this.currentPalette.views[i]
@@ -228,7 +227,6 @@ Component({
         if (this.touchedView && this.touchedView.id && this.touchedView.id === view.id && this.isDelete(x, y, rect)) {
           canBeTouched.length = 0
           deleteIndex = i
-          deleteView = this.currentPalette.views[i]
           isDelete = true
           break
         }
@@ -280,7 +278,7 @@ Component({
         topBlock.paint();
         if (isDelete) {
           this.triggerEvent('touchEnd', {
-            view: deleteView,
+            view: this.currentPalette.views[deleteIndex],
             index: deleteIndex
           })
           this.doAction()

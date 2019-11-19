@@ -1,12 +1,5 @@
 import Card from '../../palette/card';
 
-const ACTION_NAMES = {
-  MOVE: 'move',
-  RESIZE: 'resize',
-  ADD: 'add',
-  DELETE: 'delete',
-  CHANGE: 'change'
-}
 // src/pages/xml2can/xml2can.js
 Page({
   imagePath: '',
@@ -32,7 +25,7 @@ Page({
     if (!pre) {
       return
     }
-    const needRefresh = pre.index >= 0 && pre.index <= this.data.template.views.length
+    const needRefresh = pre.index && pre.index >= 0 && pre.index <= this.data.template.views.length
     if (needRefresh) {
       if (this.data.template.views[pre.index].id === pre.view.id) {
         this.data.template.views.splice(pre.index, 1)
@@ -65,7 +58,7 @@ Page({
     if (!fut) {
       return
     }
-    const needRefresh = fut.index >= 0 && fut.index <= this.data.template.views.length
+    const needRefresh = fut.index && fut.index >= 0 && fut.index <= this.data.template.views.length
     if (needRefresh) {
       if (this.data.template.views[fut.index].id === fut.view.id) {
         this.data.template.views.splice(fut.index, 1)
