@@ -101,6 +101,7 @@ export default class Painter {
     this.ctx.lineWidth = lineWidth;
     if (borderStyle === 'dashed') {
       this.ctx.setLineDash([2 * lineWidth, 2 * lineWidth]);
+      // this.ctx.lineDashOffset = 2 * lineWidth
     } else if (borderStyle === 'dotted') {
       this.ctx.setLineDash([lineWidth, lineWidth]);
     } else if (borderStyle !== 'solid') {
@@ -127,8 +128,11 @@ export default class Painter {
     notSolid && r4 === 0 && this.ctx.moveTo(-width / 2 - lineWidth / 2, height / 2 + lineWidth) // 左边虚线规避重叠规则
     r4 !== 0 && this.ctx.arc(-width / 2 + r4, height / 2 - r4, r4 + lineWidth / 2, 0.5 * Math.PI, 1 * Math.PI); // 左下角圆弧
     this.ctx.lineTo(-width / 2 - lineWidth / 2, r1 === 0 ? notSolid ? -height / 2 : -height / 2 - lineWidth / 2 : -height / 2 + r1); // 左边线
+    notSolid && r1 === 0 && this.ctx.moveTo(-width / 2 - lineWidth, -height / 2 - lineWidth / 2) // 顶边虚线规避重叠规则
 
-    this.ctx.closePath();
+    if (!notSolid) {
+      this.ctx.closePath();
+    }
   }
 
   /**
