@@ -10,21 +10,61 @@ export default class LastMayday {
         _textDecoration('line-through', 2),
         _textDecoration('overline underline line-through', 3, 'red'),
         {
+          type: 'rect',
+          css: {
+            width: '200rpx',
+            right: '20rpx',
+            top: '30rpx',
+            height: '100rpx',
+            borderRadius: '100rpx',
+            shadow: '10rpx 10rpx 5rpx #888888',
+            color: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
+          },
+        },
+        {
+          id: 'my-text-id',
           type: 'text',
           text: "fontWeight: 'bold'",
           css: [{
             top: `${startTop + 4 * gapSize}rpx`,
+            shadow: '10rpx 10rpx 5rpx #888888',
             fontWeight: 'bold',
           }, common],
         },
         {
+          type: 'rect',
+          css: {
+            width: '20rpx',
+            height: '20rpx',
+            color: 'red',
+            left: [`${startTop}rpx`, 'my-text-id'],
+            top: `${startTop + 4 * gapSize + 15}rpx`,
+          },
+        },
+        {
+          id: 'text-id-2',
           type: 'text',
           text: '我是把width设置为400rpx后，我就换行了xx行了',
           css: [{
             top: `${startTop + 5 * gapSize}rpx`,
             align: 'center',
             width: '400rpx',
+            background: '#538e60',
+            textAlign: 'center',
+            padding: '10rpx',
+            scalable: true,
+            deletable: true,
           }, common, { left: '300rpx' }],
+        },
+        {
+          type: 'rect',
+          css: {
+            width: '20rpx',
+            height: '20rpx',
+            color: 'red',
+            left: '200rpx',
+            top: [`${startTop + 5 * gapSize}rpx`, 'text-id-2'],
+          },
         },
         {
           type: 'text',
@@ -65,6 +105,7 @@ export default class LastMayday {
             color: 'red',
             borderWidth: '10rpx',
             borderColor: 'blue',
+            borderStyle: 'dashed',
             width: '120rpx',
             height: '120rpx',
           },
@@ -74,7 +115,7 @@ export default class LastMayday {
           css: {
             bottom: '40rpx',
             right: '40rpx',
-            color: 'green',
+            color: 'radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)',
             borderRadius: '20rpx',
             borderWidth: '10rpx',
             width: '120rpx',
@@ -119,6 +160,7 @@ function _textDecoration(decoration, index, color) {
 function _image(index, rotate, borderRadius) {
   return (
     {
+      id: `image-${index}`,
       type: 'image',
       url: '/palette/avatar.jpg',
       css: {
@@ -126,8 +168,10 @@ function _image(index, rotate, borderRadius) {
         left: `${startLeft + 160 * index}rpx`,
         width: '120rpx',
         height: '120rpx',
+        shadow: '10rpx 10rpx 5rpx #888888',
         rotate: rotate,
         borderRadius: borderRadius,
+        scalable: true,
       },
     }
   );

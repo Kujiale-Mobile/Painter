@@ -1,4 +1,18 @@
-<view>
-  <painter customStyle='margin-left:40rpx' palette="{{template}}" bind:imgOK="onImgOK" />
-  <button style='position:relative;margin-top:50rpx' bind:tap='saveImage'>保存</button>
+<view style='position: relative;'>
+  <view class="top">
+    <button bind:tap='onRevert'>撤销</button>
+    <button bind:tap='onRecover'>恢复</button>
+    <button bind:tap='saveImage'>保存</button>
+  </view>
+  <painter 
+    customStyle='margin-left: 40rpx; height: 1000rpx;'
+    customActionStyle="{{customActionStyle}}"
+    dancePalette="{{template}}"
+    palette="{{paintPallette}}"
+    bind:imgOK="onImgOK" 
+    bind:touchEnd="touchEnd" 
+    action="{{action}}" 
+    />
+  <!-- <image src="{{image}}" style="width: 654rpx; height: 1000rpx; margin-left:40rpx;"/> -->
+  
 </view>
