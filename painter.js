@@ -27,7 +27,7 @@ Component({
     },
     palette: {
       type: Object,
-      observer: function (newVal, oldVal) {
+      observer: function(newVal, oldVal) {
         if (this.isNeedRefresh(newVal, oldVal)) {
           this.paintCount = 0;
           this.startPaint();
@@ -36,7 +36,7 @@ Component({
     },
     dancePalette: {
       type: Object,
-      observer: function (newVal, oldVal) {
+      observer: function(newVal, oldVal) {
         if (!this.isEmpty(newVal)) {
           this.initDancePalette(newVal);
         }
@@ -53,7 +53,7 @@ Component({
     },
     action: {
       type: Object,
-      observer: function (newVal, oldVal) {
+      observer: function(newVal, oldVal) {
         if (newVal) {
           this.doAction(newVal)
         }
@@ -624,10 +624,10 @@ Component({
       setTimeout(() => {
         wx.canvasToTempFilePath({
           canvasId: 'photo',
-          success: function (res) {
+          success: function(res) {
             that.getImageInfo(res.tempFilePath);
           },
-          fail: function (error) {
+          fail: function(error) {
             console.error(`canvasToTempFilePath failed, ${JSON.stringify(error)}`);
             that.triggerEvent('imgErr', {
               error: error
@@ -679,6 +679,9 @@ function setStringPrototype(screenK, scale) {
    * @param {Boolean} minus 是否支持负数
    */
   String.prototype.toPx = function toPx(minus) {
+    if (this === '0') {
+      return 0
+    }
     let reg;
     if (minus) {
       reg = /^-?[0-9]+([.]{1}[0-9]+){0,1}(rpx|px)$/g;
