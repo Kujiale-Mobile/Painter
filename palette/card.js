@@ -105,6 +105,7 @@ export default class LastMayday {
             color: 'red',
             borderWidth: '10rpx',
             borderColor: 'blue',
+            borderStyle: 'dashed',
             width: '120rpx',
             height: '120rpx',
           },
@@ -159,6 +160,7 @@ function _textDecoration(decoration, index, color) {
 function _image(index, rotate, borderRadius) {
   return (
     {
+      id: `image-${index}`,
       type: 'image',
       url: '/palette/avatar.jpg',
       css: {
@@ -169,6 +171,7 @@ function _image(index, rotate, borderRadius) {
         shadow: '10rpx 10rpx 5rpx #888888',
         rotate: rotate,
         borderRadius: borderRadius,
+        scalable: true,
       },
     }
   );

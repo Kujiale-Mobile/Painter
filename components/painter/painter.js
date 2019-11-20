@@ -7,7 +7,8 @@ const downloader = new Downloader();
 
 // 最大尝试的绘制次数
 const MAX_PAINT_COUNT = 5;
-const ACTION_POINT_RADIUS = 10;
+const ACTION_DEFAULT_SIZE = 10;
+const ACTION_OFFSET = '2rpx';
 Component({
   canvasWidthInPx: 0,
   canvasHeightInPx: 0,
@@ -109,7 +110,8 @@ Component({
       return boxArea
     },
 
-    getScaleIcon(rect) {
+
+    getScaleIcon(rect, type) {
       let scaleArea = {}
       if (this.properties.customActionStyle && this.properties.customActionStyle.scale) {
         scaleArea = this.properties.customActionStyle.scale
@@ -117,17 +119,17 @@ Component({
         scaleArea = {
           type: 'rect',
           css: {
-            height: `${2 * ACTION_POINT_RADIUS}px`,
-            width: `${2 * ACTION_POINT_RADIUS}px`,
-            borderRadius: `${ACTION_POINT_RADIUS}px`,
+            height: `${2 * ACTION_DEFAULT_SIZE}px`,
+            width: `${2 * ACTION_DEFAULT_SIZE}px`,
+            borderRadius: `${ACTION_DEFAULT_SIZE}px`,
             color: '#0000ff',
           }
         }
       }
       scaleArea.css = Object.assign({}, scaleArea.css, {
         align: 'center',
-        left: `${rect.right}px`,
-        top: `${rect.bottom - scaleArea.css.height.toPx() / 2}px`
+        left: `${rect.right + ACTION_OFFSET.toPx()}px`,
+        top: type === 'text' ? `${rect.top - ACTION_OFFSET.toPx() - scaleArea.css.height.toPx() / 2}px` : `${rect.bottom - ACTION_OFFSET.toPx() - scaleArea.css.height.toPx() / 2}px`
       })
       Object.assign(scaleArea, {
         id: 'scale'
@@ -143,17 +145,17 @@ Component({
         deleteArea = {
           type: 'rect',
           css: {
-            height: `${2 * ACTION_POINT_RADIUS}px`,
-            width: `${2 * ACTION_POINT_RADIUS}px`,
-            borderRadius: `${ACTION_POINT_RADIUS}px`,
+            height: `${2 * ACTION_DEFAULT_SIZE}px`,
+            width: `${2 * ACTION_DEFAULT_SIZE}px`,
+            borderRadius: `${ACTION_DEFAULT_SIZE}px`,
             color: '#0000ff',
           }
         }
       }
       deleteArea.css = Object.assign({}, deleteArea.css, {
         align: 'center',
-        left: `${rect.left}px`,
-        top: `${rect.top - deleteArea.css.height.toPx() / 2}px`
+        left: `${rect.left - ACTION_OFFSET.toPx()}px`,
+        top: `${rect.top - ACTION_OFFSET.toPx() - deleteArea.css.height.toPx() / 2}px`
       })
       Object.assign(deleteArea, {
         id: 'delete'
@@ -210,17 +212,19 @@ Component({
         pen.paint(callback)
       }
       const {
-        rect
+        rect,
+        css,
+        type
       } = doView
       this.block = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
         views: this.isEmpty(doView) ? [] : [this.getBox(rect)]
       }
-      if (this.touchedView.css && this.touchedView.css.scalable) {
-        this.block.views.push(this.getScaleIcon(rect))
+      if (css && css.scalable) {
+        this.block.views.push(this.getScaleIcon(rect, type))
       }
-      if (this.touchedView.css && this.touchedView.css.deletable) {
+      if (css && css.deletable) {
         this.block.views.push(this.getDeleteIcon(rect))
       }
       const topBlock = new Pen(this.frontContext, this.block)
