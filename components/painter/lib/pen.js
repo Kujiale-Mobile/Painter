@@ -81,25 +81,65 @@ export default class Painter {
     }
   }
 
+  _border({ borderRadius = 0, width, height, borderWidth = 0, borderStyle = 'solid' }) {
+    let r1 = 0,
+      r2 = 0,
+      r3 = 0,
+      r4 = 0
+    if (borderRadius) {
+      const border = borderRadius.split(/\s+/)
+      if (border.length === 4) {
+        r1 = Math.min(border[0].toPx(), width / 2, height / 2);
+        r2 = Math.min(border[1].toPx(), width / 2, height / 2);
+        r3 = Math.min(border[2].toPx(), width / 2, height / 2);
+        r4 = Math.min(border[3].toPx(), width / 2, height / 2);
+      } else {
+        r1 = r2 = r3 = r4 = Math.min(borderRadius && borderRadius.toPx(), width / 2, height / 2);
+      }
+    }
+    const lineWidth = borderWidth && borderWidth.toPx();
+    this.ctx.lineWidth = lineWidth;
+    if (borderStyle === 'dashed') {
+      this.ctx.setLineDash([lineWidth * 4 / 3, lineWidth * 4 / 3]);
+      // this.ctx.lineDashOffset = 2 * lineWidth
+    } else if (borderStyle === 'dotted') {
+      this.ctx.setLineDash([lineWidth, lineWidth]);
+    }
+    const notSolid = borderStyle !== 'solid'
+    this.ctx.beginPath();
+
+    notSolid && r1 === 0 && this.ctx.moveTo(-width / 2 - lineWidth, -height / 2 - lineWidth / 2) // 顶边虚线规避重叠规则
+    r1 !== 0 && this.ctx.arc(-width / 2 + r1, -height / 2 + r1, r1 + lineWidth / 2, 1 * Math.PI, 1.5 * Math.PI); //左上角圆弧
+    this.ctx.lineTo(r2 === 0 ? notSolid ? width / 2 : width / 2 + lineWidth / 2 : width / 2 - r2, -height / 2 - lineWidth / 2); // 顶边线
+
+    notSolid && r2 === 0 && this.ctx.moveTo(width / 2 + lineWidth / 2, -height / 2 - lineWidth) // 右边虚线规避重叠规则
+    r2 !== 0 && this.ctx.arc(width / 2 - r2, -height / 2 + r2, r2 + lineWidth / 2, 1.5 * Math.PI, 2 * Math.PI); // 右上角圆弧
+    this.ctx.lineTo(width / 2 + lineWidth / 2, r3 === 0 ? notSolid ? height / 2 : height / 2 + lineWidth / 2 : height / 2 - r3); // 右边线
+
+    notSolid && r3 === 0 && this.ctx.moveTo(width / 2 + lineWidth, height / 2 + lineWidth / 2) // 底边虚线规避重叠规则
+    r3 !== 0 && this.ctx.arc(width / 2 - r3, height / 2 - r3, r3 + lineWidth / 2, 0, 0.5 * Math.PI); // 右下角圆弧
+    this.ctx.lineTo(r4 === 0 ? notSolid ? -width / 2 : -width / 2 - lineWidth / 2 : -width / 2 + r4, height / 2 + lineWidth / 2); // 底边线
+
+    notSolid && r4 === 0 && this.ctx.moveTo(-width / 2 - lineWidth / 2, height / 2 + lineWidth) // 左边虚线规避重叠规则
+    r4 !== 0 && this.ctx.arc(-width / 2 + r4, height / 2 - r4, r4 + lineWidth / 2, 0.5 * Math.PI, 1 * Math.PI); // 左下角圆弧
+    this.ctx.lineTo(-width / 2 - lineWidth / 2, r1 === 0 ? notSolid ? -height / 2 : -height / 2 - lineWidth / 2 : -height / 2 + r1); // 左边线
+    notSolid && r1 === 0 && this.ctx.moveTo(-width / 2 - lineWidth, -height / 2 - lineWidth / 2) // 顶边虚线规避重叠规则
+
+    if (!notSolid) {
+      this.ctx.closePath();
+    }
+  }
+
   /**
    * 根据 borderRadius 进行裁减
    */
-  _doClip(borderRadius, width, height) {
+  _doClip(borderRadius, width, height, borderStyle) {
     if (borderRadius && width && height) {
-      const r = Math.min(borderRadius.toPx(), width / 2, height / 2);
       // 防止在某些机型上周边有黑框现象，此处如果直接设置 fillStyle 为透明，在 Android 机型上会导致被裁减的图片也变为透明， iOS 和 IDE 上不会
       // globalAlpha 在 1.9.90 起支持，低版本下无效，但把 fillStyle 设为了 white，相对默认的 black 要好点
       this.ctx.globalAlpha = 0;
       this.ctx.fillStyle = 'white';
-      this.ctx.beginPath();
-      this.ctx.arc(-width / 2 + r, -height / 2 + r, r, 1 * Math.PI, 1.5 * Math.PI);
-      this.ctx.lineTo(width / 2 - r, -height / 2);
-      this.ctx.arc(width / 2 - r, -height / 2 + r, r, 1.5 * Math.PI, 2 * Math.PI);
-      this.ctx.lineTo(width / 2, height / 2 - r);
-      this.ctx.arc(width / 2 - r, height / 2 - r, r, 0, 0.5 * Math.PI);
-      this.ctx.lineTo(-width / 2 + r, height / 2);
-      this.ctx.arc(-width / 2 + r, height / 2 - r, r, 0.5 * Math.PI, 1 * Math.PI);
-      this.ctx.closePath();
+      this._border({ borderRadius, width, height, borderStyle })
       this.ctx.fill();
       // 在 ios 的 6.6.6 版本上 clip 有 bug，禁掉此类型上的 clip，也就意味着，在此版本微信的 ios 设备下无法使用 border 属性
       if (!(getApp().systemInfo &&
@@ -122,30 +162,15 @@ export default class Painter {
       borderRadius,
       borderWidth,
       borderColor,
+      borderStyle
     } = view.css;
     if (!borderWidth) {
       return;
     }
     this.ctx.save();
     this._preProcess(view, true);
-    let r;
-    if (borderRadius) {
-      r = Math.min(borderRadius.toPx(), width / 2, height / 2);
-    } else {
-      r = 0;
-    }
-    const lineWidth = borderWidth.toPx();
-    this.ctx.lineWidth = lineWidth;
     this.ctx.strokeStyle = (borderColor || 'black');
-    this.ctx.beginPath();
-    this.ctx.arc(-width / 2 + r, -height / 2 + r, r + lineWidth / 2, 1 * Math.PI, 1.5 * Math.PI);
-    this.ctx.lineTo(width / 2 - r, -height / 2 - lineWidth / 2);
-    this.ctx.arc(width / 2 - r, -height / 2 + r, r + lineWidth / 2, 1.5 * Math.PI, 2 * Math.PI);
-    this.ctx.lineTo(width / 2 + lineWidth / 2, height / 2 - r);
-    this.ctx.arc(width / 2 - r, height / 2 - r, r + lineWidth / 2, 0, 0.5 * Math.PI);
-    this.ctx.lineTo(-width / 2 + r, height / 2 + lineWidth / 2);
-    this.ctx.arc(-width / 2 + r, height / 2 - r, r + lineWidth / 2, 0.5 * Math.PI, 1 * Math.PI);
-    this.ctx.closePath();
+    this._border({ borderRadius, width, height, borderWidth, borderStyle })
     this.ctx.stroke();
     this.ctx.restore();
   }
@@ -306,7 +331,7 @@ export default class Painter {
 
     this.ctx.rotate(angle);
     if (!notClip && view.css && view.css.borderRadius && view.type !== 'rect') {
-      this._doClip(view.css.borderRadius, width, height);
+      this._doClip(view.css.borderRadius, width, height, view.css.borderStyle);
     }
     this._doShadow(view);
     if (view.id) {
@@ -370,7 +395,7 @@ export default class Painter {
     const width = rawWidth + pd[1] + pd[3];
     const height = rawHeight + pd[0] + pd[2];
 
-    this._doClip(view.css.borderRadius, width, height)
+    this._doClip(view.css.borderRadius, width, height, view.css.borderStyle)
     if (GD.api.isGradient(background)) {
       GD.api.doGradient(background, width, height, this.ctx);
     } else {
@@ -598,17 +623,8 @@ export default class Painter {
     } else {
       this.ctx.fillStyle = view.css.color;
     }
-    const borderRadius = view.css.borderRadius
-    const r = borderRadius ? Math.min(borderRadius.toPx(), width / 2, height / 2) : 0;
-    this.ctx.beginPath();
-    this.ctx.arc(-width / 2 + r, -height / 2 + r, r, 1 * Math.PI, 1.5 * Math.PI); //左上角圆弧
-    this.ctx.lineTo(width / 2 - r, -height / 2);
-    this.ctx.arc(width / 2 - r, -height / 2 + r, r, 1.5 * Math.PI, 2 * Math.PI); // 右上角圆弧
-    this.ctx.lineTo(width / 2, height / 2 - r);
-    this.ctx.arc(width / 2 - r, height / 2 - r, r, 0, 0.5 * Math.PI); // 右下角圆弧
-    this.ctx.lineTo(-width / 2 + r, height / 2);
-    this.ctx.arc(-width / 2 + r, height / 2 - r, r, 0.5 * Math.PI, 1 * Math.PI); // 左下角圆弧
-    this.ctx.closePath();
+    const { borderRadius, borderStyle, borderWidth } = view.css
+    this._border({ borderRadius, width, height, borderWidth, borderStyle })
     this.ctx.fill();
     this.ctx.restore();
     this._doBorder(view, width, height);
@@ -620,7 +636,7 @@ export default class Painter {
     if (!view.css || !view.css.shadow) {
       return;
     }
-    const box = view.css.shadow.replace(/,\s+/g, ',').split(' ');
+    const box = view.css.shadow.replace(/,\s+/g, ',').split(/\s+/);
     if (box.length > 4) {
       console.error('shadow don\'t spread option');
       return;
