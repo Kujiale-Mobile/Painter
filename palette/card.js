@@ -135,11 +135,13 @@ export default class LastMayday {
         {
           type: 'rect',
           css: {
-            color: 'rgba(0,0,0,0)',
             width: '100rpx',
             height: '100rpx',
+            color: 'rgba(0,0,0,0.2)',
             left: '50%',
-            top: '50%'
+            top: '50%',
+            align: 'center',
+            verticalAlign: 'center',
           }
         }
       ],
