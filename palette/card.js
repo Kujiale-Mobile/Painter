@@ -132,6 +132,16 @@ export default class LastMayday {
             borderWidth: '2rpx',
           },
         },
+        {
+          type: 'rect',
+          css: {
+            color: 'rgba(0,0,0,0)',
+            width: '100rpx',
+            height: '100rpx',
+            left: '50%',
+            top: '50%'
+          }
+        }
       ],
     });
   }

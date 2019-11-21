@@ -13,7 +13,7 @@ Page({
     template: {},
     customActionStyle: {
       border: {
-        borderColor: 'red',
+        borderColor: '#1A7AF8',
       }
     }
   },
