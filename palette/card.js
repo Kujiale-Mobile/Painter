@@ -182,6 +182,7 @@ function _image(index, rotate, borderRadius) {
         height: '120rpx',
         shadow: '10rpx 10rpx 5rpx #888888',
         rotate: rotate,
+        minWidth: '60rpx',
         borderRadius: borderRadius,
         scalable: true,
       },

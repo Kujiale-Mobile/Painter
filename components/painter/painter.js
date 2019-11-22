@@ -462,6 +462,16 @@ Component({
       let css = {}
       if (this.isScale) {
         const newW = this.startW + offsetX > 1 ? this.startW + offsetX : 1
+        if (this.touchedView.css && this.touchedView.css.minWidth) {
+          if (newW < this.touchedView.css.minWidth.toPx()) {
+            return
+          }
+        }
+        if (this.touchedView.rect && this.touchedView.rect.minWidth) {
+          if (newW < this.touchedView.rect.minWidth) {
+            return
+          }
+        }
         const newH = this.startH + offsetY > 1 ? this.startH + offsetY : 1
         css = {
           width: `${newW}px`,
