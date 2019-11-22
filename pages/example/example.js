@@ -14,6 +14,13 @@ Page({
     customActionStyle: {
       border: {
         borderColor: '#1A7AF8',
+      },
+      scale: {
+        textIcon: '/palette/switch.png',
+        imageIcon: '/palette/scale.png'
+      },
+      delete: {
+        icon: '/palette/close.png'
       }
     }
   },

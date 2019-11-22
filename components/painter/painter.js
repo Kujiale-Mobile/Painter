@@ -7,7 +7,7 @@ const downloader = new Downloader();
 
 // 最大尝试的绘制次数
 const MAX_PAINT_COUNT = 5;
-const ACTION_DEFAULT_SIZE = 10;
+const ACTION_DEFAULT_SIZE = 24;
 const ACTION_OFFSET = '2rpx';
 Component({
   canvasWidthInPx: 0,
@@ -115,18 +115,28 @@ Component({
       return boxArea
     },
 
-
     getScaleIcon(rect, type) {
       let scaleArea = {}
-      if (this.properties.customActionStyle && this.properties.customActionStyle.scale) {
-        scaleArea = this.properties.customActionStyle.scale
+      const {
+        customActionStyle
+      } = this.properties
+      if (customActionStyle && customActionStyle.scale) {
+        scaleArea = {
+          type: 'image',
+          url: type === 'text' ? customActionStyle.scale.textIcon : customActionStyle.scale.imageIcon,
+          css: {
+            height: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            width: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            borderRadius: `${ACTION_DEFAULT_SIZE}rpx`,
+          }
+        }
       } else {
         scaleArea = {
           type: 'rect',
           css: {
-            height: `${2 * ACTION_DEFAULT_SIZE}px`,
-            width: `${2 * ACTION_DEFAULT_SIZE}px`,
-            borderRadius: `${ACTION_DEFAULT_SIZE}px`,
+            height: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            width: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            borderRadius: `${ACTION_DEFAULT_SIZE}rpx`,
             color: '#0000ff',
           }
         }
@@ -144,15 +154,26 @@ Component({
 
     getDeleteIcon(rect) {
       let deleteArea = {}
-      if (this.properties.customActionStyle && this.properties.customActionStyle.delete) {
-        deleteArea = this.properties.customActionStyle.delete
+      const {
+        customActionStyle
+      } = this.properties
+      if (customActionStyle && customActionStyle.scale) {
+        deleteArea = {
+          type: 'image',
+          url: customActionStyle.delete.icon,
+          css: {
+            height: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            width: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            borderRadius: `${ACTION_DEFAULT_SIZE}rpx`,
+          }
+        }
       } else {
         deleteArea = {
           type: 'rect',
           css: {
-            height: `${2 * ACTION_DEFAULT_SIZE}px`,
-            width: `${2 * ACTION_DEFAULT_SIZE}px`,
-            borderRadius: `${ACTION_DEFAULT_SIZE}px`,
+            height: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            width: `${2 * ACTION_DEFAULT_SIZE}rpx`,
+            borderRadius: `${ACTION_DEFAULT_SIZE}rpx`,
             color: '#0000ff',
           }
         }
@@ -210,6 +231,7 @@ Component({
         height: this.currentPalette.height,
         views: this.isEmpty(doView) ? [] : [doView]
       }
+
       const pen = new Pen(this.globalContext, draw);
       if (isMoving && this.currentPalette.views[0].type === 'text') {
         pen.paint(callback, true, this.movingCache);
