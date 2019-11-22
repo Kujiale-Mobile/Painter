@@ -620,6 +620,7 @@ Component({
               preCount++;
               /* eslint-disable no-loop-func */
               downloader.download(view.url).then((path) => {
+                view.originUrl = view.url;
                 view.url = path;
                 wx.getImageInfo({
                   src: view.url,
