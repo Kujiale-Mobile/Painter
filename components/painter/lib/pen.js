@@ -201,7 +201,7 @@ export default class Painter {
         const linesArray = [];
         for (let i = 0; i < textArray.length; ++i) {
           const textLength = this.ctx.measureText(textArray[i]).width;
-          const partWidth = view.css.width ? view.css.width.toPx() : textLength;
+          const partWidth = view.css.width ? view.css.width.toPx(false, this.style.width) : textLength;
           const calLines = Math.ceil(textLength / partWidth);
           width = partWidth > width ? partWidth : width;
           lines += calLines;
@@ -234,14 +234,14 @@ export default class Painter {
           width = Math.round(view.sWidth / ratio);
           height = Math.round(view.sHeight / ratio);
         } else if (view.css.width === 'auto') {
-          height = view.css.height.toPx();
+          height = view.css.height.toPx(false, this.style.height);
           width = view.sWidth / view.sHeight * height;
         } else if (view.css.height === 'auto') {
-          width = view.css.width.toPx();
+          width = view.css.width.toPx(false, this.style.width);
           height = view.sHeight / view.sWidth * width;
         } else {
-          width = view.css.width.toPx();
-          height = view.css.height.toPx();
+          width = view.css.width.toPx(false, this.style.width);
+          height = view.css.height.toPx(false, this.style.height);
         }
         break;
       }
@@ -250,8 +250,8 @@ export default class Painter {
           console.error('You should set width and height');
           return;
         }
-        width = view.css.width.toPx();
-        height = view.css.height.toPx();
+        width = view.css.width.toPx(false, this.style.width);
+        height = view.css.height.toPx(false, this.style.height);
         break;
     }
     let x;
