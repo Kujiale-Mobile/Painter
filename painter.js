@@ -226,6 +226,10 @@ Component({
           doView.css = Object.assign({}, doView.css, newVal.css)
         }
       }
+      (newVal && newVal.url !== doView.url) && (doView.url = newVal.url);
+      (newVal && newVal.text !== doView.text) && (doView.text = newVal.text);
+      (newVal && newVal.content !== doView.content) && (doView.content = newVal.content);
+
       const draw = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
