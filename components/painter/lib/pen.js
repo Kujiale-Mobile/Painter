@@ -90,18 +90,19 @@ export default class Painter {
       r2 = 0,
       r3 = 0,
       r4 = 0
+    const minSize = Math.min(width, height);
     if (borderRadius) {
       const border = borderRadius.split(/\s+/)
       if (border.length === 4) {
-        r1 = Math.min(border[0].toPx(), width / 2, height / 2);
-        r2 = Math.min(border[1].toPx(), width / 2, height / 2);
-        r3 = Math.min(border[2].toPx(), width / 2, height / 2);
-        r4 = Math.min(border[3].toPx(), width / 2, height / 2);
+        r1 = Math.min(border[0].toPx(false, minSize), width / 2, height / 2);
+        r2 = Math.min(border[1].toPx(false, minSize), width / 2, height / 2);
+        r3 = Math.min(border[2].toPx(false, minSize), width / 2, height / 2);
+        r4 = Math.min(border[3].toPx(false, minSize), width / 2, height / 2);
       } else {
-        r1 = r2 = r3 = r4 = Math.min(borderRadius && borderRadius.toPx(), width / 2, height / 2);
+        r1 = r2 = r3 = r4 = Math.min(borderRadius && borderRadius.toPx(false, minSize), width / 2, height / 2);
       }
     }
-    const lineWidth = borderWidth && borderWidth.toPx();
+    const lineWidth = borderWidth && borderWidth.toPx(false, minSize);
     this.ctx.lineWidth = lineWidth;
     if (borderStyle === 'dashed') {
       this.ctx.setLineDash([lineWidth * 4 / 3, lineWidth * 4 / 3]);
