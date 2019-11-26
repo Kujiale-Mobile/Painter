@@ -332,13 +332,19 @@ export default class Painter {
     } else if (align === 'right') {
       left = x - width
     }
+    var top = y;
+      if (verticalAlign === 'center') {
+        top = y - height / 2;
+      } else if (verticalAlign === 'bottom') {
+        top = y - height
+      }
     view.rect = {
-      left,
-      top: y,
+      left: left,
+      top: top,
       right: left + width,
-      bottom: y + height,
-      x: view.css && view.css.right ? (x - width) : x,
-      y
+      bottom: top + height,
+      x: view.css && view.css.right ? x - width : x,
+      y: y
     };
     const pd = this._doPaddings(view);
     view.rect.left = view.rect.left - pd[3];
