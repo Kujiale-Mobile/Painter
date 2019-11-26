@@ -583,15 +583,19 @@ export default class Painter {
           }
           this.ctx.setTextAlign(view.css.textAlign ? view.css.textAlign : 'left');
           let x;
+          let lineX;
           switch (view.css.textAlign) {
             case 'center':
               x = 0;
+              lineX = x - measuredWith / 2;
               break;
             case 'right':
               x = (width / 2);
+              lineX = x - measuredWith;
               break;
             default:
               x = -(width / 2);
+              lineX = x;
               break;
           }
           const y = -(height / 2) + (lineIndex === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + lineIndex * lineHeight));
@@ -605,27 +609,27 @@ export default class Painter {
           if (view.css.textDecoration) {
             this.ctx.beginPath();
             if (/\bunderline\b/.test(view.css.textDecoration)) {
-              this.ctx.moveTo(x, y);
-              this.ctx.lineTo(x + measuredWith, y);
+              this.ctx.moveTo(lineX, y);
+              this.ctx.lineTo(lineX + measuredWith, y);
               !this.isMoving && (this.callbackInfo.textDecoration = {
-                moveTo: [x, y],
-                lineTo: [x + measuredWith, y]
+                moveTo: [lineX, y],
+                lineTo: [lineX + measuredWith, y]
               })
             }
             if (/\boverline\b/.test(view.css.textDecoration)) {
-              this.ctx.moveTo(x, y - fontSize);
-              this.ctx.lineTo(x + measuredWith, y - fontSize);
+              this.ctx.moveTo(lineX, y - fontSize);
+              this.ctx.lineTo(lineX + measuredWith, y - fontSize);
               !this.isMoving && (this.callbackInfo.textDecoration = {
-                moveTo: [x, y - fontSize],
-                lineTo: [x + measuredWith, y - fontSize]
+                moveTo: [lineX, y - fontSize],
+                lineTo: [lineX + measuredWith, y - fontSize]
               })
             }
             if (/\bline-through\b/.test(view.css.textDecoration)) {
-              this.ctx.moveTo(x, y - fontSize / 3);
-              this.ctx.lineTo(x + measuredWith, y - fontSize / 3);
+              this.ctx.moveTo(lineX, y - fontSize / 3);
+              this.ctx.lineTo(lineX + measuredWith, y - fontSize / 3);
               !this.isMoving && (this.callbackInfo.textDecoration = {
-                moveTo: [x, y - fontSize / 3],
-                lineTo: [x + measuredWith, y - fontSize / 3]
+                moveTo: [lineX, y - fontSize / 3],
+                lineTo: [lineX + measuredWith, y - fontSize / 3]
               })
             }
             this.ctx.closePath();
