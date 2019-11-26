@@ -230,7 +230,7 @@ Component({
           doView.css = Object.assign({}, doView.css, newVal.css)
         }
       }
-      if (newVal.rect) {
+      if (newVal && newVal.rect) {
         doView.rect = newVal.rect;
       }
       if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
