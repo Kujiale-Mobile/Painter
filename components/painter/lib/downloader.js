@@ -40,6 +40,24 @@ export default class Dowloader {
         resolve(url);
         return;
       }
+      if (!lru) {
+        // 无 lru 情况下直接判断 临时文件是否存在，不存在重新下载
+        wx.getFileInfo({
+          filePath: url,
+          success: () => {
+            resolve(url);
+          },
+          fail: () => {
+            downloadFile(url, lru).then((path) => {
+              resolve(path);
+            }, () => {
+              reject();
+            });
+          },
+        })
+        return
+      }
+
       const file = getFile(url);
 
       if (file) {
@@ -79,7 +97,9 @@ function downloadFile(url, lru) {
           reject();
           return;
         }
-        const { tempFilePath } = res;
+        const {
+          tempFilePath
+        } = res;
         wx.getFileInfo({
           filePath: tempFilePath,
           success: (tmpRes) => {
@@ -93,7 +113,7 @@ function downloadFile(url, lru) {
             }) : resolve(tempFilePath);
           },
           fail: (error) => {
-          // 文件大小信息获取失败，则此文件也不要进行存储
+            // 文件大小信息获取失败，则此文件也不要进行存储
             console.error(`getFileInfo ${res.tempFilePath} failed, ${JSON.stringify(error)}`);
             resolve(res.tempFilePath);
           },
@@ -186,7 +206,7 @@ function doLru(size) {
       key: SAVED_FILES_KEY,
       data: savedFiles,
       success: () => {
-      // 保证 storage 中不会存在不存在的文件数据
+        // 保证 storage 中不会存在不存在的文件数据
         if (pathsShouldDelete.length > 0) {
           removeFiles(pathsShouldDelete);
         }

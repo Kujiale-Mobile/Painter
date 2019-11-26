@@ -234,11 +234,16 @@ Component({
         downloader.download(newVal.url, this.properties.LRU).then((path) => {
           doView.originUrl = doView.url
           doView.url = path
+          this.reDraw(doView, callback, isMoving)
         })
-      };
-      (newVal && newVal.text && doView.text && newVal.text !== doView.text) && (doView.text = newVal.text);
-      (newVal && newVal.content && doView.content && newVal.content !== doView.content) && (doView.content = newVal.content);
+      } else {
+        (newVal && newVal.text && doView.text && newVal.text !== doView.text) && (doView.text = newVal.text);
+        (newVal && newVal.content && doView.content && newVal.content !== doView.content) && (doView.content = newVal.content);
+        this.reDraw(doView, callback, isMoving)
+      }
+    },
 
+    reDraw(doView, callback, isMoving) {
       const draw = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
