@@ -52,7 +52,6 @@ export default class LastMayday {
             background: '#538e60',
             textAlign: 'center',
             padding: '10rpx',
-            color: '#0000ff',
             scalable: true,
             deletable: true,
           }, common, { left: '300rpx' }],
