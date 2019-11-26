@@ -34,7 +34,7 @@ export default class Dowloader {
    * 下载文件，会用 lru 方式来缓存文件到本地
    * @param {String} url 文件的 url
    */
-  download(url) {
+  download(url, lru) {
     return new Promise((resolve, reject) => {
       if (!(url && util.isValidUrl(url))) {
         resolve(url);
@@ -51,7 +51,7 @@ export default class Dowloader {
           },
           fail: (error) => {
             console.error(`the file is broken, redownload it, ${JSON.stringify(error)}`);
-            downloadFile(url).then((path) => {
+            downloadFile(url, lru).then((path) => {
               resolve(path);
             }, () => {
               reject();
@@ -59,7 +59,7 @@ export default class Dowloader {
           },
         });
       } else {
-        downloadFile(url).then((path) => {
+        downloadFile(url, lru).then((path) => {
           resolve(path);
         }, () => {
           reject();
@@ -69,7 +69,7 @@ export default class Dowloader {
   }
 }
 
-function downloadFile(url) {
+function downloadFile(url, lru) {
   return new Promise((resolve, reject) => {
     wx.downloadFile({
       url: url,
@@ -84,13 +84,13 @@ function downloadFile(url) {
           filePath: tempFilePath,
           success: (tmpRes) => {
             const newFileSize = tmpRes.size;
-            doLru(newFileSize).then(() => {
+            lru ? doLru(newFileSize).then(() => {
               saveFile(url, newFileSize, tempFilePath).then((filePath) => {
                 resolve(filePath);
               });
             }, () => {
               resolve(tempFilePath);
-            });
+            }) : resolve(tempFilePath);
           },
           fail: (error) => {
           // 文件大小信息获取失败，则此文件也不要进行存储
