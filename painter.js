@@ -230,10 +230,15 @@ Component({
           doView.css = Object.assign({}, doView.css, newVal.css)
         }
       }
+      if (newVal.rect) {
+        doView.rect = newVal.rect;
+      }
       if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
         downloader.download(newVal.url, this.properties.LRU).then((path) => {
           doView.originUrl = doView.url
-          doView.url = path
+          doView.url = path;
+          newVal.sHeight && (doView.sHeight = newVal.sHeight);
+          newVal.sWidth && (doView.sWidth = newVal.sWidth);
           this.reDraw(doView, callback, isMoving)
         })
       } else {
