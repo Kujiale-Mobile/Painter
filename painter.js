@@ -235,11 +235,16 @@ Component({
       }
       if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
         downloader.download(newVal.url, this.properties.LRU).then((path) => {
-          doView.originUrl = doView.url
-          doView.url = path;
-          newVal.sHeight && (doView.sHeight = newVal.sHeight);
-          newVal.sWidth && (doView.sWidth = newVal.sWidth);
-          this.reDraw(doView, callback, isMoving)
+          wx.getImageInfo({
+            src: path,
+            success: () => {
+              doView.originUrl = newVal.url
+              doView.url = path;
+              newVal.sHeight && (doView.sHeight = newVal.sHeight);
+              newVal.sWidth && (doView.sWidth = newVal.sWidth);
+              this.reDraw(doView, callback, isMoving)
+            },
+          })
         })
       } else {
         (newVal && newVal.text && doView.text && newVal.text !== doView.text) && (doView.text = newVal.text);
@@ -256,7 +261,7 @@ Component({
       }
 
       const pen = new Pen(this.globalContext, draw);
-      if (isMoving && this.currentPalette.views[0].type === 'text') {
+      if (isMoving && doView.type === 'text') {
         pen.paint(callback, true, this.movingCache);
       } else {
         pen.paint(callback)
@@ -646,7 +651,7 @@ Component({
                 view.originUrl = view.url;
                 view.url = path;
                 wx.getImageInfo({
-                  src: view.url,
+                  src: path,
                   success: (res) => {
                     // 获得一下图片信息，供后续裁减使用
                     view.sWidth = res.width;
