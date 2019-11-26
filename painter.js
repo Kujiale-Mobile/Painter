@@ -52,6 +52,10 @@ Component({
       type: Boolean,
       value: false,
     },
+    LRU: {
+      type: Boolean,
+      value: true,
+    },
     action: {
       type: Object,
       observer: function (newVal, oldVal) {
@@ -226,7 +230,12 @@ Component({
           doView.css = Object.assign({}, doView.css, newVal.css)
         }
       }
-      (newVal && newVal.url && doView.url && newVal.url !== doView.url) && (doView.url = newVal.url);
+      if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
+        downloader.download(newVal.url, this.properties.LRU).then((path) => {
+          doView.originUrl = doView.url
+          doView.url = path
+        })
+      };
       (newVal && newVal.text && doView.text && newVal.text !== doView.text) && (doView.text = newVal.text);
       (newVal && newVal.content && doView.content && newVal.content !== doView.content) && (doView.content = newVal.content);
 
@@ -605,7 +614,7 @@ Component({
         const paletteCopy = JSON.parse(JSON.stringify(palette));
         if (paletteCopy.background) {
           preCount++;
-          downloader.download(paletteCopy.background).then((path) => {
+          downloader.download(paletteCopy.background, this.properties.LRU).then((path) => {
             paletteCopy.background = path;
             completeCount++;
             if (preCount === completeCount) {
@@ -623,7 +632,7 @@ Component({
             if (view && view.type === 'image' && view.url) {
               preCount++;
               /* eslint-disable no-loop-func */
-              downloader.download(view.url).then((path) => {
+              downloader.download(view.url, this.properties.LRU).then((path) => {
                 view.originUrl = view.url;
                 view.url = path;
                 wx.getImageInfo({
