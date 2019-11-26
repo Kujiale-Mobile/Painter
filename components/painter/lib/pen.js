@@ -355,6 +355,11 @@ export default class Painter {
       view.rect.minWidth = view.css.fontSize.toPx() + pd[1] + pd[3];
     }
 
+    view.css.bottom = undefined
+    view.css.right = undefined
+    view.css.left = `${view.rect.left}px`
+    view.css.top = `${view.rect.top}px`
+
     this.ctx.rotate(angle);
     if (!notClip && view.css && view.css.borderRadius && view.type !== 'rect') {
       this._doClip(view.css.borderRadius, width, height, view.css.borderStyle);
@@ -496,6 +501,7 @@ export default class Painter {
       height,
       extra,
     } = this._preProcess(view, view.css.background && view.css.borderRadius);
+    this.ctx.fillStyle = (view.css.color || 'black');
     if (this.isMoving && JSON.stringify(this.movingCache) !== JSON.stringify({})) {
       this.globalWidth[view.id] = this.movingCache.globalWidth
       this.ctx.setTextAlign(view.css.textAlign ? view.css.textAlign : 'left');
@@ -521,7 +527,6 @@ export default class Painter {
         }
       }
     } else {
-      this.ctx.fillStyle = (view.css.color || 'black');
       const {
         lines,
         lineHeight,
