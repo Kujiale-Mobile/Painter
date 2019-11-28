@@ -68,6 +68,15 @@ Component({
           this.doAction(newVal)
         }
       },
+    },
+    disableAction: {
+      type: Boolean,
+      observer: function (isDisabled) {
+        let style = isDisabled ? 'visibility: hidden' : ''
+        this.setData({
+          frontStyle: style
+        })
+      }
     }
   },
 
@@ -75,6 +84,7 @@ Component({
     picURL: '',
     showCanvas: true,
     painterStyle: '',
+    frontStyle: '',
   },
 
   methods: {
