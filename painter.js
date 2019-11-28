@@ -569,22 +569,22 @@ Component({
         this.bottomContext || (this.bottomContext = wx.createCanvasContext('bottom', this));
         this.topContext || (this.topContext = wx.createCanvasContext('top', this));
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
-        new Pen(this.globalContext, palette).paint();
+        new Pen(this.bottomContext, palette).paint();
+        new Pen(this.globalContext, {
+          width,
+          height,
+          views: []
+        }).paint();
         new Pen(this.frontContext, {
           width,
           height,
           views: []
-        }).paint()
-        new Pen(this.bottomContext, {
-          width,
-          height,
-          views: []
-        }).paint()
+        }).paint();
         new Pen(this.topContext, {
           width,
           height,
           views: []
-        }).paint()
+        }).paint();
       });
     },
 
