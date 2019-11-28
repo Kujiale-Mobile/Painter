@@ -365,7 +365,7 @@ Component({
           }
           this.touchedView = touchAble[i].view
           this.findedIndex = touchAble[i].index
-          this.triggerEvent('touchStart', {
+          this.triggerEvent('viewClicked', {
             view: this.touchedView
           })
         }
