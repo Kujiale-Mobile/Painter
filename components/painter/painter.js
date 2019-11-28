@@ -43,6 +43,11 @@ Component({
         }
       },
     },
+    // 缩放比，会在传入的 palette 中统一乘以该缩放比
+    scaleRatio: {
+      type: Number,
+      value: 1
+    },
     widthPixels: {
       type: Number,
       value: 0
@@ -545,7 +550,7 @@ Component({
       if (getApp() && getApp().systemInfo && getApp().systemInfo.screenWidth) {
         this.screenK = getApp().systemInfo.screenWidth / 750;
       }
-      setStringPrototype(this.screenK, 1);
+      setStringPrototype(this.screenK, this.properties.scaleRatio);
     },
 
     initDancePalette() {
@@ -618,7 +623,7 @@ Component({
         new Pen(this.photoContext, palette).paint(() => {
           this.saveImgToLocal();
         });
-        setStringPrototype(this.screenK, 1);
+        setStringPrototype(this.screenK, this.properties.scaleRatio);
       });
     },
 
