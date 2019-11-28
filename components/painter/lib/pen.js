@@ -357,8 +357,8 @@ export default class Painter {
 
     view.css.bottom = undefined
     view.css.right = undefined
-    view.css.left = `${view.rect.left}px`
-    view.css.top = `${view.rect.top}px`
+    view.css.left = `${view.rect.x}px`
+    view.css.top = `${view.rect.y}px`
 
     this.ctx.rotate(angle);
     if (!notClip && view.css && view.css.borderRadius && view.type !== 'rect') {
