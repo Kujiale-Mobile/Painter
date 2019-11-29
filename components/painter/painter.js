@@ -68,7 +68,7 @@ Component({
         if (newVal) {
           this.doAction(newVal, (callbackInfo) => {
             this.movingCache = callbackInfo
-          })
+          }, false, true)
         }
       },
     },
@@ -225,7 +225,7 @@ Component({
       return deleteArea
     },
 
-    doAction(action, callback, isMoving) {
+    doAction(action, callback, isMoving, overwrite) {
       let newVal = null
       if (action) {
         newVal = action.view
@@ -252,7 +252,9 @@ Component({
         return
       }
       if (newVal && newVal.css) {
-        if (Array.isArray(doView.css) && Array.isArray(newVal.css)) {
+        if (overwrite) {
+          doView.css = newVal.css
+        } else if (Array.isArray(doView.css) && Array.isArray(newVal.css)) {
           doView.css = Object.assign({}, ...doView.css, ...newVal.css)
         } else if (Array.isArray(doView.css)) {
           doView.css = Object.assign({}, ...doView.css, newVal.css)
@@ -618,6 +620,7 @@ Component({
           views: []
         }).paint();
       });
+      this.touchedView = {};
     },
 
     startPaint() {
