@@ -15,6 +15,7 @@ Component({
   paintCount: 0,
   currentPalette: {},
   movingCache: {},
+  needClear: false,
   /**
    * 组件的属性列表
    */
@@ -65,7 +66,9 @@ Component({
       type: Object,
       observer: function (newVal, oldVal) {
         if (newVal) {
-          this.doAction(newVal)
+          this.doAction(newVal, (callbackInfo) => {
+            this.movingCache = callbackInfo
+          })
         }
       },
     },
@@ -77,7 +80,21 @@ Component({
           frontStyle: style
         })
       }
-    }
+    },
+    clearActionBox: {
+      type: Boolean,
+      observer: function (needClear) {
+        if (needClear && !this.needClear) {
+          if (this.frontContext) { 
+            this.frontContext.draw()
+            this.touchedView = {};
+            this.prevFindedIndex = this.findedIndex
+            this.findedIndex = -1;
+          }
+        }
+        this.needClear = needClear
+      }
+    },
   },
 
   data: {
