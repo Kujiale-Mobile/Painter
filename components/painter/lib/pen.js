@@ -521,8 +521,8 @@ export default class Painter {
           const fontSize = view.css.fontSize.toPx();
           this.ctx.lineWidth = fontSize / 13;
           this.ctx.beginPath();
-          this.ctx.moveTo(...this.callbackInfo.textDecoration.moveTo);
-          this.ctx.lineTo(...this.callbackInfo.textDecoration.lineTo);
+          this.ctx.moveTo(...this.movingCache.textDecoration.moveTo);
+          this.ctx.lineTo(...this.movingCache.textDecoration.lineTo);
           this.ctx.closePath();
           this.ctx.strokeStyle = view.css.color;
           this.ctx.stroke();
