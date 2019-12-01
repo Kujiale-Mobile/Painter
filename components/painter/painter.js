@@ -178,6 +178,8 @@ Component({
       setTimeout(() => {
         wx.canvasToTempFilePath({
           canvasId: 'k-canvas',
+          destWidth: that.canvasWidthInPx,
+          destHeight: that.canvasHeightInPx,
           success: function (res) {
             that.getImageInfo(res.tempFilePath);
           },
