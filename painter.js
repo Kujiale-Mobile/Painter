@@ -85,7 +85,7 @@ Component({
       type: Boolean,
       observer: function (needClear) {
         if (needClear && !this.needClear) {
-          if (this.frontContext) { 
+          if (this.frontContext) {
             this.frontContext.draw()
             this.touchedView = {};
             this.prevFindedIndex = this.findedIndex
@@ -269,16 +269,22 @@ Component({
       }
       if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
         downloader.download(newVal.url, this.properties.LRU).then((path) => {
+          doView.originUrl = newVal.url
+          doView.url = path;
           wx.getImageInfo({
             src: path,
-            success: () => {
-              doView.originUrl = newVal.url
-              doView.url = path;
-              newVal.sHeight && (doView.sHeight = newVal.sHeight);
-              newVal.sWidth && (doView.sWidth = newVal.sWidth);
+            success: (res) => {
+              doView.sHeight = res.height
+              doView.sWidth = res.width
               this.reDraw(doView, callback, isMoving)
             },
+            fail: () => {
+              this.reDraw(doView, callback, isMoving)
+            }
           })
+        }).catch(() => {
+          // 未下载成功，直接绘制
+          this.reDraw(doView, callback, isMoving)
         })
       } else {
         (newVal && newVal.text && doView.text && newVal.text !== doView.text) && (doView.text = newVal.text);
