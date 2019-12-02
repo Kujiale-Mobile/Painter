@@ -301,12 +301,16 @@ Component({
       if (isMoving && doView.type === 'text') {
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
-          this.triggerEvent('viewUpdate', this.touchedView);
+          this.triggerEvent('viewUpdate', {
+            view: this.touchedView
+          });
         }, true, this.movingCache);
       } else {
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
-          this.triggerEvent('viewUpdate', this.touchedView);
+          this.triggerEvent('viewUpdate', {
+            view: this.touchedView
+          });
         })
       }
       const {
