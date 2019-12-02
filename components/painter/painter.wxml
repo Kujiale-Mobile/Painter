@@ -5,7 +5,7 @@
   <canvas canvas-id="top" style="{{painterStyle}};position: absolute;" />
   <canvas 
     canvas-id="front" 
-    style="{{painterStyle}};position: absolute;{{frontStyle}};"
+    style="{{painterStyle}};position: absolute;"
     bindtouchstart="onTouchStart"
     bindtouchmove="onTouchMove"
     bindtouchend="onTouchEnd"

@@ -15,6 +15,7 @@ Component({
   paintCount: 0,
   currentPalette: {},
   movingCache: {},
+  isDisabled: false,
   needClear: false,
   /**
    * 组件的属性列表
@@ -75,10 +76,7 @@ Component({
     disableAction: {
       type: Boolean,
       observer: function (isDisabled) {
-        let style = isDisabled ? 'visibility: hidden' : ''
-        this.setData({
-          frontStyle: style
-        })
+        this.isDisabled = isDisabled
       }
     },
     clearActionBox: {
@@ -101,7 +99,6 @@ Component({
     picURL: '',
     showCanvas: true,
     painterStyle: '',
-    frontStyle: '',
   },
 
   methods: {
@@ -473,6 +470,9 @@ Component({
     isScale: false,
     startTimeStamp: 0,
     onTouchStart(event) {
+      if (this.isDisabled) {
+        return
+      }
       const {
         x,
         y
@@ -496,6 +496,9 @@ Component({
     },
 
     onTouchEnd(e) {
+      if (this.isDisabled) {
+        return
+      }
       const current = new Date().getTime()
       if ((current - this.startTimeStamp) <= 500 && !this.hasMove) {
         !this.isScale && this.onClick(e)
@@ -508,11 +511,17 @@ Component({
     },
 
     onTouchCancel(e) {
+      if (this.isDisabled) {
+        return
+      }
       this.onTouchEnd(e)
     },
 
     hasMove: false,
     onTouchMove(event) {
+      if (this.isDisabled) {
+        return
+      }
       this.hasMove = true
       if (!this.touchedView || (this.touchedView && !this.touchedView.id)) {
         return
