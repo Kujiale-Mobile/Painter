@@ -299,9 +299,15 @@ Component({
 
       const pen = new Pen(this.globalContext, draw);
       if (isMoving && doView.type === 'text') {
-        pen.paint(callback, true, this.movingCache);
+        pen.paint((callbackInfo) => {
+          callback && callback(callbackInfo);
+          this.triggerEvent('viewUpdate', this.touchedView);
+        }, true, this.movingCache);
       } else {
-        pen.paint(callback)
+        pen.paint((callbackInfo) => {
+          callback && callback(callbackInfo);
+          this.triggerEvent('viewUpdate', this.touchedView);
+        })
       }
       const {
         rect,
