@@ -434,7 +434,7 @@ Component({
           })
           this.doAction()
         } else if (this.findedIndex < 0) {
-          this.triggerEvent('touchStart', {})
+          this.triggerEvent('viewClicked', {})
         }
         this.findedIndex = -1
         this.prevFindedIndex = -1
