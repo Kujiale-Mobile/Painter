@@ -502,6 +502,8 @@ Component({
         } else {
           this.isScale = false
         }
+      } else {
+        this.isScale = false
       }
     },
 
