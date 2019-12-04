@@ -247,7 +247,7 @@ Component({
 
       const doView = this.touchedView
 
-      if (!doView) {
+      if (!doView || this.isEmpty(doView)) {
         return
       }
       if (newVal && newVal.css) {
@@ -268,7 +268,9 @@ Component({
       }
       if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
         downloader.download(newVal.url, this.properties.LRU).then((path) => {
-          doView.originUrl = newVal.url
+          if (newVal.url.startsWidth('https')) {
+            doView.originUrl = newVal.url
+          }
           doView.url = path;
           wx.getImageInfo({
             src: path,
