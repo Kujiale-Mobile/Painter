@@ -84,7 +84,9 @@ Component({
       observer: function (needClear) {
         if (needClear && !this.needClear) {
           if (this.frontContext) {
-            this.frontContext.draw()
+            setTimeout(() => {
+              this.frontContext.draw();
+            }, 100);
             this.touchedView = {};
             this.prevFindedIndex = this.findedIndex
             this.findedIndex = -1;
@@ -296,8 +298,8 @@ Component({
         height: this.currentPalette.height,
         views: this.isEmpty(doView) ? [] : [doView]
       }
-
       const pen = new Pen(this.globalContext, draw);
+
       if (isMoving && doView.type === 'text') {
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
@@ -306,6 +308,9 @@ Component({
           });
         }, true, this.movingCache);
       } else {
+        // 某些机型（华为 P20）只绘制一遍会偶然性没法展示，目前采用再绘一遍的方法，次方法加上后，没法针对半透明场景，会导致叠加增强
+        // 后续找到原因
+        pen.paint()
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
           this.triggerEvent('viewUpdate', {
@@ -313,11 +318,13 @@ Component({
           });
         })
       }
+
       const {
         rect,
         css,
         type
       } = doView
+
       this.block = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
@@ -419,13 +426,7 @@ Component({
       }
       if (this.findedIndex < 0 || (this.touchedView && !this.touchedView.id)) {
         // 证明点击了背景 或无法移动的view
-        const block = {
-          width: this.currentPalette.width,
-          height: this.currentPalette.height,
-          views: []
-        }
-        const topBlock = new Pen(this.frontContext, block)
-        topBlock.paint();
+        this.frontContext.draw();
         if (isDelete) {
           this.triggerEvent('touchEnd', {
             view: this.currentPalette.views[deleteIndex],
@@ -439,7 +440,7 @@ Component({
         this.findedIndex = -1
         this.prevFindedIndex = -1
       } else if (this.touchedView && this.touchedView.id) {
-        this.sliceLayers()
+        this.sliceLayers();
       }
     },
 
@@ -611,7 +612,6 @@ Component({
 
     initDancePalette() {
       this.initScreenK();
-
       this.downloadImages(this.properties.dancePalette).then((palette) => {
         this.currentPalette = palette
         const {
@@ -633,21 +633,9 @@ Component({
         new Pen(this.bottomContext, palette).paint(() => {
           this.triggerEvent('didShow');
         });
-        new Pen(this.globalContext, {
-          width,
-          height,
-          views: []
-        }).paint();
-        new Pen(this.frontContext, {
-          width,
-          height,
-          views: []
-        }).paint();
-        new Pen(this.topContext, {
-          width,
-          height,
-          views: []
-        }).paint();
+        this.globalContext.draw();
+        this.frontContext.draw();
+        this.topContext.draw();
       });
       this.touchedView = {};
     },
