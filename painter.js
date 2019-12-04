@@ -630,7 +630,9 @@ Component({
         this.bottomContext || (this.bottomContext = wx.createCanvasContext('bottom', this));
         this.topContext || (this.topContext = wx.createCanvasContext('top', this));
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
-        new Pen(this.bottomContext, palette).paint();
+        new Pen(this.bottomContext, palette).paint(() => {
+          this.triggerEvent('didShow');
+        });
         new Pen(this.globalContext, {
           width,
           height,
