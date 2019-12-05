@@ -84,7 +84,9 @@ Component({
       observer: function (needClear) {
         if (needClear && !this.needClear) {
           if (this.frontContext) {
-            this.frontContext.draw()
+            setTimeout(() => {
+              this.frontContext.draw();
+            }, 100);
             this.touchedView = {};
             this.prevFindedIndex = this.findedIndex
             this.findedIndex = -1;
@@ -245,7 +247,7 @@ Component({
 
       const doView = this.touchedView
 
-      if (!doView) {
+      if (!doView || this.isEmpty(doView)) {
         return
       }
       if (newVal && newVal.css) {
@@ -266,7 +268,9 @@ Component({
       }
       if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
         downloader.download(newVal.url, this.properties.LRU).then((path) => {
-          doView.originUrl = newVal.url
+          if (newVal.url.startsWidth('https')) {
+            doView.originUrl = newVal.url
+          }
           doView.url = path;
           wx.getImageInfo({
             src: path,
@@ -296,8 +300,8 @@ Component({
         height: this.currentPalette.height,
         views: this.isEmpty(doView) ? [] : [doView]
       }
-
       const pen = new Pen(this.globalContext, draw);
+
       if (isMoving && doView.type === 'text') {
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
@@ -306,6 +310,10 @@ Component({
           });
         }, true, this.movingCache);
       } else {
+        // 某些机型（华为 P20）非移动场景下，只绘制一遍会偶然性图片绘制失败，目前采用再绘一遍的方法
+        if (!isMoving && doView.type === 'image') {
+          pen.paint()
+        }
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
           this.triggerEvent('viewUpdate', {
@@ -313,11 +321,13 @@ Component({
           });
         })
       }
+
       const {
         rect,
         css,
         type
       } = doView
+
       this.block = {
         width: this.currentPalette.width,
         height: this.currentPalette.height,
@@ -419,13 +429,7 @@ Component({
       }
       if (this.findedIndex < 0 || (this.touchedView && !this.touchedView.id)) {
         // 证明点击了背景 或无法移动的view
-        const block = {
-          width: this.currentPalette.width,
-          height: this.currentPalette.height,
-          views: []
-        }
-        const topBlock = new Pen(this.frontContext, block)
-        topBlock.paint();
+        this.frontContext.draw();
         if (isDelete) {
           this.triggerEvent('touchEnd', {
             view: this.currentPalette.views[deleteIndex],
@@ -439,7 +443,7 @@ Component({
         this.findedIndex = -1
         this.prevFindedIndex = -1
       } else if (this.touchedView && this.touchedView.id) {
-        this.sliceLayers()
+        this.sliceLayers();
       }
     },
 
@@ -611,7 +615,6 @@ Component({
 
     initDancePalette() {
       this.initScreenK();
-
       this.downloadImages(this.properties.dancePalette).then((palette) => {
         this.currentPalette = palette
         const {
@@ -630,22 +633,12 @@ Component({
         this.bottomContext || (this.bottomContext = wx.createCanvasContext('bottom', this));
         this.topContext || (this.topContext = wx.createCanvasContext('top', this));
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
-        new Pen(this.bottomContext, palette).paint();
-        new Pen(this.globalContext, {
-          width,
-          height,
-          views: []
-        }).paint();
-        new Pen(this.frontContext, {
-          width,
-          height,
-          views: []
-        }).paint();
-        new Pen(this.topContext, {
-          width,
-          height,
-          views: []
-        }).paint();
+        new Pen(this.bottomContext, palette).paint(() => {
+          this.triggerEvent('didShow');
+        });
+        this.globalContext.draw();
+        this.frontContext.draw();
+        this.topContext.draw();
       });
       this.touchedView = {};
     },
