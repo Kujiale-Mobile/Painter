@@ -615,6 +615,7 @@ Component({
     },
 
     initDancePalette() {
+      this.isDisabled = true;
       this.initScreenK();
       this.downloadImages(this.properties.dancePalette).then((palette) => {
         this.currentPalette = palette
@@ -635,6 +636,7 @@ Component({
         this.topContext || (this.topContext = wx.createCanvasContext('top', this));
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
         new Pen(this.bottomContext, palette).paint(() => {
+          this.isDisabled = false;
           this.triggerEvent('didShow');
         });
         this.globalContext.draw();
