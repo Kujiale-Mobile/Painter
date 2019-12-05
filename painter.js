@@ -310,9 +310,10 @@ Component({
           });
         }, true, this.movingCache);
       } else {
-        // 某些机型（华为 P20）只绘制一遍会偶然性没法展示，目前采用再绘一遍的方法，次方法加上后，没法针对半透明场景，会导致叠加增强
-        // 后续找到原因
-        pen.paint()
+        // 某些机型（华为 P20）非移动场景下，只绘制一遍会偶然性图片绘制失败，目前采用再绘一遍的方法
+        if (!isMoving && doView.type === 'image') {
+          pen.paint()
+        }
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
           this.triggerEvent('viewUpdate', {
