@@ -454,6 +454,7 @@ export default class Painter {
           text += '...';
           measuredWith = this.ctx.measureText(text).width;
         }
+        this.ctx.textBaseline = 'bottom'
         this.ctx.setTextAlign(view.css.textAlign ? view.css.textAlign : 'left');
         let x;
         switch (view.css.textAlign) {
@@ -467,7 +468,7 @@ export default class Painter {
             x = -(width / 2);
             break;
         }
-        const y = -(height / 2) + (lineIndex === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + lineIndex * lineHeight));
+        const y = -(height / 2) + (lineIndex === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + lineIndex * lineHeight)) + ((lineHeight - view.css.fontSize.toPx())/2);
         lineIndex++;
         if (view.css.textStyle === 'stroke') {
           this.ctx.strokeText(text, x, y, measuredWith);
