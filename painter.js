@@ -66,7 +66,7 @@ Component({
     action: {
       type: Object,
       observer: function (newVal, oldVal) {
-        if (newVal) {
+        if (newVal && !this.isEmpty(newVal)) {
           this.doAction(newVal, (callbackInfo) => {
             this.movingCache = callbackInfo
           }, false, true)
@@ -268,7 +268,7 @@ Component({
       }
       if (newVal && newVal.url && doView.url && newVal.url !== doView.url) {
         downloader.download(newVal.url, this.properties.LRU).then((path) => {
-          if (newVal.url.startsWidth('https')) {
+          if (newVal.url.startsWith('https')) {
             doView.originUrl = newVal.url
           }
           doView.url = path;
@@ -283,8 +283,9 @@ Component({
               this.reDraw(doView, callback, isMoving)
             }
           })
-        }).catch(() => {
+        }).catch((error) => {
           // 未下载成功，直接绘制
+          console.error(error)
           this.reDraw(doView, callback, isMoving)
         })
       } else {
@@ -614,6 +615,7 @@ Component({
     },
 
     initDancePalette() {
+      this.isDisabled = true;
       this.initScreenK();
       this.downloadImages(this.properties.dancePalette).then((palette) => {
         this.currentPalette = palette
@@ -634,6 +636,7 @@ Component({
         this.topContext || (this.topContext = wx.createCanvasContext('top', this));
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
         new Pen(this.bottomContext, palette).paint(() => {
+          this.isDisabled = false;
           this.triggerEvent('didShow');
         });
         this.globalContext.draw();
