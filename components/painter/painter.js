@@ -15,6 +15,7 @@ Component({
   paintCount: 0,
   currentPalette: {},
   movingCache: {},
+  outterDisabled: false,
   isDisabled: false,
   needClear: false,
   /**
@@ -76,6 +77,7 @@ Component({
     disableAction: {
       type: Boolean,
       observer: function (isDisabled) {
+        this.outterDisabled = isDisabled
         this.isDisabled = isDisabled
       }
     },
@@ -637,6 +639,7 @@ Component({
         this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
         new Pen(this.bottomContext, palette).paint(() => {
           this.isDisabled = false;
+          this.isDisabled = this.outterDisabled;
           this.triggerEvent('didShow');
         });
         this.globalContext.draw();
