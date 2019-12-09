@@ -57,7 +57,7 @@ export default class ImageExample {
         },
         {
           type: 'image',
-          url: '/palette/sky.jpg',
+          url: 'https://t1.focus-img.cn/applet/2019-11-15/9bd5bc1d9e8e44cdbd2af8c9de8297a4.png',
           css: {
             width: '200rpx',
             height: 'auto',
