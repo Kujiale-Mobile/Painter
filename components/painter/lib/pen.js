@@ -204,7 +204,7 @@ export default class Painter {
         for (let i = 0; i < textArray.length; ++i) {
           const textLength = this.ctx.measureText(textArray[i]).width;
           let partWidth = view.css.width ? view.css.width.toPx(false, this.style.width) - paddings[1] - paddings[3] : textLength;
-          partWidth = partWidth > fontSize ? partWidth - partWidth % fontSize + fontSize : fontSize
+          // partWidth = partWidth > fontSize ? partWidth - partWidth % fontSize + fontSize : fontSize
           const calLines = Math.ceil(textLength / partWidth);
           // 取最长的作为 width
           width = partWidth > width ? partWidth : width;
