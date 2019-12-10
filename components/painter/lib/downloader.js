@@ -155,9 +155,6 @@ function reset() {
 }
 
 function doLru(size) {
-  if (size > MAX_SPACE_IN_B) {
-    return Promise.reject()
-  }
   return new Promise((resolve, reject) => {
     let totalSize = savedFiles[KEY_TOTAL_SIZE] ? savedFiles[KEY_TOTAL_SIZE] : 0;
 
