@@ -527,18 +527,19 @@ export default class Painter {
           text,
           x,
           y,
+          textDecoration
         } = i
         if (view.css.textStyle === 'stroke') {
           this.ctx.strokeText(text, x, y, measuredWith);
         } else {
           this.ctx.fillText(text, x, y, measuredWith);
         }
-        if (view.css.textDecoration) {
+        if (textDecoration) {
           const fontSize = view.css.fontSize.toPx();
           this.ctx.lineWidth = fontSize / 13;
           this.ctx.beginPath();
-          this.ctx.moveTo(...this.movingCache.textDecoration.moveTo);
-          this.ctx.lineTo(...this.movingCache.textDecoration.lineTo);
+          this.ctx.moveTo(...textDecoration.moveTo);
+          this.ctx.lineTo(...textDecoration.lineTo);
           this.ctx.closePath();
           this.ctx.strokeStyle = view.css.color;
           this.ctx.stroke();
@@ -625,32 +626,33 @@ export default class Painter {
             this.ctx.fillText(text, x, y, measuredWith);
           }
           const fontSize = view.css.fontSize.toPx();
+          let textDecoration;
           if (view.css.textDecoration) {
             this.ctx.lineWidth = fontSize / 13;
             this.ctx.beginPath();
             if (/\bunderline\b/.test(view.css.textDecoration)) {
               this.ctx.moveTo(lineX, y);
               this.ctx.lineTo(lineX + measuredWith, y);
-              !this.isMoving && (this.callbackInfo.textDecoration = {
+              textDecoration = {
                 moveTo: [lineX, y],
                 lineTo: [lineX + measuredWith, y]
-              })
+              }
             }
             if (/\boverline\b/.test(view.css.textDecoration)) {
               this.ctx.moveTo(lineX, y - fontSize);
               this.ctx.lineTo(lineX + measuredWith, y - fontSize);
-              !this.isMoving && (this.callbackInfo.textDecoration = {
+              textDecoration = {
                 moveTo: [lineX, y - fontSize],
                 lineTo: [lineX + measuredWith, y - fontSize]
-              })
+              }
             }
             if (/\bline-through\b/.test(view.css.textDecoration)) {
               this.ctx.moveTo(lineX, y - fontSize / 3);
               this.ctx.lineTo(lineX + measuredWith, y - fontSize / 3);
-              !this.isMoving && (this.callbackInfo.textDecoration = {
+              textDecoration = {
                 moveTo: [lineX, y - fontSize / 3],
                 lineTo: [lineX + measuredWith, y - fontSize / 3]
-              })
+              }
             }
             this.ctx.closePath();
             this.ctx.strokeStyle = view.css.color;
@@ -661,12 +663,14 @@ export default class Painter {
               text,
               x,
               y,
-              measuredWith
+              measuredWith,
+              textDecoration
             }) : this.callbackInfo.lineArray = [{
               text,
               x,
               y,
-              measuredWith
+              measuredWith,
+              textDecoration
             }]
           }
         }
