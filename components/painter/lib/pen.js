@@ -556,7 +556,8 @@ export default class Painter {
       if (view.id) {
         let textWidth = 0;
         for (let i = 0; i < textArray.length; ++i) {
-          textWidth = this.ctx.measureText(textArray[i]).width > textWidth ? this.ctx.measureText(textArray[i]).width : textWidth;
+          const _w = this.ctx.measureText(textArray[i]).width
+          textWidth = _w > textWidth ? _w : textWidth;
         }
         this.globalWidth[view.id] = width ? (textWidth < width ? textWidth : width) : textWidth;
         if (!this.isMoving) {
@@ -570,6 +571,7 @@ export default class Painter {
         const preLineLength = Math.ceil(textArray[j].length / linesArray[j]);
         let start = 0;
         let alreadyCount = 0;
+
         for (let i = 0; i < linesArray[j]; ++i) {
           // 绘制行数大于最大行数，则直接跳出循环
           if (lineIndex >= lines) {
@@ -580,11 +582,16 @@ export default class Painter {
           let measuredWith = this.ctx.measureText(text).width;
           // 如果测量大小小于width一个字符的大小，则进行补齐，如果测量大小超出 width，则进行减除
           // 如果已经到文本末尾，也不要进行该循环
-          while ((start + alreadyCount <= textArray[j].length) && (width - measuredWith > view.css.fontSize.toPx() || measuredWith > width)) {
+          while ((start + alreadyCount <= textArray[j].length) && (width - measuredWith > view.css.fontSize.toPx() || measuredWith - width > view.css.fontSize.toPx())) {
             if (measuredWith < width) {
               text = textArray[j].substr(start, ++alreadyCount);
             } else {
-              break;
+              if (text.length <= 1) {
+                // 如果只有一个字符时，直接跳出循环
+                break;
+              }
+              text = textArray[j].substr(start, --alreadyCount);
+              // break;
             }
             measuredWith = this.ctx.measureText(text).width;
           }
