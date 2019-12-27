@@ -313,9 +313,8 @@ Component({
           });
         }, true, this.movingCache);
       } else {
-        // 某些机型（华为 P20）非移动场景下，只绘制一遍会偶然性图片绘制失败，目前采用再绘一遍的方法
-        // 文字也会出现
-        if (!isMoving && (doView.type === 'image' || doView.type === 'text')) {
+        // 某些机型（华为 P20）非移动和缩放场景下，只绘制一遍会偶然性图片绘制失败
+        if (!isMoving && !this.isScale) {
           pen.paint()
         }
         pen.paint((callbackInfo) => {
