@@ -222,8 +222,11 @@ export default class Painter {
         const linesArray = [];
         for (let i = 0; i < textArray.length; ++i) {
           const textLength = this.ctx.measureText(textArray[i]).width;
+          const minWidth = view.css.fontSize.toPx() + paddings[1] + paddings[3];
           let partWidth = view.css.width ? view.css.width.toPx(false, this.style.width) - paddings[1] - paddings[3] : textLength;
-          // partWidth = partWidth > fontSize ? partWidth - partWidth % fontSize + fontSize : fontSize
+          if (partWidth < minWidth) {
+            partWidth = minWidth;
+          }
           const calLines = Math.ceil(textLength / partWidth);
           // 取最长的作为 width
           width = partWidth > width ? partWidth : width;
