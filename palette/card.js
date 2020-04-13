@@ -16,7 +16,7 @@ export default class LastMayday {
             right: '20rpx',
             top: '30rpx',
             height: '100rpx',
-            borderRadius: '100rpx',
+            borderRadius: '100%',
             shadow: '10rpx 10rpx 5rpx #888888',
             color: 'linear-gradient(-135deg, #fedcba 0%, rgba(18, 52, 86, 1) 20%, #987 80%)',
           },
@@ -52,6 +52,8 @@ export default class LastMayday {
             background: '#538e60',
             textAlign: 'center',
             padding: '10rpx',
+            scalable: true,
+            deletable: true,
           }, common, { left: '300rpx' }],
         },
         {
@@ -103,6 +105,7 @@ export default class LastMayday {
             color: 'red',
             borderWidth: '10rpx',
             borderColor: 'blue',
+            borderStyle: 'dashed',
             width: '120rpx',
             height: '120rpx',
           },
@@ -129,6 +132,18 @@ export default class LastMayday {
             borderWidth: '2rpx',
           },
         },
+        {
+          type: 'rect',
+          css: {
+            width: '100rpx',
+            height: '100rpx',
+            color: 'rgba(0,0,0,0.2)',
+            left: '50%',
+            top: '50%',
+            align: 'center',
+            verticalAlign: 'center',
+          }
+        }
       ],
     });
   }
@@ -157,6 +172,7 @@ function _textDecoration(decoration, index, color) {
 function _image(index, rotate, borderRadius) {
   return (
     {
+      id: `image-${index}`,
       type: 'image',
       url: '/palette/avatar.jpg',
       css: {
@@ -166,7 +182,9 @@ function _image(index, rotate, borderRadius) {
         height: '120rpx',
         shadow: '10rpx 10rpx 5rpx #888888',
         rotate: rotate,
+        minWidth: '60rpx',
         borderRadius: borderRadius,
+        scalable: true,
       },
     }
   );

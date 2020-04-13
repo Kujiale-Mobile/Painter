@@ -20,6 +20,8 @@
 - [x] 支持元素的相对定位方法
 - [x] 可通过文本中的换行符进行主动换行
 - [x] 生成的图片支持分辨率调节
+- [x] 支持 borderStyle
+- [] line-space 属性支持
 
 ## 画家计划
 
@@ -358,6 +360,7 @@ left: ['10rpx', 'my-text-id', 比例]
 | borderRadius | 边界圆角程度，如果是正方形布局，该属性为一半宽或高时，则为圆形 | 0                      |
 | borderWidth  | 边界宽度，外边界                                             | 必设值，否则无边框效果 |
 | borderColor  | 边框颜色                                                     | black                  |
+| borderStyle  | 边框样式，支持 dashed、dotted、solid                           | solid                  |
 
 ![](https://user-images.githubusercontent.com/4279515/46778646-3cba1400-cd47-11e8-916a-3fddc172534d.png)
 
