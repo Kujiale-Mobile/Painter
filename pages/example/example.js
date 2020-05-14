@@ -5,6 +5,7 @@ Page({
   imagePath: '',
   history: [],
   future: [],
+  isSave: false,
 
   /**
    * 页面的初始数据
@@ -30,6 +31,9 @@ Page({
     this.setData({
       image: this.imagePath
     })
+    if (this.isSave) {
+      this.saveImage(this.imagePath);
+    }
   },
 
   onRevert() {
@@ -98,10 +102,18 @@ Page({
     this.setData(props)
   },
 
-  saveImage() {
-    wx.saveImageToPhotosAlbum({
-      filePath: this.imagePath,
-    });
+  saveImage(imagePath = '') {
+    if (!this.isSave) {
+      this.isSave = true;
+      this.setData({
+        paintPallette: this.data.template,
+      });
+    } else if (imagePath) {
+      this.isSave = false;
+      wx.saveImageToPhotosAlbum({
+        filePath: imagePath,
+      });
+    }
   },
 
   touchEnd({ detail }) {
