@@ -110,18 +110,20 @@ export default class LastMayday {
             height: '120rpx',
           },
         },
-        {
-          type: 'rect',
-          css: {
-            bottom: '40rpx',
-            right: '40rpx',
-            color: 'radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)',
-            borderRadius: '20rpx',
-            borderWidth: '10rpx',
-            width: '120rpx',
-            height: '120rpx',
-          },
-        },
+        // {
+        //   id: 'rect',
+        //   type: 'rect',
+        //   css: {
+        //     scalable: true,
+        //     bottom: '40rpx',
+        //     right: '40rpx',
+        //     color: 'radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)',
+        //     borderRadius: '20rpx',
+        //     borderWidth: '10rpx',
+        //     width: '120rpx',
+        //     height: '120rpx',
+        //   },
+        // },
         {
           type: 'text',
           text: 'borderWidth',

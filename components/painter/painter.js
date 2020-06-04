@@ -1,5 +1,6 @@
 import Pen from './lib/pen';
 import Downloader from './lib/downloader';
+import WxCanvas from './lib/wx-canvas';
 
 const util = require('./lib/util');
 
@@ -22,6 +23,9 @@ Component({
    * 组件的属性列表
    */
   properties: {
+    use2D: {
+      type: Boolean,
+    },
     customStyle: {
       type: String,
     },
@@ -314,9 +318,9 @@ Component({
         }, true, this.movingCache);
       } else {
         // 某些机型（华为 P20）非移动和缩放场景下，只绘制一遍会偶然性图片绘制失败
-        if (!isMoving && !this.isScale) {
-          pen.paint()
-        }
+        // if (!isMoving && !this.isScale) {
+        //   pen.paint()
+        // }
         pen.paint((callbackInfo) => {
           callback && callback(callbackInfo);
           this.triggerEvent('viewUpdate', {
@@ -619,7 +623,7 @@ Component({
     initDancePalette() {
       this.isDisabled = true;
       this.initScreenK();
-      this.downloadImages(this.properties.dancePalette).then((palette) => {
+      this.downloadImages(this.properties.dancePalette).then(async (palette) => {
         this.currentPalette = palette
         const {
           width,
@@ -633,11 +637,11 @@ Component({
         this.setData({
           painterStyle: `width:${width.toPx()}px;height:${height.toPx()}px;`,
         });
-        this.frontContext || (this.frontContext = wx.createCanvasContext('front', this));
-        this.bottomContext || (this.bottomContext = wx.createCanvasContext('bottom', this));
-        this.topContext || (this.topContext = wx.createCanvasContext('top', this));
-        this.globalContext || (this.globalContext = wx.createCanvasContext('k-canvas', this));
-        new Pen(this.bottomContext, palette).paint(() => {
+        this.frontContext || (this.frontContext = await this.getCanvasContext(this.properties.use2D, 'front', width.toPx(), height.toPx()));
+        this.bottomContext || (this.bottomContext = await this.getCanvasContext(this.properties.use2D, 'bottom', width.toPx(), height.toPx()));
+        this.topContext || (this.topContext = await this.getCanvasContext(this.properties.use2D, 'top', width.toPx(), height.toPx()));
+        this.globalContext || (this.globalContext = await this.getCanvasContext(this.properties.use2D, 'k-canvas', width.toPx(), height.toPx()));
+        new Pen(this.bottomContext, palette, this.properties.use2D).paint(() => {
           this.isDisabled = false;
           this.isDisabled = this.outterDisabled;
           this.triggerEvent('didShow');
@@ -652,7 +656,7 @@ Component({
     startPaint() {
       this.initScreenK();
 
-      this.downloadImages(this.properties.palette).then((palette) => {
+      this.downloadImages(this.properties.palette).then(async (palette) => {
         const {
           width,
           height
@@ -674,7 +678,7 @@ Component({
         this.setData({
           photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
         });
-        this.photoContext || (this.photoContext = wx.createCanvasContext('photo', this));
+        this.photoContext || (this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo', width.toPx(), height.toPx()));
 
         new Pen(this.photoContext, palette).paint(() => {
           this.saveImgToLocal();
@@ -763,6 +767,31 @@ Component({
           },
         }, this);
       }, 300);
+    },
+
+
+    getCanvasContext(use2D, id, width, height) {
+      return new Promise(resolve => {
+        if (use2D) {
+          const query = wx.createSelectorQuery().in(this);
+          const selectId = `#${id}`;
+          query.select(selectId)
+          .fields({ node: true, size: true })
+          .exec((res) => {
+            const canvasNode = res[0].node;
+            const ctx = canvasNode.getContext('2d');
+            const wxCanvas = new WxCanvas('2d', ctx, id, true, canvasNode);
+            const dpr = wx.getSystemInfoSync().pixelRatio
+            wxCanvas.width = res[0].width * dpr
+            wxCanvas.height = res[0].height * dpr
+            wxCanvas.scale(dpr, dpr)
+            resolve(wxCanvas);
+          });
+        } else {
+          const temp = wx.createCanvasContext(id, this);
+          resolve(new WxCanvas('mina', temp, id, true));
+        }
+      })
     },
 
     getImageInfo(filePath) {
