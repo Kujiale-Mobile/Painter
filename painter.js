@@ -13,6 +13,7 @@ const ACTION_OFFSET = '2rpx';
 Component({
   canvasWidthInPx: 0,
   canvasHeightInPx: 0,
+  canvasNode: null,
   paintCount: 0,
   currentPalette: {},
   movingCache: {},
@@ -637,10 +638,10 @@ Component({
         this.setData({
           painterStyle: `width:${width.toPx()}px;height:${height.toPx()}px;`,
         });
-        this.frontContext || (this.frontContext = await this.getCanvasContext(this.properties.use2D, 'front', width.toPx(), height.toPx()));
-        this.bottomContext || (this.bottomContext = await this.getCanvasContext(this.properties.use2D, 'bottom', width.toPx(), height.toPx()));
-        this.topContext || (this.topContext = await this.getCanvasContext(this.properties.use2D, 'top', width.toPx(), height.toPx()));
-        this.globalContext || (this.globalContext = await this.getCanvasContext(this.properties.use2D, 'k-canvas', width.toPx(), height.toPx()));
+        this.frontContext || (this.frontContext = await this.getCanvasContext(this.properties.use2D, 'front'));
+        this.bottomContext || (this.bottomContext = await this.getCanvasContext(this.properties.use2D, 'bottom'));
+        this.topContext || (this.topContext = await this.getCanvasContext(this.properties.use2D, 'top'));
+        this.globalContext || (this.globalContext = await this.getCanvasContext(this.properties.use2D, 'k-canvas'));
         new Pen(this.bottomContext, palette, this.properties.use2D).paint(() => {
           this.isDisabled = false;
           this.isDisabled = this.outterDisabled;
@@ -678,7 +679,7 @@ Component({
         this.setData({
           photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
         });
-        this.photoContext || (this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo', width.toPx(), height.toPx()));
+        this.photoContext || (this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo'));
 
         new Pen(this.photoContext, palette).paint(() => {
           this.saveImgToLocal();
@@ -754,8 +755,9 @@ Component({
       setTimeout(() => {
         wx.canvasToTempFilePath({
           canvasId: 'photo',
-          destWidth: that.canvasWidthInPx,
-          destHeight: that.canvasHeightInPx,
+          canvas: that.properties.use2D ? that.canvasNode : null,
+          destWidth: that.canvasWidthInPx * getApp().systemInfo.pixelRatio,
+          destHeight: that.canvasHeightInPx * getApp().systemInfo.pixelRatio,
           success: function (res) {
             that.getImageInfo(res.tempFilePath);
           },
@@ -770,25 +772,26 @@ Component({
     },
 
 
-    getCanvasContext(use2D, id, width, height) {
+    getCanvasContext(use2D, id) {
+      const that = this;
       return new Promise(resolve => {
         if (use2D) {
-          const query = wx.createSelectorQuery().in(this);
+          const query = wx.createSelectorQuery().in(that);
           const selectId = `#${id}`;
           query.select(selectId)
           .fields({ node: true, size: true })
           .exec((res) => {
-            const canvasNode = res[0].node;
-            const ctx = canvasNode.getContext('2d');
-            const wxCanvas = new WxCanvas('2d', ctx, id, true, canvasNode);
-            const dpr = wx.getSystemInfoSync().pixelRatio
+            that.canvasNode = res[0].node;
+            const ctx = that.canvasNode.getContext('2d');
+            const wxCanvas = new WxCanvas('2d', ctx, id, true, that.canvasNode);
+            const dpr = Math.min(2, getApp().systemInfo.pixelRatio)
             wxCanvas.width = res[0].width * dpr
             wxCanvas.height = res[0].height * dpr
             wxCanvas.scale(dpr, dpr)
             resolve(wxCanvas);
           });
         } else {
-          const temp = wx.createCanvasContext(id, this);
+          const temp = wx.createCanvasContext(id, that);
           resolve(new WxCanvas('mina', temp, id, true));
         }
       })
