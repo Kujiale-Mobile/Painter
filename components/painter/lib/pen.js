@@ -216,7 +216,7 @@ export default class Painter {
         if (!view.css.fontSize) {
           view.css.fontSize = '20rpx';
         }
-        this.ctx.font = `${textStyle} ${fontWeight} ${view.css.fontSize.toPx()}px ${view.css.fontFamily ? view.css.fontFamily : 'sans-serif'}`;
+        this.ctx.font = `${textStyle} ${fontWeight} ${view.css.fontSize.toPx()}px "${view.css.fontFamily || 'sans-serif'}"`;
         // 计算行数
         let lines = 0;
         const linesArray = [];

@@ -108,7 +108,7 @@ Page({
       this.setData({
         paintPallette: this.data.template,
       });
-    } else if (imagePath) {
+    } else if (imagePath && typeof imagePath === 'string') {
       this.isSave = false;
       wx.saveImageToPhotosAlbum({
         filePath: imagePath,
