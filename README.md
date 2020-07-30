@@ -235,7 +235,7 @@ export default class ImageExample {
 | fontWeight     | 字体粗细。仅支持 normal, bold                                | normal              |
 | textDecoration | 文本修饰，支持 underline、 overline、 line-through，也可组合使用 | 无效果              |
 | textStyle      | fill： 填充样式，stroke：镂空样式                            | fill                |
-| fontFamily     | 字体，如需加载网络字体，前提前使用 wx.loadFontFace 进行加载（https://developers.weixin.qq.com/miniprogram/dev/api/media/font/wx.loadFontFace.html） | sans-serif          |
+| fontFamily     | 字体，如需加载网络字体，前提前使用 wx.loadFontFace 进行加载（https://developers.weixin.qq.com/miniprogram/dev/api/ui/font/wx.loadFontFace.html） | sans-serif          |
 | background     | 文字背景颜色                                               | 无       |
 | padding        | 文字背景颜色边际与文字间距                                       | 0rpx      |
 | textAlign | 文字的对齐方式，分为 left, center, right，view 的对齐方式请看 align 属性 | left |
