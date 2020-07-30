@@ -3,6 +3,7 @@
  * 详细设计文档可查看 https://juejin.im/post/5b42d3ede51d4519277b6ce3
  */
 const util = require('./util');
+const sha1 = require('./sha1');
 
 const SAVED_FILES_KEY = 'savedFiles';
 const KEY_TOTAL_SIZE = 'totalSize';
@@ -40,25 +41,34 @@ export default class Dowloader {
         resolve(url);
         return;
       }
+      const fileName = getFileName(url);
       if (!lru) {
         // 无 lru 情况下直接判断 临时文件是否存在，不存在重新下载
         wx.getFileInfo({
-          filePath: url,
+          filePath: fileName,
           success: () => {
             resolve(url);
           },
           fail: () => {
-            downloadFile(url, lru).then((path) => {
-              resolve(path);
-            }, () => {
-              reject();
-            });
+            if (util.isOnlineUrl(url)) {
+              downloadFile(url, lru).then((path) => {
+                resolve(path);
+              }, () => {
+                reject();
+              });
+            } else if (util.isDataUrl(url)) {
+              transformBase64File(url, lru).then(path => {
+                resolve(path);
+              }, () => {
+                reject();
+              });
+            }
           },
         })
         return
       }
 
-      const file = getFile(url);
+      const file = getFile(fileName);
 
       if (file) {
         // 检查文件是否正常，不正常需要重新下载
@@ -77,14 +87,69 @@ export default class Dowloader {
           },
         });
       } else {
-        downloadFile(url, lru).then((path) => {
-          resolve(path);
-        }, () => {
-          reject();
-        });
+        if (util.isOnlineUrl(url)) {
+          downloadFile(url, lru).then((path) => {
+            resolve(path);
+          }, () => {
+            reject();
+          });
+        } else if (util.isDataUrl(url)) {
+          transformBase64File(url, lru).then(path => {
+            resolve(path);
+          }, () => {
+            reject();
+          });
+        }
       }
     });
   }
+}
+
+function getFileName(url) {
+  if (util.isDataUrl(url)) { 
+    const [, format, bodyData] = /data:image\/(\w+);base64,(.*)/.exec(base64data) || [];
+    const fileName = `${sha1.hex_sha1(bodyData)}.${format}`;
+    return fileName;
+  } else {
+    return url;
+  }
+}
+
+function transformBase64File(base64data, lru) {
+  return new Promise((resolve, reject) => {
+    const [, format, bodyData] = /data:image\/(\w+);base64,(.*)/.exec(base64data) || [];
+    if (!format) {
+      console.error('base parse failed');
+      reject();
+      return;
+    }
+    const fileName = `${sha1.hex_sha1(bodyData)}.${format}`;
+    const path = `${wx.env.USER_DATA_PATH}/${fileName}`;
+    const buffer = wx.base64ToArrayBuffer(bodyData.replace(/[\r\n]/g, ""));
+    const result = wx.getFileSystemManager().writeFileSync(path, buffer, 'binary');
+    if (!result) {
+      wx.getFileInfo({
+        filePath: path,
+        success: (tmpRes) => {
+          const newFileSize = tmpRes.size;
+          lru ? doLru(newFileSize).then(() => {
+            saveFile(fileName, newFileSize, path).then((filePath) => {
+              resolve(filePath);
+            });
+          }, () => {
+            resolve(path);
+          }) : resolve(path);
+        },
+        fail: (error) => {
+        // 文件大小信息获取失败，则此文件也不要进行存储
+          console.error(`getFileInfo ${path} failed, ${JSON.stringify(error)}`);
+          resolve(path);
+        },
+      });
+    } else {
+      reject()
+    }
+  });  
 }
 
 function downloadFile(url, lru) {
