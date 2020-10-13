@@ -53,7 +53,7 @@ git clone https://github.com/Kujiale-Mobile/Painter.git
 
 mpvue 的使用方法请移步 [mpvue 接入方案](https://github.com/Kujiale-Mobile/Painter/wiki/mpvue-%E6%8E%A5%E5%85%A5%E6%96%B9%E5%BC%8F)
 
-taro 的使用方法请参考 [Taro 接入方案](https://github.com/Kujiale-Mobile/Taro-Painter-Demo)
+taro 的使用方法请参考 [Taro 接入方案](https://github.com/Kujiale-Mobile/Taro-Painter-Demo) painter 已发布 taro 版本的npm包[mina-painter](https://www.npmjs.com/package/mina-painter)
 
 1. 引入代码
 
