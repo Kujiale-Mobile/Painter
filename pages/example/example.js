@@ -102,16 +102,11 @@ Page({
     this.setData(props)
   },
 
-  saveImage(imagePath = '') {
-    if (!this.isSave) {
-      this.isSave = true;
-      this.setData({
-        paintPallette: this.data.template,
-      });
-    } else if (imagePath && typeof imagePath === 'string') {
+  saveImage() {
+    if (this.imagePath && typeof this.imagePath === 'string') {
       this.isSave = false;
       wx.saveImageToPhotosAlbum({
-        filePath: imagePath,
+        filePath: this.imagePath,
       });
     }
   },
@@ -156,7 +151,7 @@ Page({
    */
   onReady: function() {
     this.setData({
-      template: new Card().palette(),
+      paintPallette: new Card().palette(),
     });
   },
 });

@@ -28,7 +28,7 @@
 
 **TODO**
 
-- [ ] canvas2d 接口支持 [测试版本](https://github.com/Kujiale-Mobile/Painter/tree/heidao)
+- [x] canvas2d 接口支持
 - [ ] base64 图片支持 [测试版本](https://github.com/Kujiale-Mobile/Painter/tree/base64)
 - [ ] node 端服务版的 painter
 - [ ] line-space 属性支持
@@ -53,7 +53,7 @@ git clone https://github.com/Kujiale-Mobile/Painter.git
 
 mpvue 的使用方法请移步 [mpvue 接入方案](https://github.com/Kujiale-Mobile/Painter/wiki/mpvue-%E6%8E%A5%E5%85%A5%E6%96%B9%E5%BC%8F)
 
-taro 的使用方法请参考 [Taro 接入方案](https://github.com/Kujiale-Mobile/Taro-Painter-Demo) painter 已发布 taro 版本的npm包[mina-painter](https://www.npmjs.com/package/mina-painter)
+taro 的使用方法请参考 [Taro 接入方案](https://github.com/Kujiale-Mobile/Taro-Painter-Demo) painter 已发布 taro 版本的 npm 包[mina-painter](https://www.npmjs.com/package/mina-painter)
 
 1. 引入代码
 
@@ -98,25 +98,26 @@ taro 的使用方法请参考 [Taro 接入方案](https://github.com/Kujiale-Mob
 
 ## 组件文档
 
-| 属性              | 类型               | 说明                                                                                               | 必填 | 默认值 |
-| ----------------- | ------------------ | -------------------------------------------------------------------------------------------------- | ---- | ------ |
-| customStyle       | string             | canvas 的自定义样式                                                                                | 否   |        |
-| palette           | IPalette           | 静态模版，具体规范下文有详细介绍                                                                   | 否   |        |
-| scaleRatio        | number             | 缩放比，会在传入的 palette 中统一乘以该缩放比                                                      | 否   | 1      |
-| widthPixels       | number             | 生成的图片的像素宽度，如不传则根据模版动态生成                                                     | 否   | 0      |
-| dirty             | boolean            | 是否启用脏检查                                                                                     | 否   | false  |
-| LRU               | boolean            | 是否开启 LRU 机制                                                                                  | 否   | true   |
-| dancePalette      | IPalette           | 动态模版，规范同静态模版                                                                           | 否   |        |
-| customActionStyle | ICustomActionStyle | 选择框、缩放图标、删除图标的自定义样式与图片                                                       | 否   |        |
-| action            | IView              | 动态编辑内容，用于刷新动态模版                                                                     | 否   |        |
-| disableAction     | boolean            | 禁止动态编辑操作                                                                                   | 否   | false  |
-| clearActionBox    | boolean            | 清除动态编辑框                                                                                     | 否   | false  |
-| imgErr            | function           | 图片生成失败，可以从 e.detail.error 获取错误信息                                                   | 否   |        |
-| imgOk             | function           | 图片生成成功，可以从 e.detail.path 获取生成的图片路径                                              | 否   |        |
-| viewUpdate        | function           | 动态模版， view 被更新，可从 e.detail.view 获取更新的 view                                         | 否   |        |
-| viewClicked       | function           | 动态模版， view 被选中， 可从 e.detail.view 获取点击的 view，如为空，则是选中背景                  | 否   |        |
+| 属性              | 类型               | 说明                                                                                         | 必填 | 默认值 |
+| ----------------- | ------------------ | -------------------------------------------------------------------------------------------- | ---- | ------ |
+| customStyle       | string             | canvas 的自定义样式                                                                          | 否   |        |
+| palette           | IPalette           | 静态模版，具体规范下文有详细介绍                                                             | 否   |        |
+| scaleRatio        | number             | 缩放比，会在传入的 palette 中统一乘以该缩放比                                                | 否   | 1      |
+| widthPixels       | number             | 生成的图片的像素宽度，如不传则根据模版动态生成                                               | 否   | 0      |
+| dirty             | boolean            | 是否启用脏检查                                                                               | 否   | false  |
+| LRU               | boolean            | 是否开启 LRU 机制                                                                            | 否   | true   |
+| dancePalette      | IPalette           | 动态模版，规范同静态模版                                                                     | 否   |        |
+| customActionStyle | ICustomActionStyle | 选择框、缩放图标、删除图标的自定义样式与图片                                                 | 否   |        |
+| action            | IView              | 动态编辑内容，用于刷新动态模版                                                               | 否   |        |
+| disableAction     | boolean            | 禁止动态编辑操作                                                                             | 否   | false  |
+| clearActionBox    | boolean            | 清除动态编辑框                                                                               | 否   | false  |
+| imgErr            | function           | 图片生成失败，可以从 e.detail.error 获取错误信息                                             | 否   |        |
+| imgOk             | function           | 图片生成成功，可以从 e.detail.path 获取生成的图片路径                                        | 否   |        |
+| viewUpdate        | function           | 动态模版， view 被更新，可从 e.detail.view 获取更新的 view                                   | 否   |        |
+| viewClicked       | function           | 动态模版， view 被选中， 可从 e.detail.view 获取点击的 view，如为空，则是选中背景            | 否   |        |
 | touchEnd          | function           | 动态模版，触碰结束。只有 view，代表触碰的对象；包含 view、type、index，代表点击了删除 icon； | 否   |
-| didShow           | function           | 动态模版，绘制结束时触发                                                                           | 否   |        |
+| didShow           | function           | 动态模版，绘制结束时触发                                                                     | 否   |        |
+| use2D             | boolean            | 是否使用 canvas2d 接口（注意！使用 use2D 就无法使用 dancePalette 与 action）                 | 否   | false  |
 
 ```typescript
 interface IView {
@@ -714,7 +715,7 @@ data: {
 // ···
 ```
 
-动态模版向用户提供了一个可供编辑的海报模版。在使用动态模版时，painter默认支持用户对海报中 view 的拖动、缩放和删除操作，增加海报自由度。（[了解更多关于动态模版](https://github.com/Kujiale-Mobile/Painter/wiki/%E5%8A%A8%E6%80%81%E6%A8%A1%E7%89%88%E7%AE%80%E4%BB%8B)）
+动态模版向用户提供了一个可供编辑的海报模版。在使用动态模版时，painter 默认支持用户对海报中 view 的拖动、缩放和删除操作，增加海报自由度。（[了解更多关于动态模版](https://github.com/Kujiale-Mobile/Painter/wiki/%E5%8A%A8%E6%80%81%E6%A8%A1%E7%89%88%E7%AE%80%E4%BB%8B)）
 
 customStyle、palette、imgOk 三个属性是旧版 painter 已存在的，使用方式并没有发生变化，因此不再赘述。(这里同时使用静态模版和动态模版，是为了在动态模版上编辑完毕后，通过静态模版生成一整张图片交给用户)
 

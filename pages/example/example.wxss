@@ -11,5 +11,5 @@
 }
 
 .top {
-  display: flex;
+  /* display: flex; */
 }
