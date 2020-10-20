@@ -46,7 +46,7 @@ Component({
     dancePalette: {
       type: Object,
       observer: function (newVal, oldVal) {
-        if (!this.isEmpty(newVal)) {
+        if (!this.isEmpty(newVal) && !this.properties.use2D) {
           this.initDancePalette(newVal);
         }
       },
@@ -72,7 +72,7 @@ Component({
     action: {
       type: Object,
       observer: function (newVal, oldVal) {
-        if (newVal && !this.isEmpty(newVal)) {
+        if (newVal && !this.isEmpty(newVal) && !this.properties.use2D) {
           this.doAction(newVal, (callbackInfo) => {
             this.movingCache = callbackInfo
           }, false, true)
@@ -232,6 +232,9 @@ Component({
     },
 
     doAction(action, callback, isMoving, overwrite) {
+      if (this.properties.use2D) {
+        return;
+      }
       let newVal = null
       if (action) {
         newVal = action.view
@@ -622,6 +625,9 @@ Component({
     },
 
     initDancePalette() {
+      if (this.properties.use2D) {
+        return;
+      }
       this.isDisabled = true;
       this.initScreenK();
       this.downloadImages(this.properties.dancePalette).then(async (palette) => {
