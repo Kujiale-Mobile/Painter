@@ -668,19 +668,33 @@ Component({
           return;
         }
 
+        let needScale = false;
         // 生成图片时，根据设置的像素值重新绘制
-        this.canvasWidthInPx = width.toPx();
+        if (width.toPx() !== this.canvasWidthInPx) {
+          this.canvasWidthInPx = width.toPx();
+          needScale = this.properties.use2D;
+        }
         if (this.properties.widthPixels) {
           setStringPrototype(this.screenK, this.properties.widthPixels / this.canvasWidthInPx)
           this.canvasWidthInPx = this.properties.widthPixels
         }
 
-        this.canvasHeightInPx = height.toPx();
+        if (this.canvasHeightInPx !== height.toPx()) {
+          this.canvasHeightInPx = height.toPx();
+          needScale = needScale || this.properties.use2D;
+        }
         this.setData({
           photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
         });
-        this.photoContext || (this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo'));
-
+        if (!this.photoContext) {
+          this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo');
+        }
+        if (needScale) {
+          const scale = getApp().systemInfo.pixelRatio;
+          this.photoContext.width = this.canvasWidthInPx * scale;
+          this.photoContext.height = this.canvasHeightInPx * scale;
+          this.photoContext.scale(scale, scale);
+        }
         new Pen(this.photoContext, palette).paint(() => {
           this.saveImgToLocal();
         });
@@ -784,10 +798,6 @@ Component({
             that.canvasNode = res[0].node;
             const ctx = that.canvasNode.getContext('2d');
             const wxCanvas = new WxCanvas('2d', ctx, id, true, that.canvasNode);
-            const dpr = Math.min(2, getApp().systemInfo.pixelRatio)
-            wxCanvas.width = res[0].width * dpr
-            wxCanvas.height = res[0].height * dpr
-            wxCanvas.scale(dpr, dpr)
             resolve(wxCanvas);
           });
         } else {
