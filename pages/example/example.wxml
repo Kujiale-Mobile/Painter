@@ -11,7 +11,8 @@
     palette="{{paintPallette}}"
     bind:imgOK="onImgOK" 
     bind:touchEnd="touchEnd" 
-    action="{{action}}" 
+    action="{{action}}"
+    use2D="{{true}}"
     />
   <!-- <image src="{{image}}" style="width: 654rpx; height: 1000rpx; margin-left:40rpx;"/> -->
   
