@@ -204,7 +204,7 @@ export default class Painter {
     const paddings = this._doPaddings(view);
     switch (view.type) {
       case 'text': {
-        const textArray = view.text.split('\n');
+        const textArray = String(view.text).split('\n');
         // 处理多个连续的'\n'
         for (let i = 0; i < textArray.length; ++i) {
           if (textArray[i] === '') {
