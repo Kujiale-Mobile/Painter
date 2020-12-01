@@ -46,7 +46,7 @@ Component({
     dancePalette: {
       type: Object,
       observer: function (newVal, oldVal) {
-        if (!this.isEmpty(newVal)) {
+        if (!this.isEmpty(newVal) && !this.properties.use2D) {
           this.initDancePalette(newVal);
         }
       },
@@ -72,7 +72,7 @@ Component({
     action: {
       type: Object,
       observer: function (newVal, oldVal) {
-        if (newVal && !this.isEmpty(newVal)) {
+        if (newVal && !this.isEmpty(newVal) && !this.properties.use2D) {
           this.doAction(newVal, (callbackInfo) => {
             this.movingCache = callbackInfo
           }, false, true)
@@ -232,6 +232,9 @@ Component({
     },
 
     doAction(action, callback, isMoving, overwrite) {
+      if (this.properties.use2D) {
+        return;
+      }
       let newVal = null
       if (action) {
         newVal = action.view
@@ -622,6 +625,9 @@ Component({
     },
 
     initDancePalette() {
+      if (this.properties.use2D) {
+        return;
+      }
       this.isDisabled = true;
       this.initScreenK();
       this.downloadImages(this.properties.dancePalette).then(async (palette) => {
@@ -656,35 +662,49 @@ Component({
 
     startPaint() {
       this.initScreenK();
+      const {
+        width,
+        height
+      } = this.properties.palette;
 
-      this.downloadImages(this.properties.palette).then(async (palette) => {
-        const {
-          width,
-          height
-        } = palette;
+      if (!width || !height) {
+        console.error(`You should set width and height correctly for painter, width: ${width}, height: ${height}`);
+        return;
+      }
 
-        if (!width || !height) {
-          console.error(`You should set width and height correctly for painter, width: ${width}, height: ${height}`);
-          return;
-        }
-
-        // 生成图片时，根据设置的像素值重新绘制
+      let needScale = false;
+      // 生成图片时，根据设置的像素值重新绘制
+      if (width.toPx() !== this.canvasWidthInPx) {
         this.canvasWidthInPx = width.toPx();
-        if (this.properties.widthPixels) {
-          setStringPrototype(this.screenK, this.properties.widthPixels / this.canvasWidthInPx)
-          this.canvasWidthInPx = this.properties.widthPixels
-        }
+        needScale = this.properties.use2D;
+      }
+      if (this.properties.widthPixels) {
+        setStringPrototype(this.screenK, this.properties.widthPixels / this.canvasWidthInPx)
+        this.canvasWidthInPx = this.properties.widthPixels
+      }
 
+      if (this.canvasHeightInPx !== height.toPx()) {
         this.canvasHeightInPx = height.toPx();
-        this.setData({
-          photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
+        needScale = needScale || this.properties.use2D;
+      }
+      this.setData({
+        photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
+      }, function () {
+        this.downloadImages(this.properties.palette).then(async palette => {
+          if (!this.photoContext) {
+            this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo');
+          }
+          if (needScale) {
+            const scale = getApp().systemInfo.pixelRatio;
+            this.photoContext.width = this.canvasWidthInPx * scale;
+            this.photoContext.height = this.canvasHeightInPx * scale;
+            this.photoContext.scale(scale, scale);
+          }
+          new Pen(this.photoContext, palette).paint(() => {
+            this.saveImgToLocal();
+          });
+          setStringPrototype(this.screenK, this.properties.scaleRatio);
         });
-        this.photoContext || (this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo'));
-
-        new Pen(this.photoContext, palette).paint(() => {
-          this.saveImgToLocal();
-        });
-        setStringPrototype(this.screenK, this.properties.scaleRatio);
       });
     },
 
@@ -784,10 +804,6 @@ Component({
             that.canvasNode = res[0].node;
             const ctx = that.canvasNode.getContext('2d');
             const wxCanvas = new WxCanvas('2d', ctx, id, true, that.canvasNode);
-            const dpr = Math.min(2, getApp().systemInfo.pixelRatio)
-            wxCanvas.width = res[0].width * dpr
-            wxCanvas.height = res[0].height * dpr
-            wxCanvas.scale(dpr, dpr)
             resolve(wxCanvas);
           });
         } else {
