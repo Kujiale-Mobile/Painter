@@ -294,7 +294,7 @@ export default class ImageExample {
 | color          | 字体颜色                                                                 | black               |
 | maxLines       | 最大行数                                                                 | 不限，根据 width 来 |
 | lineHeight     | 行高（上下两行文字 baseline 的距离）                                     | fontSize 大小       |
-| fontWeight     | 字体粗细。仅支持 normal, bold                                            | normal              |
+| fontWeight     | 字体粗细。                                            | normal              |
 | textDecoration | 文本修饰，支持 underline、 overline、 line-through，也可组合使用         | 无效果              |
 | textStyle      | fill： 填充样式，stroke：镂空样式                                        | fill                |
 | background     | 文字背景颜色                                                             | 无                  |
