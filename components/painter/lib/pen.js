@@ -211,8 +211,8 @@ export default class Painter {
             textArray[i] = ' ';
           }
         }
-        const fontWeight = view.css.fontWeight === 'bold' ? 'bold' : 'normal';
-        const textStyle = view.css.textStyle === 'italic' ? 'italic' : 'normal';
+        const fontWeight = view.css.fontWeight || '400';
+        const textStyle = view.css.textStyle || 'normal';
         if (!view.css.fontSize) {
           view.css.fontSize = '20rpx';
         }
