@@ -745,8 +745,8 @@ Component({
                   },
                   fail: (error) => {
                     // 如果图片坏了，则直接置空，防止坑爹的 canvas 画崩溃了
+                    console.warn(`getImageInfo ${view.originUrl} failed, ${JSON.stringify(error)}`);
                     view.url = "";
-                    console.error(`getImageInfo ${view.url} failed, ${JSON.stringify(error)}`);
                   },
                   complete: () => {
                     completeCount++;
