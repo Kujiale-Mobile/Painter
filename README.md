@@ -105,7 +105,7 @@ taro 的使用方法请参考 [Taro 接入方案](https://github.com/Kujiale-Mob
 | scaleRatio        | number             | 缩放比，会在传入的 palette 中统一乘以该缩放比                                                | 否   | 1      |
 | widthPixels       | number             | 生成的图片的像素宽度，如不传则根据模版动态生成                                               | 否   | 0      |
 | dirty             | boolean            | 是否启用脏检查                                                                               | 否   | false  |
-| LRU               | boolean            | 是否开启 LRU 机制                                                                            | 否   | true   |
+| LRU               | boolean            | 是否开启 LRU 机制                                                                            | 否   | false   |
 | dancePalette      | IPalette           | 动态模版，规范同静态模版                                                                     | 否   |        |
 | customActionStyle | ICustomActionStyle | 选择框、缩放图标、删除图标的自定义样式与图片                                                 | 否   |        |
 | action            | IView              | 动态编辑内容，用于刷新动态模版                                                               | 否   |        |
@@ -421,7 +421,7 @@ function _textDecoration(decoration, index, color) {
   id: 'my-text-id',
   type: 'text',
 
-2，然后在后面的 view 中，你可以在 left 和 right 属性中使用这个id。如下
+2，然后在后面的 view 中，你可以在 left、right、top属性中使用这个id。如下
 left: ['10rpx', 'my-text-id', 比例]
 表示布局在距离左边（10rpx + 该text文本宽度 * 比例） 的距离，比例默认为 1，可省去，你也可以使用负数或小数来做计算，最终的 left 会加上文本宽度乘以该数的值。
 

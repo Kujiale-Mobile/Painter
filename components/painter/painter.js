@@ -67,7 +67,7 @@ Component({
     },
     LRU: {
       type: Boolean,
-      value: true,
+      value: false,
     },
     action: {
       type: Object,
