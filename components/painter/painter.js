@@ -689,9 +689,7 @@ Component({
           this.canvasHeightInPx = height.toPx();
           needScale = needScale || this.properties.use2D;
         }
-        this.setData({
-          photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
-        });
+        
         if (!this.photoContext) {
           this.photoContext = await this.getCanvasContext(this.properties.use2D, 'photo');
         }
@@ -701,10 +699,15 @@ Component({
           this.photoContext.height = this.canvasHeightInPx * scale;
           this.photoContext.scale(scale, scale);
         }
-        new Pen(this.photoContext, palette).paint(() => {
-          this.saveImgToLocal();
+        
+        this.setData({
+          photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
+        }, () => {
+          new Pen(this.photoContext, palette).paint(() => {
+            this.saveImgToLocal();
+          });
+          setStringPrototype(this.screenK, this.properties.scaleRatio);
         });
-        setStringPrototype(this.screenK, this.properties.scaleRatio);
       });
     },
 
@@ -776,8 +779,8 @@ Component({
         wx.canvasToTempFilePath({
           canvasId: 'photo',
           canvas: that.properties.use2D ? that.canvasNode : null,
-          destWidth: that.canvasWidthInPx * getApp().systemInfo.pixelRatio,
-          destHeight: that.canvasHeightInPx * getApp().systemInfo.pixelRatio,
+          destWidth: that.canvasWidthInPx,
+          destHeight: that.canvasHeightInPx,
           success: function (res) {
             that.getImageInfo(res.tempFilePath);
           },
