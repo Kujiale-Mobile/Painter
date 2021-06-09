@@ -540,9 +540,9 @@ export default class WxCanvas {
         for (const step of realstepList) {
           this.implementMinaStep(step);
         }
-        this.ctx.draw(reserve, func);
         realstepList.length = 0;
       }
+      this.ctx.draw(reserve, func);
     } else if (this.type === "2d") {
       if (!reserve) {
         this.ctx.clearRect(0, 0, this.canvasNode.width, this.canvasNode.height);
