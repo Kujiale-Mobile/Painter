@@ -29,7 +29,8 @@
 **TODO**
 
 - [x] canvas2d 接口支持
-- [ ] base64 图片支持 [测试版本](https://github.com/Kujiale-Mobile/Painter/tree/base64)
+- [x] base64 图片支持
+- [x] calc 支持
 - [ ] node 端服务版的 painter
 - [ ] line-space 属性支持
 - [ ] 三角形等常用图形的支持
@@ -411,30 +412,79 @@ function _textDecoration(decoration, index, color) {
 
 ![](https://user-images.githubusercontent.com/4279515/46778627-290ead80-cd47-11e8-8483-2e36e39b36f0.png)
 
-#### 相对布局方法
+#### 相对布局
 
-很多人有获得文本宽度的需求，因为文本宽度随着字数不同而动态变化，如果想在文本后面加个图标，那么我们就需要获得文本宽度。Painter 的解决方案如下：
-
+1，在需要暴露自己位置的信息的元素上增加一个 id 属性，如下：
 ```
-1，首先你需要为检测长度的文本添加一个 id。如下
 {
-  id: 'my-text-id',
+  id: 'myTextId',
   type: 'text',
-
-2，然后在后面的 view 中，你可以在 left、right、top属性中使用这个id。如下
-left: ['10rpx', 'my-text-id', 比例]
-表示布局在距离左边（10rpx + 该text文本宽度 * 比例） 的距离，比例默认为 1，可省去，你也可以使用负数或小数来做计算，最终的 left 会加上文本宽度乘以该数的值。
-
+  ...
+}  
+```
+2，然后在后面的 view 中，你可以在 left、right、top、bottom、width、height 属性中使用 calc 属性。如下
+```
+left: 'calc(myTextId.bottom + 100rpx)'
+width: 'calc(myTextId.width * 2)'
 ```
 
-注意：
+<details><summary>例子代码（点击展开）</summary><br>
 
-- 比例一定为一个 number
-- 获得的长度为 view 自身的尺寸，而非该 view 到对应边的 距离 + 自身尺寸
+```javascript
+{
+  width: '654rpx',
+  height: '1000rpx',
+  background: '#eee',
+  views: [
+    {
+      id: 'one',
+      type: 'rect',
+      css: {
+        width: '200rpx',
+        left: 'calc(50% - 100rpx)',
+        top: '30rpx',
+        height: '100rpx',
+      },
+    },
+    {
+      id: 'two',
+      type: 'rect',
+      css: {
+        width: '200rpx',
+        left: 'calc(one.left + 100rpx)',
+        top: 'calc(one.bottom + 10rpx)',
+        height: '100rpx',
+      },
+    },
+    {
+      id: 'three',
+      type: 'rect',
+      css: {
+        width: '200rpx',
+        left: 'calc(two.left + 100rpx)',
+        align: 'center',
+        top: 'calc(two.bottom + 3 * 10rpx)',
+        height: '100rpx',
+      },
+    },
+    {
+      id: 'four',
+      type: 'rect',
+      css: {
+        width: 'calc(2 * one.width)',
+        left: 'calc(one.left)',
+        align: 'center',
+        top: 'calc(three.bottom + 10rpx)',
+        height: '100rpx',
+      },
+    },
+  ],
+}
+```
 
-如果想获得高度，top 也支持上述用法，并且除文本外，你可以对任何 view 设置一个 id，然后使用上述方法进行相对布局。
+</details>
 
-**注：相对布局的那个 view 代码一定需要在被相对的 view 的下面。**
+**注：相对布局的 view 代码一定需要在被相对的 view 的之后。**
 
 #### border 类型
 
