@@ -884,7 +884,7 @@ function setStringPrototype(screenK, scale) {
     const formula = /^calc\((.+)\)$/.exec(this)
     if (formula && formula[1]) {
       // 进行 calc 计算
-      const afterOne = formula[1].replace(/([^\s]+)\.(left|right|bottom|top|width|height)/, (word) => {
+      const afterOne = formula[1].replace(/([^\s]+)\.(left|right|bottom|top|width|height)/g, (word) => {
           const [id, attr] = word.split('.');
           return relativeViewRect[id][attr]
         }

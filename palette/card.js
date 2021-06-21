@@ -37,7 +37,7 @@ export default class LastMayday {
             width: '20rpx',
             height: '20rpx',
             color: 'red',
-            left: [`${startTop}rpx`, 'my-text-id'],
+            left: 'calc(my-text-id.right + 20rpx)',
             top: `${startTop + 4 * gapSize + 15}rpx`,
           },
         },
@@ -63,7 +63,7 @@ export default class LastMayday {
             height: '20rpx',
             color: 'red',
             left: '200rpx',
-            top: [`${startTop + 5 * gapSize}rpx`, 'text-id-2'],
+            top: 'calc(text-id-2.bottom + 20rpx)',
           },
         },
         {

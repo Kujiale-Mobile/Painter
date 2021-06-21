@@ -7,43 +7,38 @@ export default class LastMayday {
       views: [
         {
           id: 'one',
-          type: 'rect',
+          type: 'qrcode',
+          content: '12345',
           css: {
-            width: '200rpx',
-            left: 'calc(50% - 100rpx)',
+            width: '400rpx',
+            left: '50%',
+            align: 'center',
             top: '30rpx',
-            height: '100rpx',
+            height: '400rpx',
           },
         },
         {
           id: 'two',
-          type: 'rect',
+          type: 'image',
+          url: '/palette/avatar.jpg',
           css: {
-            width: '200rpx',
-            left: 'calc(one.left + 100rpx)',
-            top: 'calc(one.bottom + 10rpx)',
-            height: '100rpx',
-          },
-        },
-        {
-          id: 'three',
-          type: 'rect',
-          css: {
-            width: '200rpx',
-            left: 'calc(two.left + 100rpx)',
-            align: 'center',
-            top: 'calc(two.bottom + 3 * 10rpx)',
-            height: '100rpx',
-          },
-        },
-        {
-          id: 'four',
-          type: 'rect',
-          css: {
-            width: 'calc(2 * one.width)',
+            width: '100rpx',
             left: 'calc(one.left)',
             align: 'center',
-            top: 'calc(three.bottom + 10rpx)',
+            top: 'calc(one.top + one.height / 2 - 50rpx)',
+            height: '100rpx',
+            borderRadius: '10rpx',
+            borderWidth: '10rpx',
+            borderColor: '#fff'
+          },
+        },
+        {
+          type: 'rect',
+          css: {
+            width: 'calc(one.width / 2)',
+            left: 'calc(one.left)',
+            align: 'center',
+            top: 'calc(one.bottom + 10rpx)',
             height: '100rpx',
           },
         },

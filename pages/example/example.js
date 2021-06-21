@@ -1,4 +1,4 @@
-import Card from '../../palette/relative';
+import Card from '../../palette/card';
 
 // src/pages/xml2can/xml2can.js
 Page({
