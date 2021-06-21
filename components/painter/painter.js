@@ -860,10 +860,10 @@ function setStringPrototype(screenK, scale) {
     if (this === '0') {
       return 0;
     }
-    const REG = /-?[0-9]+([.]{1}[0-9]+){0,1}(rpx|px|%)/g;
+    const REG = /-?[0-9]+(\.[0-9]+)?(rpx|px|%)/;
 
     const parsePx = origin => {
-      const results = REG.exec(origin);
+      const results = new RegExp(REG).exec(origin);
       if (!origin || !results) {
         console.error(`The size: ${origin} is illegal`);
         return 0;
@@ -889,7 +889,7 @@ function setStringPrototype(screenK, scale) {
           return relativeViewRect[id][attr]
         }
       );
-      const afterTwo = afterOne.replace(REG, parsePx);
+      const afterTwo = afterOne.replace(new RegExp(REG, 'g'), parsePx);
       return calc(afterTwo);
     } else {
       return parsePx(this);

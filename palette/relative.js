@@ -10,8 +10,7 @@ export default class LastMayday {
           type: 'rect',
           css: {
             width: '200rpx',
-            left: '50%',
-            align: 'center',
+            left: 'calc(50% - 100rpx)',
             top: '30rpx',
             height: '100rpx',
           },
@@ -22,7 +21,6 @@ export default class LastMayday {
           css: {
             width: '200rpx',
             left: 'calc(one.left + 100rpx)',
-            align: 'center',
             top: 'calc(one.bottom + 10rpx)',
             height: '100rpx',
           },
