@@ -3,6 +3,7 @@ import Downloader from './lib/downloader';
 import WxCanvas from './lib/wx-canvas';
 
 const util = require('./lib/util');
+const calc = require('./lib/calc');
 
 const downloader = new Downloader();
 
@@ -851,36 +852,47 @@ Component({
 function setStringPrototype(screenK, scale) {
   /* eslint-disable no-extend-native */
   /**
-   * 是否支持负数
-   * @param {Boolean} minus 是否支持负数
+   * string 到对应的 px
    * @param {Number} baseSize 当设置了 % 号时，设置的基准值
+   * @param {Object} relativeViewRect 所相对的 view 的信息
    */
-  String.prototype.toPx = function toPx(minus, baseSize) {
+  String.prototype.toPx = function toPx(_, baseSize, relativeViewRect) {
     if (this === '0') {
-      return 0
-    }
-    let reg;
-    if (minus) {
-      reg = /^-?[0-9]+([.]{1}[0-9]+){0,1}(rpx|px|%)$/g;
-    } else {
-      reg = /^[0-9]+([.]{1}[0-9]+){0,1}(rpx|px|%)$/g;
-    }
-    const results = reg.exec(this);
-    if (!this || !results) {
-      console.error(`The size: ${this} is illegal`);
       return 0;
     }
-    const unit = results[2];
-    const value = parseFloat(this);
+    const REG = /-?[0-9]+([.]{1}[0-9]+){0,1}(rpx|px|%)/g;
 
-    let res = 0;
-    if (unit === 'rpx') {
-      res = Math.round(value * (screenK || 0.5) * (scale || 1));
-    } else if (unit === 'px') {
-      res = Math.round(value * (scale || 1));
-    } else if (unit === '%') {
-      res = Math.round(value * baseSize / 100);
+    const parsePx = origin => {
+      const results = REG.exec(origin);
+      if (!origin || !results) {
+        console.error(`The size: ${origin} is illegal`);
+        return 0;
+      }
+      const unit = results[2];
+      const value = parseFloat(origin);
+
+      let res = 0;
+      if (unit === 'rpx') {
+        res = Math.round(value * (screenK || 0.5) * (scale || 1));
+      } else if (unit === 'px') {
+        res = Math.round(value * (scale || 1));
+      } else if (unit === '%') {
+        res = Math.round((value * baseSize) / 100);
+      }
+      return res;
+    };
+    const formula = /^calc\((.+)\)$/.exec(this)
+    if (formula && formula[1]) {
+      // 进行 calc 计算
+      const afterOne = formula[1].replace(/([^\s]+)\.(left|right|bottom|top|width|height)/, (word) => {
+          const [id, attr] = word.split('.');
+          return relativeViewRect[id][attr]
+        }
+      );
+      const afterTwo = afterOne.replace(REG, parsePx);
+      return calc(afterTwo);
+    } else {
+      return parsePx(this);
     }
-    return res;
   };
 }
