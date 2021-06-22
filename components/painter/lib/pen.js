@@ -1,33 +1,38 @@
 const QR = require('./qrcode.js');
 const GD = require('./gradient.js');
 
+export const penCache = {
+  // 用于存储带 id 的 view 的 rect 信息
+  viewRect: {},
+  textLines: {},
+};
+export const clearPenCache = id => {
+  if (id) {
+    penCache.viewRect[id] = null;
+    penCache.textLines[id] = null;
+  } else {
+    penCache.viewRect = {};
+    penCache.textLines = {};
+  }
+};
 export default class Painter {
   constructor(ctx, data) {
     this.ctx = ctx;
     this.data = data;
   }
 
-  isMoving = false;
-  // 动态模板时的缓存，加速渲染
-  movingCache = {};
-  callbackInfo = {};
-  // 用于存储带 id 的 view 的 rect 信息
-  viewRect = {};
-  paint(callback, isMoving, movingCache) {
+  paint(callback) {
     this.style = {
       width: this.data.width.toPx(),
       height: this.data.height.toPx(),
     };
-    if (isMoving) {
-      this.isMoving = true;
-      this.movingCache = movingCache;
-    }
+
     this._background();
     for (const view of this.data.views) {
       this._drawAbsolute(view);
     }
     this.ctx.draw(false, () => {
-      callback && callback(this.callbackInfo);
+      callback && callback();
     });
   }
 
@@ -262,14 +267,14 @@ export default class Painter {
           width = Math.round(view.sWidth / ratio);
           height = Math.round(view.sHeight / ratio);
         } else if (view.css.width === 'auto') {
-          height = view.css.height.toPx(false, this.style.height, this.viewRect);
+          height = view.css.height.toPx(false, this.style.height);
           width = (view.sWidth / view.sHeight) * height;
         } else if (view.css.height === 'auto') {
-          width = view.css.width.toPx(false, this.style.width, this.viewRect);
+          width = view.css.width.toPx(false, this.style.width);
           height = (view.sHeight / view.sWidth) * width;
         } else {
-          width = view.css.width.toPx(false, this.style.width, this.viewRect);
-          height = view.css.height.toPx(false, this.style.height, this.viewRect);
+          width = view.css.width.toPx(false, this.style.width);
+          height = view.css.height.toPx(false, this.style.height);
         }
         break;
       }
@@ -278,26 +283,29 @@ export default class Painter {
           console.error('You should set width and height');
           return;
         }
-        width = view.css.width.toPx(false, this.style.width, this.viewRect);
-        height = view.css.height.toPx(false, this.style.height, this.viewRect);
+        width = view.css.width.toPx(false, this.style.width);
+        height = view.css.height.toPx(false, this.style.height);
         break;
     }
     let x;
     if (view.css && view.css.right) {
       if (typeof view.css.right === 'string') {
-        x = this.style.width - view.css.right.toPx(true, this.style.width, this.viewRect);
+        x = this.style.width - view.css.right.toPx(true, this.style.width);
       } else {
         // 可以用数组方式，把文字长度计算进去
         // [right, 文字id, 乘数（默认 1）]
         const rights = view.css.right;
-        x = this.style.width - rights[0].toPx(true, this.style.width) - this.viewRect[rights[1]].width * (rights[2] || 1);
+        x =
+          this.style.width -
+          rights[0].toPx(true, this.style.width) -
+          penCache.viewRect[rights[1]].width * (rights[2] || 1);
       }
     } else if (view.css && view.css.left) {
       if (typeof view.css.left === 'string') {
-        x = view.css.left.toPx(true, this.style.width, this.viewRect);
+        x = view.css.left.toPx(true, this.style.width);
       } else {
         const lefts = view.css.left;
-        x = lefts[0].toPx(true, this.style.width) + this.viewRect[lefts[1]].width * (lefts[2] || 1);
+        x = lefts[0].toPx(true, this.style.width) + penCache.viewRect[lefts[1]].width * (lefts[2] || 1);
       }
     } else {
       x = 0;
@@ -305,14 +313,14 @@ export default class Painter {
     //const y = view.css && view.css.bottom ? this.style.height - height - view.css.bottom.toPx(true) : (view.css && view.css.top ? view.css.top.toPx(true) : 0);
     let y;
     if (view.css && view.css.bottom) {
-      y = this.style.height - height - view.css.bottom.toPx(true, this.style.height, this.viewRect);
+      y = this.style.height - height - view.css.bottom.toPx(true, this.style.height);
     } else {
       if (view.css && view.css.top) {
         if (typeof view.css.top === 'string') {
-          y = view.css.top.toPx(true, this.style.height, this.viewRect);
+          y = view.css.top.toPx(true, this.style.height);
         } else {
           const tops = view.css.top;
-          y = tops[0].toPx(true, this.style.height) + this.viewRect[tops[1]].height * (tops[2] || 1);
+          y = tops[0].toPx(true, this.style.height) + penCache.viewRect[tops[1]].height * (tops[2] || 1);
         }
       } else {
         y = 0;
@@ -396,7 +404,7 @@ export default class Painter {
     }
     this._doShadow(view);
     if (view.id) {
-      this.viewRect[view.id] = {
+      penCache.viewRect[view.id] = {
         width,
         height,
         left: x,
@@ -520,10 +528,9 @@ export default class Painter {
     this.ctx.save();
     const { width, height, extra } = this._preProcess(view, view.css.background && view.css.borderRadius);
     this.ctx.fillStyle = view.css.color || 'black';
-    if (this.isMoving && JSON.stringify(this.movingCache) !== JSON.stringify({})) {
-      this.viewRect[view.id] = this.movingCache.viewRect;
+    if (view.id && penCache.textLines[view.id]) {
       this.ctx.textAlign = view.css.textAlign ? view.css.textAlign : 'left';
-      for (const i of this.movingCache.lineArray) {
+      for (const i of penCache.textLines[view.id]) {
         const { measuredWith, text, x, y, textDecoration } = i;
         if (view.css.textStyle === 'stroke') {
           this.ctx.strokeText(text, x, y, measuredWith);
@@ -550,12 +557,7 @@ export default class Painter {
           const _w = this.ctx.measureText(textArray[i]).width;
           textWidth = _w > textWidth ? _w : textWidth;
         }
-        this.viewRect[view.id].width = width ? (textWidth < width ? textWidth : width) : textWidth;
-        if (!this.isMoving) {
-          Object.assign(this.callbackInfo, {
-            viewRect: this.viewRect[view.id],
-          });
-        }
+        penCache.viewRect[view.id].width = width ? (textWidth < width ? textWidth : width) : textWidth;
       }
       let lineIndex = 0;
       for (let j = 0; j < textArray.length; ++j) {
@@ -619,6 +621,7 @@ export default class Painter {
               lineX = x;
               break;
           }
+
           const y =
             -(height / 2) +
             (lineIndex === 0 ? view.css.fontSize.toPx() : view.css.fontSize.toPx() + lineIndex * lineHeight);
@@ -661,16 +664,16 @@ export default class Painter {
             this.ctx.strokeStyle = view.css.color;
             this.ctx.stroke();
           }
-          if (!this.isMoving) {
-            this.callbackInfo.lineArray
-              ? this.callbackInfo.lineArray.push({
+          if (view.id) {
+            penCache.textLines[view.id]
+              ? penCache.textLines[view.id].push({
                   text,
                   x,
                   y,
                   measuredWith,
                   textDecoration,
                 })
-              : (this.callbackInfo.lineArray = [
+              : (penCache.textLines[view.id] = [
                   {
                     text,
                     x,

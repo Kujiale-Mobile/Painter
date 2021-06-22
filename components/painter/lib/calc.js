@@ -1,4 +1,4 @@
-var calculate = function (s) {
+module.exports = function (s) {
   s = s.trim();
   const stack = new Array();
   let preSign = '+';
@@ -46,5 +46,3 @@ var calculate = function (s) {
   }
   return ans;
 };
-
-module.exports = calculate;
