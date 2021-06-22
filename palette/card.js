@@ -22,7 +22,7 @@ export default class LastMayday {
           },
         },
         {
-          id: 'my-text-id',
+          id: 'my_text_id',
           type: 'text',
           text: "fontWeight: 'bold'",
           css: [{
@@ -37,12 +37,12 @@ export default class LastMayday {
             width: '20rpx',
             height: '20rpx',
             color: 'red',
-            left: 'calc(my-text-id.right + 20rpx)',
+            left: 'calc(my_text_id.right + 20rpx)',
             top: `${startTop + 4 * gapSize + 15}rpx`,
           },
         },
         {
-          id: 'text-id-2',
+          id: 'text_id_2',
           type: 'text',
           text: '我是把width设置为400rpx后，我就换行了xx行了',
           css: [{
@@ -63,7 +63,7 @@ export default class LastMayday {
             height: '20rpx',
             color: 'red',
             left: '200rpx',
-            top: 'calc(text-id-2.bottom + 20rpx)',
+            top: 'calc(text_id_2.bottom + 20rpx)',
           },
         },
         {

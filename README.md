@@ -414,7 +414,7 @@ function _textDecoration(decoration, index, color) {
 
 #### 相对布局
 
-1，在需要暴露自己位置的信息的元素上增加一个 id 属性，如下：
+1，在需要暴露自己位置的信息的元素上增加一个 id 属性，注意此 id 中不要包含加减乘除符号，如下：
 ```
 {
   id: 'myTextId',
