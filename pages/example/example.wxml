@@ -7,7 +7,7 @@
   <painter 
     customActionStyle="{{customActionStyle}}"
     palette="{{paintPallette}}"
-    bind:imgOK="onImgOK" 
+    bind:imgOK="onImgOK"
     bind:touchEnd="touchEnd" 
     action="{{action}}"
     widthPixels="1000"

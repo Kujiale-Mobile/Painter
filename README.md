@@ -103,8 +103,8 @@ taro 的使用方法请参考 [Taro 接入方案](https://github.com/Kujiale-Mob
 | ----------------- | ------------------ | -------------------------------------------------------------------------------------------- | ---- | ------ |
 | customStyle       | string             | canvas 的自定义样式                                                                          | 否   |        |
 | palette           | IPalette           | 静态模版，具体规范下文有详细介绍                                                             | 否   |        |
-| scaleRatio        | number             | 缩放比，会在传入的 palette 中统一乘以该缩放比                                                | 否   | 1      |
-| widthPixels       | number             | 生成的图片的像素宽度，如不传则根据模版动态生成                                               | 否   | 0      |
+| scaleRatio        | number             | 缩放比，会在传入的 palette 中统一乘以该缩放比，作用和 widthPixels 类似，所以不要同时使用                                               | 否   | 1      |
+| widthPixels       | number             | 生成的图片的像素宽度，如不传则根据模版动态生成                                               | 否   |       |
 | dirty             | boolean            | 是否启用脏检查                                                                               | 否   | false  |
 | LRU               | boolean            | 是否开启 LRU 机制                                                                            | 否   | false   |
 | dancePalette      | IPalette           | 动态模版，规范同静态模版                                                                     | 否   |        |
@@ -427,7 +427,7 @@ function _textDecoration(decoration, index, color) {
 left: 'calc(myTextId.bottom + 100rpx)'
 width: 'calc(myTextId.width * 2)'
 ```
-
+![](https://qhstaticssl.kujiale.com/newt/165/image/png/1624271816278/AF8DE4AEA90102C2220247E0244EF2C0.png)
 <details><summary>例子代码（点击展开）</summary><br>
 
 ```javascript
