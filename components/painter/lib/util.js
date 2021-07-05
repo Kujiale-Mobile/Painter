@@ -4,7 +4,9 @@ function isValidUrl(url) {
 }
 
 function isOnlineUrl(url) {
-  return /(ht|f)tp(s?):\/\/([^ \\/]*\.)+[^ \\/]*(:[0-9]+)?\/?/.test(url)
+  // 支持微信云文件的fileId（cloud://开头）
+  // return /(ht|f)tp(s?):\/\/([^ \\/]*\.)+[^ \\/]*(:[0-9]+)?\/?/.test(url)
+  return /((ht|f)tp(s?)|cloud):\/\/([^ \\/]*\.)+[^ \\/]*(:[0-9]+)?\/?/.test(url)
 }
 
 function isDataUrl(url) {

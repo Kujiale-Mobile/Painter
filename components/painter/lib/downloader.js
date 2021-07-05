@@ -174,10 +174,13 @@ function transformBase64File(base64data, lru) {
   });  
 }
 
+//支持微信云文件fileID
 function downloadFile(url, lru) {
   return new Promise((resolve, reject) => {
-    wx.downloadFile({
+    const downloader = url.startsWith('cloud://')?wx.cloud.downloadFile:wx.downloadFile
+    downloader({
       url: url,
+      fileID: url,
       success: function (res) {
         if (res.statusCode !== 200) {
           console.error(`downloadFile ${url} failed res.statusCode is not 200`);
