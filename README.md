@@ -933,7 +933,7 @@ touchEnd({ detail }) {
 ## License
 
 ```
-Copyright (c) 2018 Kujiale
+Copyright 2021 Manycore Tech Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
