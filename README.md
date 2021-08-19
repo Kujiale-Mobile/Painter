@@ -19,6 +19,7 @@
 - 支持渐变色，包括线性渐变与径向渐变。
 - 支持 box-shadow 和 text-shadow，统一使用 shadow 表示。
 - 支持文字背景、获取宽度、主动换行
+- 支持自定义字体
 - 支持图片 mode
 - 支持元素的相对定位方法
 - 杠杠的性能优化，我们对网络素材图片加载实现了一套 LRU 存储机制，不用重复下载素材图片。
@@ -304,7 +305,24 @@ export default class ImageExample {
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
 
-关于 fontFamily 属性，有一点需要澄清，最开始文档中写的可以通过 wx.loadFontFace 来加载自定义字体，是不严谨的。事实上，原版 canvas 接口不支持自定义字体。而从 2.13.0 版本基础库开始，canvas2d 版本的接口开始支持自定义字体。我们找到了如下问答作为依据： [问题链接](https://developers.weixin.qq.com/community/develop/doc/000c26f9cc4f48af2b9aed8e25b000?highLine=canvas%2520%25E5%25AD%2597%25E4%25BD%2593)。
+##### 自定义字体
+
+从 2.13.0 版本基础库开始，我们可以：
+在 app.js onLaunch 的时候添加你的[自定义字体](https://developers.weixin.qq.com/miniprogram/dev/api/ui/font/wx.loadFontFace.html)。但是有三点要注意:
+
+1. painter 组件一定要用使用 use2d。
+2. 一定要使用 scopes，`scopes: ['webview', 'native']`
+3. 在开发工具上是看不到效果的，要在手机上测试。
+
+``` js
+wx.loadFontFace({
+  global: true,
+  family: 'xxxx',
+  source:
+    'https://xxxx.ttf',
+  scopes: ['webview', 'native'],
+});
+```
 
 - **以下用个例子说下上述几个属性的用法**
 
