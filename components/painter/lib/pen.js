@@ -1,7 +1,6 @@
 const QR = require('./qrcode.js');
 const GD = require('./gradient.js');
-
-const reg = /[^\u0020-\u007E\u00A0-\u00BE\u2E80-\uA4CF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF\u0080-\u009F\u2000-\u201f\u2026\u2022\u20ac\r\n]$/;
+require('./string-polyfill.js');
 
 export const penCache = {
   // 用于存储带 id 的 view 的 rect 信息
@@ -583,18 +582,12 @@ export default class Painter {
           ) {
             if (measuredWith < width) {
               text = textArray[j].substr(start, ++alreadyCount);
-              if (reg.test(text)) {
-                text = textArray[j].substr(start, ++alreadyCount);
-              }
             } else {
               if (text.length <= 1) {
                 // 如果只有一个字符时，直接跳出循环
                 break;
               }
               text = textArray[j].substr(start, --alreadyCount);
-              if (reg.test(text)) {
-                text = textArray[j].substr(start, --alreadyCount);
-              }
               // break;
             }
             measuredWith = this.ctx.measureText(text).width;
@@ -607,7 +600,7 @@ export default class Painter {
                 // 如果只有一个字符时，直接跳出循环
                 break;
               }
-              text = text.substring(0, text.length - (reg.test(text) ? 2 : 1));
+              text = text.substring(0, text.length - 1);
             }
             text += '...';
             measuredWith = this.ctx.measureText(text).width;
