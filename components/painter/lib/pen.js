@@ -80,6 +80,15 @@ export default class Painter {
       case 'text':
         this._fillAbsText(view);
         break;
+      /**
+       * 新增 type -> inlineText
+       * 
+       * 支持配置字段 textList Array
+       *    子项为 {text: '文本', css: {}} 结构 和之前类似
+       */
+      case 'inlineText':
+        this._fillAbsInlineText(view);
+        break;
       case 'rect':
         this._drawAbsRect(view);
         break;
@@ -208,6 +217,42 @@ export default class Painter {
     let extra;
     const paddings = this._doPaddings(view);
     switch (view.type) {
+      case 'inlineText': {
+        {
+          // 计算行数
+          let lines = 0;
+          // 文字总长度
+          let textLength = 0;
+          // 行高
+          let lineHeight = 0;
+          const textList = view.textList || [];
+          for (let i = 0; i < textList.length; i++) {
+            let subView = textList[i];
+            const fontWeight = subView.css.fontWeight || '400';
+            const textStyle = subView.css.textStyle || 'normal';
+            if (!subView.css.fontSize) {
+              subView.css.fontSize = '20rpx';
+            }
+            this.ctx.font = `${textStyle} ${fontWeight} ${subView.css.fontSize.toPx()}px "${subView.css.fontFamily || 'sans-serif'}"`;
+            textLength += this.ctx.measureText(subView.text).width;
+            let tempLineHeight = subView.css.lineHeight ? subView.css.lineHeight.toPx() : subView.css.fontSize.toPx();
+            lineHeight = Math.max(lineHeight, tempLineHeight);
+          }
+          width = view.css.width ? view.css.width.toPx(false, this.style.width) - paddings[1] - paddings[3] : textLength;;
+          const calLines = Math.ceil(textLength / width);
+
+          lines += calLines;
+          // lines = view.css.maxLines < lines ? view.css.maxLines : lines;
+          height = lineHeight * lines;
+          extra = {
+            lines: lines,
+            lineHeight: lineHeight,
+            // textArray: textArray,
+            // linesArray: linesArray,
+          };
+        }
+        break;
+      }
       case 'text': {
         const textArray = String(view.text).split('\n');
         // 处理多个连续的'\n'
@@ -517,6 +562,132 @@ export default class Painter {
     }
     this.ctx.restore();
     this._doBorder(view, width, height);
+  }
+  /**
+   * 
+   * @param {*} view 
+   * @description 一行内文字多样式的方法
+   * 
+   * 暂不支持配置 text-align，默认left
+   * 暂不支持配置 maxLines
+   */
+  _fillAbsInlineText(view) {
+    if (!view.textList) {
+      return;
+    }
+    if (view.css.background) {
+      // 生成背景
+      this._doBackground(view);
+    }
+    this.ctx.save();
+    const { width, height, extra } = this._preProcess(view, view.css.background && view.css.borderRadius);
+    const { lines, lineHeight } = extra;
+    let staticX = -(width / 2);
+    let lineIndex = 0; // 第几行
+    let x = staticX; // 开始x位置
+    let leftWidth = width; // 当前行剩余多少宽度可以使用
+
+    let getStyle = css => {
+      const fontWeight = css.fontWeight || '400';
+      const textStyle = css.textStyle || 'normal';
+      if (!css.fontSize) {
+        css.fontSize = '20rpx';
+      }
+      return `${textStyle} ${fontWeight} ${css.fontSize.toPx()}px "${css.fontFamily || 'sans-serif'}"`;
+    }
+
+    // 遍历行内的文字数组
+    for (let j = 0; j < view.textList.length; j++) {
+      const subView = view.textList[j];
+
+      // 某个文字开始位置
+      let start = 0;
+      // 文字已使用的数量
+      let alreadyCount = 0;
+      // 文字总长度
+      let textLength = subView.text.length;
+      // 文字总宽度
+      let textWidth = this.ctx.measureText(subView.text).width;
+      // 每个文字的平均宽度
+      let preWidth = Math.ceil(textWidth / textLength);
+
+      // 循环写文字
+      while (alreadyCount < textLength) {
+        // alreadyCount - start + 1 -> 当前摘取出来的文字
+        // 比较可用宽度，寻找最大可写文字长度
+        while ((alreadyCount - start + 1) * preWidth < leftWidth && alreadyCount < textLength) {
+          alreadyCount++;
+        }
+
+        // 取出文字
+        let text = subView.text.substr(start, alreadyCount - start);
+
+        const y = -(height / 2) + subView.css.fontSize.toPx() + lineIndex * lineHeight;
+
+        // 设置文字样式
+        this.ctx.font = getStyle(subView.css);
+
+        this.ctx.fillStyle = subView.css.color || 'black';
+        this.ctx.textAlign = 'left';
+
+        // 执行画布操作
+        if (subView.css.textStyle === 'stroke') {
+          this.ctx.strokeText(text, x, y);
+        } else {
+          this.ctx.fillText(text, x, y);
+        }
+
+        // 当次已使用宽度
+        let currentUsedWidth = this.ctx.measureText(text).width;
+
+        const fontSize = subView.css.fontSize.toPx();
+
+        // 画 textDecoration
+        let textDecoration;
+        if (subView.css.textDecoration) {
+          this.ctx.lineWidth = fontSize / 13;
+          this.ctx.beginPath();
+          if (/\bunderline\b/.test(subView.css.textDecoration)) {
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(x + currentUsedWidth, y);
+            textDecoration = {
+              moveTo: [x, y],
+              lineTo: [x + currentUsedWidth, y],
+            };
+          }
+          if (/\boverline\b/.test(subView.css.textDecoration)) {
+            this.ctx.moveTo(x, y - fontSize);
+            this.ctx.lineTo(x + currentUsedWidth, y - fontSize);
+            textDecoration = {
+              moveTo: [x, y - fontSize],
+              lineTo: [x + currentUsedWidth, y - fontSize],
+            };
+          }
+          if (/\bline-through\b/.test(subView.css.textDecoration)) {
+            this.ctx.moveTo(x, y - fontSize / 3);
+            this.ctx.lineTo(x + currentUsedWidth, y - fontSize / 3);
+            textDecoration = {
+              moveTo: [x, y - fontSize / 3],
+              lineTo: [x + currentUsedWidth, y - fontSize / 3],
+            };
+          }
+          this.ctx.closePath();
+          this.ctx.strokeStyle = subView.css.color;
+          this.ctx.stroke();
+        }
+
+        // 重置数据
+        start = alreadyCount;
+        leftWidth -= currentUsedWidth;
+        x += currentUsedWidth;
+        // 如果剩余宽度 小于等于0 或者小于一个字的平均宽度，换行
+        if (leftWidth <= 0 || leftWidth < preWidth) {
+          leftWidth = width;
+          x = staticX;
+          lineIndex++;
+        }
+      }
+    }
   }
 
   _fillAbsText(view) {
