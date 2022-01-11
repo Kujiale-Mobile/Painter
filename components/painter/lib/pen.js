@@ -80,12 +80,6 @@ export default class Painter {
       case 'text':
         this._fillAbsText(view);
         break;
-      /**
-       * 新增 type -> inlineText
-       * 
-       * 支持配置字段 textList Array
-       *    子项为 {text: '文本', css: {}} 结构 和之前类似
-       */
       case 'inlineText':
         this._fillAbsInlineText(view);
         break;
@@ -688,6 +682,9 @@ export default class Painter {
         }
       }
     }
+
+    this.ctx.restore();
+    this._doBorder(view, width, height);
   }
 
   _fillAbsText(view) {
