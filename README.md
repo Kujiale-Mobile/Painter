@@ -177,6 +177,7 @@ views: 里面承载子 view
 | ------ | ------- | ------------------------------ | ----------------------------------------------------------------- |
 | image  | url     | 表示图片资源的地址，本地或网络 | 见 image 小节                                                     |
 | text   | text    | 文本的内容                     | 见 text 小节                                                      |
+| inlineText   | textList    | 行内文本数组，用于同行文本部分字体需要特殊样式                    | 见 inlineText 小节                                                      |
 | rect   | 无      | 矩形                           | color: 颜色，支持渐变色                                           |
 | qrcode | content | 画二维码                       | background: 背景颜色（默认为透明色）color: 二维码颜色（默认黑色） |
 
@@ -304,6 +305,14 @@ export default class ImageExample {
 | textAlign      | 文字的对齐方式，分为 left, center, right，view 的对齐方式请看 align 属性 | left                |
 
 当文字设置 width 属性后，则文字布局的最大宽度不会超过该 width 。如果内容超过 width，则会进行换行，如果此时未设置 maxLines 属性，则会把所有内容进行换行处理，行数由内容和 width 决定。如果此时设置了 maxLines 属性，则最大展示所设置的行数，如果还有多余内容未展示出来，则后面会带上 ... 。
+
+#### inlineText
+
+对于同一行文本，部分字体需要特殊样式的需求提供支持，配置格式如下图
+
+![](https://user-images.githubusercontent.com/27180609/148869047-d71499f1-89c6-42cf-88e2-9e7722d9dbd8.png)
+
+相比较于type=`text`类型的View，外层CSS暂不支持配置属性 `maxLines`、`textAlign`，而对于字体的设置属性`fontSize`、`color`、`lineHeight`、`fontWeight`、`textDescoration`、`textStyle` 移入 `textList` 的子项中的css属性配置项里
 
 ##### 自定义字体
 
