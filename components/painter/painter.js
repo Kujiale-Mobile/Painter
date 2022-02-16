@@ -734,13 +734,18 @@ Component({
 
     saveImgToLocal() {
       const that = this;
+      const optionsOf2d = {
+        canvas: that.canvasNode,
+      }
+      const optionsOfOld = {
+        canvasId: 'photo',
+        destWidth: that.canvasWidthInPx,
+        destHeight: that.canvasHeightInPx,
+      }
       setTimeout(() => {
         wx.canvasToTempFilePath(
           {
-            canvasId: 'photo',
-            canvas: that.properties.use2D ? that.canvasNode : null,
-            destWidth: that.canvasWidthInPx,
-            destHeight: that.canvasHeightInPx,
+            ...(that.properties.use2D ? optionsOf2d : optionsOfOld),
             success: function (res) {
               that.getImageInfo(res.tempFilePath);
             },
