@@ -4,7 +4,7 @@ function isValidUrl(url) {
 }
 
 function isOnlineUrl(url) {
-  return /(ht|f)tp(s?):\/\/([^ \\/]*\.)+[^ \\/]*(:[0-9]+)?\/?/.test(url)
+  return /((ht|f)tp(s?)|cloud):\/\/([^ \\/]*\.)+[^ \\/]*(:[0-9]+)?\/?/.test(url)
 }
 
 function isDataUrl(url) {
