@@ -1,40 +1,45 @@
 const QR = require('./qrcode.js');
 const GD = require('./gradient.js');
+require('./string-polyfill.js');
 
+export const penCache = {
+  // 用于存储带 id 的 view 的 rect 信息
+  viewRect: {},
+  textLines: {},
+};
+export const clearPenCache = id => {
+  if (id) {
+    penCache.viewRect[id] = null;
+    penCache.textLines[id] = null;
+  } else {
+    penCache.viewRect = {};
+    penCache.textLines = {};
+  }
+};
 export default class Painter {
   constructor(ctx, data) {
     this.ctx = ctx;
     this.data = data;
-    this.globalWidth = {};
-    this.globalHeight = {};
   }
 
-  isMoving = false
-  movingCache = {}
-  paint(callback, isMoving, movingCache) {
+  paint(callback) {
     this.style = {
       width: this.data.width.toPx(),
       height: this.data.height.toPx(),
     };
-    if (isMoving) {
-      this.isMoving = true
-      this.movingCache = movingCache
-    }
+
     this._background();
     for (const view of this.data.views) {
       this._drawAbsolute(view);
     }
     this.ctx.draw(false, () => {
-      callback && callback(this.callbackInfo);
+      callback && callback();
     });
   }
 
   _background() {
     this.ctx.save();
-    const {
-      width,
-      height,
-    } = this.style;
+    const { width, height } = this.style;
     const bg = this.data.background;
     this.ctx.translate(width / 2, height / 2);
 
@@ -60,7 +65,7 @@ export default class Painter {
   _drawAbsolute(view) {
     if (!(view && view.type)) {
       // 过滤无效 view
-      return
+      return;
     }
     // 证明 css 为数组形式，需要合并
     if (view.css && view.css.length) {
@@ -74,6 +79,9 @@ export default class Painter {
       case 'text':
         this._fillAbsText(view);
         break;
+      case 'inlineText':
+        this._fillAbsInlineText(view);
+        break;
       case 'rect':
         this._drawAbsRect(view);
         break;
@@ -85,20 +93,14 @@ export default class Painter {
     }
   }
 
-  _border({
-    borderRadius = 0,
-    width,
-    height,
-    borderWidth = 0,
-    borderStyle = 'solid'
-  }) {
+  _border({ borderRadius = 0, width, height, borderWidth = 0, borderStyle = 'solid' }) {
     let r1 = 0,
       r2 = 0,
       r3 = 0,
-      r4 = 0
+      r4 = 0;
     const minSize = Math.min(width, height);
     if (borderRadius) {
-      const border = borderRadius.split(/\s+/)
+      const border = borderRadius.split(/\s+/);
       if (border.length === 4) {
         r1 = Math.min(border[0].toPx(false, minSize), width / 2, height / 2);
         r2 = Math.min(border[1].toPx(false, minSize), width / 2, height / 2);
@@ -111,30 +113,42 @@ export default class Painter {
     const lineWidth = borderWidth && borderWidth.toPx(false, minSize);
     this.ctx.lineWidth = lineWidth;
     if (borderStyle === 'dashed') {
-      this.ctx.setLineDash([lineWidth * 4 / 3, lineWidth * 4 / 3]);
+      this.ctx.setLineDash([(lineWidth * 4) / 3, (lineWidth * 4) / 3]);
       // this.ctx.lineDashOffset = 2 * lineWidth
     } else if (borderStyle === 'dotted') {
       this.ctx.setLineDash([lineWidth, lineWidth]);
     }
-    const notSolid = borderStyle !== 'solid'
+    const notSolid = borderStyle !== 'solid';
     this.ctx.beginPath();
 
-    notSolid && r1 === 0 && this.ctx.moveTo(-width / 2 - lineWidth, -height / 2 - lineWidth / 2) // 顶边虚线规避重叠规则
+    notSolid && r1 === 0 && this.ctx.moveTo(-width / 2 - lineWidth, -height / 2 - lineWidth / 2); // 顶边虚线规避重叠规则
     r1 !== 0 && this.ctx.arc(-width / 2 + r1, -height / 2 + r1, r1 + lineWidth / 2, 1 * Math.PI, 1.5 * Math.PI); //左上角圆弧
-    this.ctx.lineTo(r2 === 0 ? notSolid ? width / 2 : width / 2 + lineWidth / 2 : width / 2 - r2, -height / 2 - lineWidth / 2); // 顶边线
+    this.ctx.lineTo(
+      r2 === 0 ? (notSolid ? width / 2 : width / 2 + lineWidth / 2) : width / 2 - r2,
+      -height / 2 - lineWidth / 2,
+    ); // 顶边线
 
-    notSolid && r2 === 0 && this.ctx.moveTo(width / 2 + lineWidth / 2, -height / 2 - lineWidth) // 右边虚线规避重叠规则
+    notSolid && r2 === 0 && this.ctx.moveTo(width / 2 + lineWidth / 2, -height / 2 - lineWidth); // 右边虚线规避重叠规则
     r2 !== 0 && this.ctx.arc(width / 2 - r2, -height / 2 + r2, r2 + lineWidth / 2, 1.5 * Math.PI, 2 * Math.PI); // 右上角圆弧
-    this.ctx.lineTo(width / 2 + lineWidth / 2, r3 === 0 ? notSolid ? height / 2 : height / 2 + lineWidth / 2 : height / 2 - r3); // 右边线
+    this.ctx.lineTo(
+      width / 2 + lineWidth / 2,
+      r3 === 0 ? (notSolid ? height / 2 : height / 2 + lineWidth / 2) : height / 2 - r3,
+    ); // 右边线
 
-    notSolid && r3 === 0 && this.ctx.moveTo(width / 2 + lineWidth, height / 2 + lineWidth / 2) // 底边虚线规避重叠规则
+    notSolid && r3 === 0 && this.ctx.moveTo(width / 2 + lineWidth, height / 2 + lineWidth / 2); // 底边虚线规避重叠规则
     r3 !== 0 && this.ctx.arc(width / 2 - r3, height / 2 - r3, r3 + lineWidth / 2, 0, 0.5 * Math.PI); // 右下角圆弧
-    this.ctx.lineTo(r4 === 0 ? notSolid ? -width / 2 : -width / 2 - lineWidth / 2 : -width / 2 + r4, height / 2 + lineWidth / 2); // 底边线
+    this.ctx.lineTo(
+      r4 === 0 ? (notSolid ? -width / 2 : -width / 2 - lineWidth / 2) : -width / 2 + r4,
+      height / 2 + lineWidth / 2,
+    ); // 底边线
 
-    notSolid && r4 === 0 && this.ctx.moveTo(-width / 2 - lineWidth / 2, height / 2 + lineWidth) // 左边虚线规避重叠规则
+    notSolid && r4 === 0 && this.ctx.moveTo(-width / 2 - lineWidth / 2, height / 2 + lineWidth); // 左边虚线规避重叠规则
     r4 !== 0 && this.ctx.arc(-width / 2 + r4, height / 2 - r4, r4 + lineWidth / 2, 0.5 * Math.PI, 1 * Math.PI); // 左下角圆弧
-    this.ctx.lineTo(-width / 2 - lineWidth / 2, r1 === 0 ? notSolid ? -height / 2 : -height / 2 - lineWidth / 2 : -height / 2 + r1); // 左边线
-    notSolid && r1 === 0 && this.ctx.moveTo(-width / 2 - lineWidth, -height / 2 - lineWidth / 2) // 顶边虚线规避重叠规则
+    this.ctx.lineTo(
+      -width / 2 - lineWidth / 2,
+      r1 === 0 ? (notSolid ? -height / 2 : -height / 2 - lineWidth / 2) : -height / 2 + r1,
+    ); // 左边线
+    notSolid && r1 === 0 && this.ctx.moveTo(-width / 2 - lineWidth, -height / 2 - lineWidth / 2); // 顶边虚线规避重叠规则
 
     if (!notSolid) {
       this.ctx.closePath();
@@ -154,13 +168,11 @@ export default class Painter {
         borderRadius,
         width,
         height,
-        borderStyle
-      })
+        borderStyle,
+      });
       this.ctx.fill();
       // 在 ios 的 6.6.6 版本上 clip 有 bug，禁掉此类型上的 clip，也就意味着，在此版本微信的 ios 设备下无法使用 border 属性
-      if (!(getApp().systemInfo &&
-          getApp().systemInfo.version <= '6.6.6' &&
-          getApp().systemInfo.platform === 'ios')) {
+      if (!(getApp().systemInfo && getApp().systemInfo.version <= '6.6.6' && getApp().systemInfo.platform === 'ios')) {
         this.ctx.clip();
       }
       this.ctx.globalAlpha = 1;
@@ -174,25 +186,20 @@ export default class Painter {
     if (!view.css) {
       return;
     }
-    const {
-      borderRadius,
-      borderWidth,
-      borderColor,
-      borderStyle
-    } = view.css;
+    const { borderRadius, borderWidth, borderColor, borderStyle } = view.css;
     if (!borderWidth) {
       return;
     }
     this.ctx.save();
     this._preProcess(view, true);
-    this.ctx.strokeStyle = (borderColor || 'black');
+    this.ctx.strokeStyle = borderColor || 'black';
     this._border({
       borderRadius,
       width,
       height,
       borderWidth,
-      borderStyle
-    })
+      borderStyle,
+    });
     this.ctx.stroke();
     this.ctx.restore();
   }
@@ -203,27 +210,67 @@ export default class Painter {
     let extra;
     const paddings = this._doPaddings(view);
     switch (view.type) {
+      case 'inlineText': {
+        {
+          // 计算行数
+          let lines = 0;
+          // 文字总长度
+          let textLength = 0;
+          // 行高
+          let lineHeight = 0;
+          const textList = view.textList || [];
+          for (let i = 0; i < textList.length; i++) {
+            let subView = textList[i];
+            const fontWeight = subView.css.fontWeight || '400';
+            const textStyle = subView.css.textStyle || 'normal';
+            if (!subView.css.fontSize) {
+              subView.css.fontSize = '20rpx';
+            }
+            this.ctx.font = `${textStyle} ${fontWeight} ${subView.css.fontSize.toPx()}px "${subView.css.fontFamily || 'sans-serif'}"`;
+            textLength += this.ctx.measureText(subView.text).width;
+            let tempLineHeight = subView.css.lineHeight ? subView.css.lineHeight.toPx() : subView.css.fontSize.toPx();
+            lineHeight = Math.max(lineHeight, tempLineHeight);
+          }
+          width = view.css.width ? view.css.width.toPx(false, this.style.width) - paddings[1] - paddings[3] : textLength;;
+          const calLines = Math.ceil(textLength / width);
+
+          lines += calLines;
+          // lines = view.css.maxLines < lines ? view.css.maxLines : lines;
+          height = lineHeight * lines;
+          extra = {
+            lines: lines,
+            lineHeight: lineHeight,
+            // textArray: textArray,
+            // linesArray: linesArray,
+          };
+        }
+        break;
+      }
       case 'text': {
-        const textArray = view.text.split('\n');
+        const textArray = String(view.text).split('\n');
         // 处理多个连续的'\n'
         for (let i = 0; i < textArray.length; ++i) {
           if (textArray[i] === '') {
             textArray[i] = ' ';
           }
         }
-        const fontWeight = view.css.fontWeight === 'bold' ? 'bold' : 'normal';
-        const textStyle = view.css.textStyle === 'italic' ? 'italic' : 'normal';
+        const fontWeight = view.css.fontWeight || '400';
+        const textStyle = view.css.textStyle || 'normal';
         if (!view.css.fontSize) {
           view.css.fontSize = '20rpx';
         }
-        this.ctx.font = `${textStyle} ${fontWeight} ${view.css.fontSize.toPx()}px "${view.css.fontFamily || 'sans-serif'}"`;
+        this.ctx.font = `${textStyle} ${fontWeight} ${view.css.fontSize.toPx()}px "${
+          view.css.fontFamily || 'sans-serif'
+        }"`;
         // 计算行数
         let lines = 0;
         const linesArray = [];
         for (let i = 0; i < textArray.length; ++i) {
           const textLength = this.ctx.measureText(textArray[i]).width;
           const minWidth = view.css.fontSize.toPx() + paddings[1] + paddings[3];
-          let partWidth = view.css.width ? view.css.width.toPx(false, this.style.width) - paddings[1] - paddings[3] : textLength;
+          let partWidth = view.css.width
+            ? view.css.width.toPx(false, this.style.width) - paddings[1] - paddings[3]
+            : textLength;
           if (partWidth < minWidth) {
             partWidth = minWidth;
           }
@@ -261,10 +308,10 @@ export default class Painter {
           height = Math.round(view.sHeight / ratio);
         } else if (view.css.width === 'auto') {
           height = view.css.height.toPx(false, this.style.height);
-          width = view.sWidth / view.sHeight * height;
+          width = (view.sWidth / view.sHeight) * height;
         } else if (view.css.height === 'auto') {
           width = view.css.width.toPx(false, this.style.width);
-          height = view.sHeight / view.sWidth * width;
+          height = (view.sHeight / view.sWidth) * width;
         } else {
           width = view.css.width.toPx(false, this.style.width);
           height = view.css.height.toPx(false, this.style.height);
@@ -288,14 +335,17 @@ export default class Painter {
         // 可以用数组方式，把文字长度计算进去
         // [right, 文字id, 乘数（默认 1）]
         const rights = view.css.right;
-        x = this.style.width - rights[0].toPx(true, this.style.width) - this.globalWidth[rights[1]] * (rights[2] || 1);
+        x =
+          this.style.width -
+          rights[0].toPx(true, this.style.width) -
+          penCache.viewRect[rights[1]].width * (rights[2] || 1);
       }
     } else if (view.css && view.css.left) {
       if (typeof view.css.left === 'string') {
         x = view.css.left.toPx(true, this.style.width);
       } else {
         const lefts = view.css.left;
-        x = lefts[0].toPx(true, this.style.width) + this.globalWidth[lefts[1]] * (lefts[2] || 1);
+        x = lefts[0].toPx(true, this.style.width) + penCache.viewRect[lefts[1]].width * (lefts[2] || 1);
       }
     } else {
       x = 0;
@@ -310,16 +360,16 @@ export default class Painter {
           y = view.css.top.toPx(true, this.style.height);
         } else {
           const tops = view.css.top;
-          y = tops[0].toPx(true, this.style.height) + this.globalHeight[tops[1]] * (tops[2] || 1);
+          y = tops[0].toPx(true, this.style.height) + penCache.viewRect[tops[1]].height * (tops[2] || 1);
         }
       } else {
-        y = 0
+        y = 0;
       }
     }
 
     const angle = view.css && view.css.rotate ? this._getAngle(view.css.rotate) : 0;
     // 当设置了 right 时，默认 align 用 right，反之用 left
-    const align = view.css && view.css.align ? view.css.align : (view.css && view.css.right ? 'right' : 'left');
+    const align = view.css && view.css.align ? view.css.align : view.css && view.css.right ? 'right' : 'left';
     const verticalAlign = view.css && view.css.verticalAlign ? view.css.verticalAlign : 'top';
     // 记录绘制时的画布
     let xa = 0;
@@ -350,17 +400,17 @@ export default class Painter {
     // 记录该 view 的有效点击区域
     // TODO ，旋转和裁剪的判断
     // 记录在真实画布上的左侧
-    let left = x
+    let left = x;
     if (align === 'center') {
-      left = x - width / 2
+      left = x - width / 2;
     } else if (align === 'right') {
-      left = x - width
+      left = x - width;
     }
     var top = y;
     if (verticalAlign === 'center') {
       top = y - height / 2;
     } else if (verticalAlign === 'bottom') {
-      top = y - height
+      top = y - height;
     }
     if (view.rect) {
       view.rect.left = left;
@@ -376,7 +426,7 @@ export default class Painter {
         right: left + width,
         bottom: top + height,
         x: view.css && view.css.right ? x - width : x,
-        y: y
+        y: y,
       };
     }
 
@@ -394,8 +444,14 @@ export default class Painter {
     }
     this._doShadow(view);
     if (view.id) {
-      this.globalWidth[view.id] = width;
-      this.globalHeight[view.id] = height;
+      penCache.viewRect[view.id] = {
+        width,
+        height,
+        left: view.rect.left,
+        top: view.rect.top,
+        right: view.rect.right,
+        bottom: view.rect.bottom,
+      };
     }
     return {
       width: width,
@@ -407,9 +463,7 @@ export default class Painter {
   }
 
   _doPaddings(view) {
-    const {
-      padding,
-    } = view.css;
+    const { padding } = view.css ? view.css : {};
     let pd = [0, 0, 0, 0];
     if (padding) {
       const pdg = padding.split(/\s+/);
@@ -442,19 +496,14 @@ export default class Painter {
   // 画文字的背景图片
   _doBackground(view) {
     this.ctx.save();
-    const {
-      width: rawWidth,
-      height: rawHeight,
-    } = this._preProcess(view, true);
+    const { width: rawWidth, height: rawHeight } = this._preProcess(view, true);
 
-    const {
-      background,
-    } = view.css;
+    const { background } = view.css;
     let pd = this._doPaddings(view);
     const width = rawWidth + pd[1] + pd[3];
     const height = rawHeight + pd[0] + pd[2];
 
-    this._doClip(view.css.borderRadius, width, height, view.css.borderStyle)
+    this._doClip(view.css.borderRadius, width, height, view.css.borderStyle);
     if (GD.api.isGradient(background)) {
       GD.api.doGradient(background, width, height, this.ctx);
     } else {
@@ -467,10 +516,7 @@ export default class Painter {
 
   _drawQRCode(view) {
     this.ctx.save();
-    const {
-      width,
-      height,
-    } = this._preProcess(view);
+    const { width, height } = this._preProcess(view);
     QR.api.draw(view.content, this.ctx, -width / 2, -height / 2, width, height, view.css.background, view.css.color);
     this.ctx.restore();
     this._doBorder(view, width, height);
@@ -481,10 +527,7 @@ export default class Painter {
       return;
     }
     this.ctx.save();
-    const {
-      width,
-      height,
-    } = this._preProcess(view);
+    const { width, height } = this._preProcess(view);
     // 获得缩放到图片大小级别的裁减框
     let rWidth = view.sWidth;
     let rHeight = view.sHeight;
@@ -513,8 +556,136 @@ export default class Painter {
     this.ctx.restore();
     this._doBorder(view, width, height);
   }
+  /**
+   * 
+   * @param {*} view 
+   * @description 一行内文字多样式的方法
+   * 
+   * 暂不支持配置 text-align，默认left
+   * 暂不支持配置 maxLines
+   */
+  _fillAbsInlineText(view) {
+    if (!view.textList) {
+      return;
+    }
+    if (view.css.background) {
+      // 生成背景
+      this._doBackground(view);
+    }
+    this.ctx.save();
+    const { width, height, extra } = this._preProcess(view, view.css.background && view.css.borderRadius);
+    const { lines, lineHeight } = extra;
+    let staticX = -(width / 2);
+    let lineIndex = 0; // 第几行
+    let x = staticX; // 开始x位置
+    let leftWidth = width; // 当前行剩余多少宽度可以使用
 
-  callbackInfo = {}
+    let getStyle = css => {
+      const fontWeight = css.fontWeight || '400';
+      const textStyle = css.textStyle || 'normal';
+      if (!css.fontSize) {
+        css.fontSize = '20rpx';
+      }
+      return `${textStyle} ${fontWeight} ${css.fontSize.toPx()}px "${css.fontFamily || 'sans-serif'}"`;
+    }
+
+    // 遍历行内的文字数组
+    for (let j = 0; j < view.textList.length; j++) {
+      const subView = view.textList[j];
+
+      // 某个文字开始位置
+      let start = 0;
+      // 文字已使用的数量
+      let alreadyCount = 0;
+      // 文字总长度
+      let textLength = subView.text.length;
+      // 文字总宽度
+      let textWidth = this.ctx.measureText(subView.text).width;
+      // 每个文字的平均宽度
+      let preWidth = Math.ceil(textWidth / textLength);
+
+      // 循环写文字
+      while (alreadyCount < textLength) {
+        // alreadyCount - start + 1 -> 当前摘取出来的文字
+        // 比较可用宽度，寻找最大可写文字长度
+        while ((alreadyCount - start + 1) * preWidth < leftWidth && alreadyCount < textLength) {
+          alreadyCount++;
+        }
+
+        // 取出文字
+        let text = subView.text.substr(start, alreadyCount - start);
+
+        const y = -(height / 2) + subView.css.fontSize.toPx() + lineIndex * lineHeight;
+
+        // 设置文字样式
+        this.ctx.font = getStyle(subView.css);
+
+        this.ctx.fillStyle = subView.css.color || 'black';
+        this.ctx.textAlign = 'left';
+
+        // 执行画布操作
+        if (subView.css.textStyle === 'stroke') {
+          this.ctx.strokeText(text, x, y);
+        } else {
+          this.ctx.fillText(text, x, y);
+        }
+
+        // 当次已使用宽度
+        let currentUsedWidth = this.ctx.measureText(text).width;
+
+        const fontSize = subView.css.fontSize.toPx();
+
+        // 画 textDecoration
+        let textDecoration;
+        if (subView.css.textDecoration) {
+          this.ctx.lineWidth = fontSize / 13;
+          this.ctx.beginPath();
+          if (/\bunderline\b/.test(subView.css.textDecoration)) {
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(x + currentUsedWidth, y);
+            textDecoration = {
+              moveTo: [x, y],
+              lineTo: [x + currentUsedWidth, y],
+            };
+          }
+          if (/\boverline\b/.test(subView.css.textDecoration)) {
+            this.ctx.moveTo(x, y - fontSize);
+            this.ctx.lineTo(x + currentUsedWidth, y - fontSize);
+            textDecoration = {
+              moveTo: [x, y - fontSize],
+              lineTo: [x + currentUsedWidth, y - fontSize],
+            };
+          }
+          if (/\bline-through\b/.test(subView.css.textDecoration)) {
+            this.ctx.moveTo(x, y - fontSize / 3);
+            this.ctx.lineTo(x + currentUsedWidth, y - fontSize / 3);
+            textDecoration = {
+              moveTo: [x, y - fontSize / 3],
+              lineTo: [x + currentUsedWidth, y - fontSize / 3],
+            };
+          }
+          this.ctx.closePath();
+          this.ctx.strokeStyle = subView.css.color;
+          this.ctx.stroke();
+        }
+
+        // 重置数据
+        start = alreadyCount;
+        leftWidth -= currentUsedWidth;
+        x += currentUsedWidth;
+        // 如果剩余宽度 小于等于0 或者小于一个字的平均宽度，换行
+        if (leftWidth <= 0 || leftWidth < preWidth) {
+          leftWidth = width;
+          x = staticX;
+          lineIndex++;
+        }
+      }
+    }
+
+    this.ctx.restore();
+    this._doBorder(view, width, height);
+  }
+
   _fillAbsText(view) {
     if (!view.text) {
       return;
@@ -524,23 +695,12 @@ export default class Painter {
       this._doBackground(view);
     }
     this.ctx.save();
-    const {
-      width,
-      height,
-      extra,
-    } = this._preProcess(view, view.css.background && view.css.borderRadius);
-    this.ctx.fillStyle = (view.css.color || 'black');
-    if (this.isMoving && JSON.stringify(this.movingCache) !== JSON.stringify({})) {
-      this.globalWidth[view.id] = this.movingCache.globalWidth
+    const { width, height, extra } = this._preProcess(view, view.css.background && view.css.borderRadius);
+    this.ctx.fillStyle = view.css.color || 'black';
+    if (view.id && penCache.textLines[view.id]) {
       this.ctx.textAlign = view.css.textAlign ? view.css.textAlign : 'left';
-      for (const i of this.movingCache.lineArray) {
-        const {
-          measuredWith,
-          text,
-          x,
-          y,
-          textDecoration
-        } = i
+      for (const i of penCache.textLines[view.id]) {
+        const { measuredWith, text, x, y, textDecoration } = i;
         if (view.css.textStyle === 'stroke') {
           this.ctx.strokeText(text, x, y, measuredWith);
         } else {
@@ -558,25 +718,15 @@ export default class Painter {
         }
       }
     } else {
-      const {
-        lines,
-        lineHeight,
-        textArray,
-        linesArray,
-      } = extra;
+      const { lines, lineHeight, textArray, linesArray } = extra;
       // 如果设置了id，则保留 text 的长度
       if (view.id) {
         let textWidth = 0;
         for (let i = 0; i < textArray.length; ++i) {
-          const _w = this.ctx.measureText(textArray[i]).width
+          const _w = this.ctx.measureText(textArray[i]).width;
           textWidth = _w > textWidth ? _w : textWidth;
         }
-        this.globalWidth[view.id] = width ? (textWidth < width ? textWidth : width) : textWidth;
-        if (!this.isMoving) {
-          Object.assign(this.callbackInfo, {
-            globalWidth: this.globalWidth[view.id]
-          })
-        }
+        penCache.viewRect[view.id].width = width ? (textWidth < width ? textWidth : width) : textWidth;
       }
       let lineIndex = 0;
       for (let j = 0; j < textArray.length; ++j) {
@@ -594,7 +744,10 @@ export default class Painter {
           let measuredWith = this.ctx.measureText(text).width;
           // 如果测量大小小于width一个字符的大小，则进行补齐，如果测量大小超出 width，则进行减除
           // 如果已经到文本末尾，也不要进行该循环
-          while ((start + alreadyCount <= textArray[j].length) && (width - measuredWith > view.css.fontSize.toPx() || measuredWith - width > view.css.fontSize.toPx())) {
+          while (
+            start + alreadyCount <= textArray[j].length &&
+            (width - measuredWith > view.css.fontSize.toPx() || measuredWith - width > view.css.fontSize.toPx())
+          ) {
             if (measuredWith < width) {
               text = textArray[j].substr(start, ++alreadyCount);
             } else {
@@ -607,7 +760,7 @@ export default class Painter {
             }
             measuredWith = this.ctx.measureText(text).width;
           }
-          start += text.length
+          start += text.length;
           // 如果是最后一行了，发现还有未绘制完的内容，则加...
           if (lineIndex === lines - 1 && (j < textArray.length - 1 || start < textArray[j].length)) {
             while (this.ctx.measureText(`${text}...`).width > width) {
@@ -629,7 +782,7 @@ export default class Painter {
               lineX = x - measuredWith / 2;
               break;
             case 'right':
-              x = (width / 2);
+              x = width / 2;
               lineX = x - measuredWith;
               break;
             default:
@@ -637,7 +790,10 @@ export default class Painter {
               lineX = x;
               break;
           }
-          const y = -(height / 2) + (lineIndex === 0 ? view.css.fontSize.toPx() : (view.css.fontSize.toPx() + lineIndex * lineHeight));
+
+          const y =
+            -(height / 2) +
+            (lineIndex === 0 ? view.css.fontSize.toPx() : view.css.fontSize.toPx() + lineIndex * lineHeight);
           lineIndex++;
           if (view.css.textStyle === 'stroke') {
             this.ctx.strokeText(text, x, y, measuredWith);
@@ -654,43 +810,47 @@ export default class Painter {
               this.ctx.lineTo(lineX + measuredWith, y);
               textDecoration = {
                 moveTo: [lineX, y],
-                lineTo: [lineX + measuredWith, y]
-              }
+                lineTo: [lineX + measuredWith, y],
+              };
             }
             if (/\boverline\b/.test(view.css.textDecoration)) {
               this.ctx.moveTo(lineX, y - fontSize);
               this.ctx.lineTo(lineX + measuredWith, y - fontSize);
               textDecoration = {
                 moveTo: [lineX, y - fontSize],
-                lineTo: [lineX + measuredWith, y - fontSize]
-              }
+                lineTo: [lineX + measuredWith, y - fontSize],
+              };
             }
             if (/\bline-through\b/.test(view.css.textDecoration)) {
               this.ctx.moveTo(lineX, y - fontSize / 3);
               this.ctx.lineTo(lineX + measuredWith, y - fontSize / 3);
               textDecoration = {
                 moveTo: [lineX, y - fontSize / 3],
-                lineTo: [lineX + measuredWith, y - fontSize / 3]
-              }
+                lineTo: [lineX + measuredWith, y - fontSize / 3],
+              };
             }
             this.ctx.closePath();
             this.ctx.strokeStyle = view.css.color;
             this.ctx.stroke();
           }
-          if (!this.isMoving) {
-            this.callbackInfo.lineArray ? this.callbackInfo.lineArray.push({
-              text,
-              x,
-              y,
-              measuredWith,
-              textDecoration
-            }) : this.callbackInfo.lineArray = [{
-              text,
-              x,
-              y,
-              measuredWith,
-              textDecoration
-            }]
+          if (view.id) {
+            penCache.textLines[view.id]
+              ? penCache.textLines[view.id].push({
+                  text,
+                  x,
+                  y,
+                  measuredWith,
+                  textDecoration,
+                })
+              : (penCache.textLines[view.id] = [
+                  {
+                    text,
+                    x,
+                    y,
+                    measuredWith,
+                    textDecoration,
+                  },
+                ]);
           }
         }
       }
@@ -701,27 +861,20 @@ export default class Painter {
 
   _drawAbsRect(view) {
     this.ctx.save();
-    const {
-      width,
-      height,
-    } = this._preProcess(view);
+    const { width, height } = this._preProcess(view);
     if (GD.api.isGradient(view.css.color)) {
       GD.api.doGradient(view.css.color, width, height, this.ctx);
     } else {
       this.ctx.fillStyle = view.css.color;
     }
-    const {
-      borderRadius,
-      borderStyle,
-      borderWidth
-    } = view.css
+    const { borderRadius, borderStyle, borderWidth } = view.css;
     this._border({
       borderRadius,
       width,
       height,
       borderWidth,
-      borderStyle
-    })
+      borderStyle,
+    });
     this.ctx.fill();
     this.ctx.restore();
     this._doBorder(view, width, height);
@@ -735,7 +888,7 @@ export default class Painter {
     }
     const box = view.css.shadow.replace(/,\s+/g, ',').split(/\s+/);
     if (box.length > 4) {
-      console.error('shadow don\'t spread option');
+      console.error("shadow don't spread option");
       return;
     }
     this.ctx.shadowOffsetX = parseInt(box[0], 10);
@@ -745,6 +898,6 @@ export default class Painter {
   }
 
   _getAngle(angle) {
-    return Number(angle) * Math.PI / 180;
+    return (Number(angle) * Math.PI) / 180;
   }
 }

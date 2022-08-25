@@ -1,6 +1,14 @@
 
 function isValidUrl(url) {
-  return /(ht|f)tp(s?):\/\/([^ \\/]*\.)+[^ \\/]*(:[0-9]+)?\/?/.test(url);
+  return isOnlineUrl(url) || isDataUrl(url);
+}
+
+function isOnlineUrl(url) {
+  return /((ht|f)tp(s?)|cloud):\/\/([^ \\/]*\.)+[^ \\/]*(:[0-9]+)?\/?/.test(url)
+}
+
+function isDataUrl(url) {
+  return /data:image\/(\w+);base64,(.*)/.test(url);
 }
 
 /**
@@ -63,6 +71,8 @@ function equal(a, b) {
 
 module.exports = {
   isValidUrl,
+  isOnlineUrl,
+  isDataUrl,
   equal
 };
 

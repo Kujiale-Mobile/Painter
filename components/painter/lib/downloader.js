@@ -3,6 +3,7 @@
  * 详细设计文档可查看 https://juejin.im/post/5b42d3ede51d4519277b6ce3
  */
 const util = require('./util');
+const sha1 = require('./sha1');
 
 const SAVED_FILES_KEY = 'savedFiles';
 const KEY_TOTAL_SIZE = 'totalSize';
@@ -40,57 +41,145 @@ export default class Dowloader {
         resolve(url);
         return;
       }
+      const fileName = getFileName(url);
       if (!lru) {
         // 无 lru 情况下直接判断 临时文件是否存在，不存在重新下载
         wx.getFileInfo({
-          filePath: url,
+          filePath: fileName,
           success: () => {
             resolve(url);
           },
           fail: () => {
-            downloadFile(url, lru).then((path) => {
-              resolve(path);
-            }, () => {
-              reject();
-            });
+            if (util.isOnlineUrl(url)) {
+              downloadFile(url, lru).then((path) => {
+                resolve(path);
+              }, () => {
+                reject();
+              });
+            } else if (util.isDataUrl(url)) {
+              transformBase64File(url, lru).then(path => {
+                resolve(path);
+              }, () => {
+                reject();
+              });
+            }
           },
         })
         return
       }
 
-      const file = getFile(url);
+      const file = getFile(fileName);
 
       if (file) {
-        // 检查文件是否正常，不正常需要重新下载
-        wx.getSavedFileInfo({
-          filePath: file[KEY_PATH],
-          success: (res) => {
-            resolve(file[KEY_PATH]);
-          },
-          fail: (error) => {
-            console.error(`the file is broken, redownload it, ${JSON.stringify(error)}`);
-            downloadFile(url, lru).then((path) => {
-              resolve(path);
-            }, () => {
-              reject();
-            });
-          },
-        });
+        if (file[KEY_PATH].indexOf('//usr/') !== -1) {
+          wx.getFileInfo({
+            filePath: file[KEY_PATH],
+            success() {
+              resolve(file[KEY_PATH]);
+            },
+            fail(error) {
+              console.error(`base64 file broken, ${JSON.stringify(error)}`);
+              transformBase64File(url, lru).then(path => {
+                resolve(path);
+              }, () => {
+                reject();
+              });
+            }
+          })
+        } else {
+          // 检查文件是否正常，不正常需要重新下载
+          wx.getSavedFileInfo({
+            filePath: file[KEY_PATH],
+            success: (res) => {
+              resolve(file[KEY_PATH]);
+            },
+            fail: (error) => {
+              console.error(`the file is broken, redownload it, ${JSON.stringify(error)}`);
+              downloadFile(url, lru).then((path) => {
+                resolve(path);
+              }, () => {
+                reject();
+              });
+            },
+          });
+        }
       } else {
-        downloadFile(url, lru).then((path) => {
-          resolve(path);
-        }, () => {
-          reject();
-        });
+        if (util.isOnlineUrl(url)) {
+          downloadFile(url, lru).then((path) => {
+            resolve(path);
+          }, () => {
+            reject();
+          });
+        } else if (util.isDataUrl(url)) {
+          transformBase64File(url, lru).then(path => {
+            resolve(path);
+          }, () => {
+            reject();
+          });
+        }
       }
     });
   }
 }
 
+function getFileName(url) {
+  if (util.isDataUrl(url)) { 
+    const [, format, bodyData] = /data:image\/(\w+);base64,(.*)/.exec(url) || [];
+    const fileName = `${sha1.hex_sha1(bodyData)}.${format}`;
+    return fileName;
+  } else {
+    return url;
+  }
+}
+
+function transformBase64File(base64data, lru) {
+  return new Promise((resolve, reject) => {
+    const [, format, bodyData] = /data:image\/(\w+);base64,(.*)/.exec(base64data) || [];
+    if (!format) {
+      console.error('base parse failed');
+      reject();
+      return;
+    }
+    const fileName = `${sha1.hex_sha1(bodyData)}.${format}`;
+    const path = `${wx.env.USER_DATA_PATH}/${fileName}`;
+    const buffer = wx.base64ToArrayBuffer(bodyData.replace(/[\r\n]/g, ""));
+    wx.getFileSystemManager().writeFile({
+      filePath: path,
+      data: buffer,
+      encoding: 'binary',
+      success() {
+        wx.getFileInfo({
+          filePath: path,
+          success: (tmpRes) => {
+            const newFileSize = tmpRes.size;
+            lru ? doLru(newFileSize).then(() => {
+              saveFile(fileName, newFileSize, path, true).then((filePath) => {
+                resolve(filePath);
+              });
+            }, () => {
+              resolve(path);
+            }) : resolve(path);
+          },
+          fail: (error) => {
+          // 文件大小信息获取失败，则此文件也不要进行存储
+            console.error(`getFileInfo ${path} failed, ${JSON.stringify(error)}`);
+            resolve(path);
+          },
+        });
+      },
+      fail(err) {
+        console.log(err)
+      }
+    })
+  });  
+}
+
 function downloadFile(url, lru) {
   return new Promise((resolve, reject) => {
-    wx.downloadFile({
+    const downloader = url.startsWith('cloud://')?wx.cloud.downloadFile:wx.downloadFile
+    downloader({
       url: url,
+      fileID: url,
       success: function (res) {
         if (res.statusCode !== 200) {
           console.error(`downloadFile ${url} failed res.statusCode is not 200`);
@@ -127,8 +216,22 @@ function downloadFile(url, lru) {
   });
 }
 
-function saveFile(key, newFileSize, tempFilePath) {
+function saveFile(key, newFileSize, tempFilePath, isDataUrl = false) {
   return new Promise((resolve, reject) => {
+    if (isDataUrl) {
+      const totalSize = savedFiles[KEY_TOTAL_SIZE] ? savedFiles[KEY_TOTAL_SIZE] : 0;
+      savedFiles[key] = {};
+      savedFiles[key][KEY_PATH] = tempFilePath;
+      savedFiles[key][KEY_TIME] = new Date().getTime();
+      savedFiles[key][KEY_SIZE] = newFileSize;
+      savedFiles['totalSize'] = newFileSize + totalSize;
+      wx.setStorage({
+        key: SAVED_FILES_KEY,
+        data: savedFiles,
+      });
+      resolve(tempFilePath);
+      return;
+    }
     wx.saveFile({
       tempFilePath: tempFilePath,
       success: (fileRes) => {
@@ -229,12 +332,21 @@ function removeFiles(pathsShouldDelete) {
     if (typeof pathDel === 'object') {
       delPath = pathDel.filePath;
     }
-    wx.removeSavedFile({
-      filePath: delPath,
-      fail: (error) => {
-        console.error(`removeSavedFile ${pathDel} failed, ${JSON.stringify(error)}`);
-      },
-    });
+    if (delPath.indexOf('//usr/') !== -1) {
+      wx.getFileSystemManager().unlink({
+        filePath: delPath,
+        fail(error) {
+          console.error(`removeSavedFile ${pathDel} failed, ${JSON.stringify(error)}`);
+        }
+      })
+    } else {
+      wx.removeSavedFile({
+        filePath: delPath,
+        fail: (error) => {
+          console.error(`removeSavedFile ${pathDel} failed, ${JSON.stringify(error)}`);
+        },
+      });
+    }
   }
 }
 

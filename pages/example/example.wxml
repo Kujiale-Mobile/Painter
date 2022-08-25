@@ -1,19 +1,16 @@
 <view style='position: relative;'>
   <view class="top">
-    <button bind:tap='onRevert'>撤销</button>
-    <button bind:tap='onRecover'>恢复</button>
+    <!-- <button bind:tap='onRevert'>撤销</button>
+    <button bind:tap='onRecover'>恢复</button> -->
     <button bind:tap='saveImage'>保存</button>
   </view>
   <painter 
-    customStyle='margin-left: 40rpx; height: 1000rpx;'
     customActionStyle="{{customActionStyle}}"
-    dancePalette="{{template}}"
     palette="{{paintPallette}}"
-    bind:imgOK="onImgOK" 
+    bind:imgOK="onImgOK"
     bind:touchEnd="touchEnd" 
     action="{{action}}"
-    use2D="{{true}}"
-    />
-  <!-- <image src="{{image}}" style="width: 654rpx; height: 1000rpx; margin-left:40rpx;"/> -->
-  
+    widthPixels="1000"
+  />
+  <image src="{{image}}" style="width: 654rpx; height: 1000rpx; margin-left:40rpx;"/>
 </view>

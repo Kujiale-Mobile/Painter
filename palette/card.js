@@ -22,7 +22,7 @@ export default class LastMayday {
           },
         },
         {
-          id: 'my-text-id',
+          id: 'my_text_id',
           type: 'text',
           text: "fontWeight: 'bold'",
           css: [{
@@ -37,12 +37,12 @@ export default class LastMayday {
             width: '20rpx',
             height: '20rpx',
             color: 'red',
-            left: [`${startTop}rpx`, 'my-text-id'],
+            left: 'calc(my_text_id.right + 20rpx)',
             top: `${startTop + 4 * gapSize + 15}rpx`,
           },
         },
         {
-          id: 'text-id-2',
+          id: 'text_id_2',
           type: 'text',
           text: '我是把width设置为400rpx后，我就换行了xx行了',
           css: [{
@@ -63,7 +63,7 @@ export default class LastMayday {
             height: '20rpx',
             color: 'red',
             left: '200rpx',
-            top: [`${startTop + 5 * gapSize}rpx`, 'text-id-2'],
+            top: 'calc(text_id_2.bottom + 20rpx)',
           },
         },
         {
@@ -110,20 +110,20 @@ export default class LastMayday {
             height: '120rpx',
           },
         },
-        // {
-        //   id: 'rect',
-        //   type: 'rect',
-        //   css: {
-        //     scalable: true,
-        //     bottom: '40rpx',
-        //     right: '40rpx',
-        //     color: 'radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)',
-        //     borderRadius: '20rpx',
-        //     borderWidth: '10rpx',
-        //     width: '120rpx',
-        //     height: '120rpx',
-        //   },
-        // },
+        {
+          id: 'rect',
+          type: 'rect',
+          css: {
+            scalable: true,
+            bottom: '40rpx',
+            right: '40rpx',
+            color: 'radial-gradient(rgba(0, 0, 0, 0) 5%, #0ff 15%, #f0f 60%)',
+            borderRadius: '20rpx',
+            borderWidth: '10rpx',
+            width: '120rpx',
+            height: '120rpx',
+          },
+        },
         {
           type: 'text',
           text: 'borderWidth',

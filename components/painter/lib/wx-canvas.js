@@ -17,7 +17,11 @@ export default class WxCanvas {
   }
 
   set width(w) {
-    if (this.canvasNode) this.canvasNode.width = w;
+    if (this.canvasNode) {
+      this.canvasNode.width = w;
+      // 经测试，在 2d 接口中如果不设置这个值，IOS 端有一定几率会出现图片显示不全的情况。
+      this.canvasNode._width = w;
+    }
   }
 
   get width() {
@@ -26,7 +30,11 @@ export default class WxCanvas {
   }
 
   set height(h) {
-    if (this.canvasNode) this.canvasNode.height = h;
+    if (this.canvasNode) {
+      this.canvasNode.height = h;
+      // 经测试，在 2d 接口中如果不设置这个值，IOS 端有一定几率会出现图片显示不全的情况。
+      this.canvasNode._height = h;
+    }
   }
 
   get height() {
@@ -540,9 +548,9 @@ export default class WxCanvas {
         for (const step of realstepList) {
           this.implementMinaStep(step);
         }
-        this.ctx.draw(reserve, func);
         realstepList.length = 0;
       }
+      this.ctx.draw(reserve, func);
     } else if (this.type === "2d") {
       if (!reserve) {
         this.ctx.clearRect(0, 0, this.canvasNode.width, this.canvasNode.height);

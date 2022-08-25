@@ -18,135 +18,133 @@ Page({
       },
       scale: {
         textIcon: '/palette/switch.png',
-        imageIcon: '/palette/scale.png'
+        imageIcon: '/palette/scale.png',
       },
       delete: {
-        icon: '/palette/close.png'
-      }
-    }
+        icon: '/palette/close.png',
+      },
+    },
   },
 
   onImgOK(e) {
     this.imagePath = e.detail.path;
     this.setData({
-      image: this.imagePath
-    })
+      image: this.imagePath,
+    });
     if (this.isSave) {
       this.saveImage(this.imagePath);
     }
   },
 
   onRevert() {
-    const pre = this.history.pop()
+    const pre = this.history.pop();
     if (!pre) {
-      return
+      return;
     }
-    const needRefresh = pre.index && pre.index >= 0 && pre.index <= this.data.template.views.length
+    const needRefresh = pre.index && pre.index >= 0 && pre.index <= this.data.template.views.length;
     if (needRefresh) {
       if (this.data.template.views[pre.index].id === pre.view.id) {
-        this.data.template.views.splice(pre.index, 1)
+        this.data.template.views.splice(pre.index, 1);
       } else {
-        this.data.template.views.splice(pre.index, 0, pre.view)
+        this.data.template.views.splice(pre.index, 0, pre.view);
       }
-      this.future.push(pre)
+      this.future.push(pre);
     } else {
       for (let i in this.data.template.views) {
         if (this.data.template.views[i].id === pre.view.id) {
-          this.future.push({ view: this.data.template.views[i] })
-          this.data.template.views[i] = pre.view
-          break
+          this.future.push({ view: this.data.template.views[i] });
+          this.data.template.views[i] = pre.view;
+          break;
         }
       }
     }
     const props = {
       paintPallette: this.data.template,
-    }
+    };
     if (needRefresh) {
-      props.template = this.data.template
+      props.template = this.data.template;
     } else {
-      props.action = pre
+      props.action = pre;
     }
-    this.setData(props)
+    this.setData(props);
   },
 
   onRecover() {
-    const fut = this.future.pop()
+    const fut = this.future.pop();
     if (!fut) {
-      return
+      return;
     }
-    const needRefresh = fut.index && fut.index >= 0 && fut.index <= this.data.template.views.length
+    const needRefresh = fut.index && fut.index >= 0 && fut.index <= this.data.template.views.length;
     if (needRefresh) {
       if (this.data.template.views[fut.index].id === fut.view.id) {
-        this.data.template.views.splice(fut.index, 1)
+        this.data.template.views.splice(fut.index, 1);
       } else {
-        this.data.template.views.splice(fut.index, 0, fut.view)
+        this.data.template.views.splice(fut.index, 0, fut.view);
       }
-      this.history.push(fut)
+      this.history.push(fut);
     } else {
       for (let i in this.data.template.views) {
         if (this.data.template.views[i].id === fut.view.id) {
-          this.history.push({ view: this.data.template.views[i] })
-          this.data.template.views[i] = fut.view
-          break
+          this.history.push({ view: this.data.template.views[i] });
+          this.data.template.views[i] = fut.view;
+          break;
         }
       }
     }
     const props = {
       paintPallette: this.data.template,
-    }
+    };
     if (needRefresh) {
-      props.template = this.data.template
+      props.template = this.data.template;
     } else {
-      props.action = fut
+      props.action = fut;
     }
-    this.setData(props)
+    this.setData(props);
   },
 
-  saveImage(imagePath = '') {
-    if (!this.isSave) {
-      this.isSave = true;
-      this.setData({
-        paintPallette: this.data.template,
-      });
-    } else if (imagePath && typeof imagePath === 'string') {
+  saveImage() {
+    if (this.imagePath && typeof this.imagePath === 'string') {
       this.isSave = false;
       wx.saveImageToPhotosAlbum({
-        filePath: imagePath,
+        filePath: this.imagePath,
       });
     }
   },
 
   touchEnd({ detail }) {
-    let needRefresh = detail.index >= 0 && detail.index <= this.data.template.views.length
+    let needRefresh = detail.index >= 0 && detail.index <= this.data.template.views.length;
     if (needRefresh) {
       this.history.push({
-        ...detail
-      })
+        ...detail,
+      });
       if (this.data.template.views[detail.index].id === detail.view.id) {
-        this.data.template.views.splice(detail.index, 1)
+        this.data.template.views.splice(detail.index, 1);
       } else {
-        this.data.template.views.splice(detail.index, 0, detail.view)
+        this.data.template.views.splice(detail.index, 0, detail.view);
       }
     } else {
+      if (!this.data.template || !this.data.template.views) {
+        return;
+      }
       for (let view of this.data.template.views) {
         if (view.id === detail.view.id) {
           this.history.push({
             view: {
               ...detail.view,
-              ...view
-            }
-          })
-          view.css = detail.view.css
-          break
+              ...view,
+            },
+          });
+          view.css = detail.view.css;
+          break;
         }
       }
     }
-    this.future.length = 0
+    this.future.length = 0;
     const props = {
       paintPallette: this.data.template,
-    }
+    };
     if (needRefresh) {
-      props.template = this.data.template
+      props.template = this.data.template;
     }
     this.setData(props);
   },
@@ -154,9 +152,9 @@ Page({
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
-  onReady: function() {
+  onReady: function () {
     this.setData({
-      template: new Card().palette(),
+      paintPallette: new Card().palette(),
     });
   },
 });
