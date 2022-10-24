@@ -615,6 +615,20 @@ export default class Painter {
         // 取出文字
         let text = subView.text.substr(start, alreadyCount - start);
 
+        if (text === "") {
+          // 重置数据
+          start = alreadyCount;
+          leftWidth -= currentUsedWidth;
+          x += currentUsedWidth;
+          // 如果剩余宽度 小于等于0 或者小于一个字的平均宽度，换行
+          if (leftWidth <= 0 || leftWidth < preWidth) {
+            leftWidth = width;
+            x = staticX;
+            lineIndex++;
+          }
+          continue
+        }
+
         const y = -(height / 2) + subView.css.fontSize.toPx() + lineIndex * lineHeight;
 
         // 设置文字样式
