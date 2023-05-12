@@ -107,6 +107,9 @@ Page({
       this.isSave = false;
       wx.saveImageToPhotosAlbum({
         filePath: this.imagePath,
+        success(res){
+          wx.showToast({ title: '保存成功' })
+        }
       });
     }
   },
