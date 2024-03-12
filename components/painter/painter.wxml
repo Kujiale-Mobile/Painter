@@ -16,6 +16,6 @@
       </block>
   </block>
   <block wx:if="{{use2D}}">
-    <canvas type="2d" id="photo" style="{{photoStyle}};" />
+    <canvas type="2d" id="photo" style="{{photoStyle}};" wx:if="{{photoStyle}}" />
   </block>
 </view>

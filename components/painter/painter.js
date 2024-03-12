@@ -102,6 +102,11 @@ Component({
         this.needClear = needClear;
       },
     },
+    //用户自定义传入参数 可传递回调函数等
+    customOpt: {
+      type: Object,
+      value: {},
+    },
   },
 
   data: {
@@ -642,6 +647,7 @@ Component({
       }
       this.setData(
         {
+          // use2d 为true的情况wxml中canvas标签的宽高无法动态设置！这里setData并无法真正的设置成功！请在canvas标签增加wx:if="{{photoStyle}}"
           photoStyle: `width:${this.canvasWidthInPx}px;height:${this.canvasHeightInPx}px;`,
         },
         function () {
@@ -736,12 +742,15 @@ Component({
       const that = this;
       const optionsOf2d = {
         canvas: that.canvasNode,
-      }
+        // 这里使用canvas2d时候，不能再自行设置宽高，会导致图像模糊。真机调试为准！！模拟器有问题！
+        // destWidth: that.canvasWidthInPx,
+        // destHeight: that.canvasHeightInPx,
+      };
       const optionsOfOld = {
         canvasId: 'photo',
         destWidth: that.canvasWidthInPx,
         destHeight: that.canvasHeightInPx,
-      }
+      };
       setTimeout(() => {
         wx.canvasToTempFilePath(
           {
@@ -806,6 +815,12 @@ Component({
             that.triggerEvent('imgOK', {
               path: filePath,
             });
+            // auth: hlr : 在taro 3.4.9 版本 triggerEvent 无法触发回调。只能用这个方式手动传入回调函数，在callback中返回！
+            if (that.properties.customOpt.onImgOK) {
+              that.properties.customOpt.onImgOK({
+                path: filePath,
+              });
+            }
           } else {
             that.startPaint();
           }
